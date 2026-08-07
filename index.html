@@ -1,0 +1,1799 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Einkauf">
+  <meta name="application-version" content="1.0.0">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
+  <title>Einkauf</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f2f2f7;
+      --surface: #fff;
+      --surface-2: #e9e9ee;
+      --text: #111114;
+      --secondary: #73737a;
+      --separator: rgba(60, 60, 67, .16);
+      --accent: #6d5ce7;
+      --accent-pressed: #5b4bce;
+      --danger: #ff3b30;
+      --shadow: 0 12px 36px rgba(0, 0, 0, .12);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      overscroll-behavior-y: none;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:disabled { cursor: default; }
+
+    :focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+      outline-offset: 2px;
+    }
+
+    .app {
+      width: min(100%, 520px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top) 18px calc(112px + env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      display: flex;
+      align-items: center;
+      min-height: 82px;
+      padding-top: 8px;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+    }
+
+    .list-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+      padding: 8px 2px;
+      border: 0;
+      background: transparent;
+      font-size: 34px;
+      font-weight: 750;
+      letter-spacing: -.9px;
+      text-align: left;
+    }
+
+    .list-title-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .list-title::after {
+      content: "";
+      width: 9px;
+      height: 9px;
+      margin: -5px 0 0 2px;
+      border-right: 2.5px solid var(--secondary);
+      border-bottom: 2.5px solid var(--secondary);
+      transform: rotate(45deg);
+    }
+
+    .list-title:disabled { opacity: 1; }
+
+    .list-title:not(:disabled):active { opacity: .65; }
+    .list-title.overview-mode::after { display: none; }
+
+    .section { margin-top: 9px; }
+
+    .section-bar {
+      display: flex;
+      height: 39px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px 7px 0;
+    }
+
+    .section-heading {
+      margin: 0;
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .card {
+      overflow: hidden;
+      border-radius: 15px;
+      background: var(--surface);
+    }
+
+    .swipe-row {
+      position: relative;
+      overflow: hidden;
+      background: var(--danger);
+    }
+
+    .swipe-row + .swipe-row .item { box-shadow: inset 0 1px var(--separator); }
+
+    .delete-reveal {
+      position: absolute;
+      inset: 0 0 0 auto;
+      display: grid;
+      width: 92px;
+      place-items: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 650;
+      border: 0;
+      background: transparent;
+    }
+
+    .item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 62px;
+      padding: 8px 16px 8px 12px;
+      background: var(--surface);
+      touch-action: pan-y;
+      transition: transform .16s ease;
+    }
+
+    .item.dragging { transition: none; }
+    .check-button {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 auto;
+      margin-right: 13px;
+      padding: 0;
+      place-items: center;
+      border: 2px solid #c7c7cc;
+      border-radius: 50%;
+      background: transparent;
+      color: transparent;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .check-button:active { transform: scale(.88); }
+
+    .check-button.checked {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .item-copy {
+      min-width: 0;
+      flex: 1;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    .item-name {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow-wrap: anywhere;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .item.bought .item-name {
+      color: var(--secondary);
+      text-decoration: line-through;
+      text-decoration-thickness: 1.5px;
+    }
+
+    .clear-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      padding: 0 11px;
+      border: 0;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .clear-button[hidden] { display: none; }
+
+    .trash-icon {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .empty {
+      display: grid;
+      min-height: 62px;
+      padding: 8px 17px;
+      place-items: center;
+      color: var(--secondary);
+      font-size: 15px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .bought-placeholder {
+      display: grid;
+      min-height: 62px;
+      padding: 8px 17px;
+      place-items: center;
+      color: var(--secondary);
+      font-size: 15px;
+      text-align: center;
+    }
+
+    .add-button {
+      position: fixed;
+      z-index: 8;
+      right: max(22px, calc((100vw - 520px) / 2 + 22px));
+      bottom: calc(22px + env(safe-area-inset-bottom));
+      display: grid;
+      width: 62px;
+      height: 62px;
+      padding: 0 0 5px;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 10px 26px rgba(109, 92, 231, .3);
+      color: #fff;
+      font-size: 40px;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .add-button:active { transform: scale(.94); background: var(--accent-pressed); }
+
+    .add-button.list-mode {
+      display: inline-flex;
+      width: auto;
+      padding: 0 18px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .add-button.list-mode .small-icon { width: 18px; height: 18px; }
+
+    dialog {
+      color: var(--text);
+      font: inherit;
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, .32);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    .sheet {
+      width: min(100%, 520px);
+      height: 74dvh;
+      max-height: 700px;
+      max-width: none;
+      margin: auto auto 0;
+      padding: 0;
+      border: 0;
+      border-radius: 22px 22px 0 0;
+      background: var(--bg);
+      box-shadow: var(--shadow);
+    }
+
+    .sheet[open] { animation: rise .22s cubic-bezier(.2, .75, .25, 1); }
+
+    .sheet.closing { animation: sink .22s cubic-bezier(.55, 0, .8, .25); }
+
+    .sheet-inner {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      padding: 8px 18px calc(18px + env(safe-area-inset-bottom));
+    }
+
+    .sheet-header {
+      display: grid;
+      grid-template-columns: 64px 1fr 64px;
+      align-items: center;
+      min-height: 52px;
+    }
+
+    .sheet-header h2 { margin: 0; font-size: 18px; text-align: center; }
+
+    .text-button {
+      min-height: 44px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .text-button:first-child { text-align: left; }
+    .text-button:last-child { text-align: right; font-weight: 650; }
+
+    .search-field {
+      width: 100%;
+      height: 52px;
+      margin-top: 8px;
+      padding: 0 50px 0 16px;
+      border: 0;
+      border-radius: 13px;
+      outline: none;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 18px;
+    }
+
+    .search-field:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent); }
+
+    .search-wrap {
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .search-wrap .search-field { margin-top: 0; }
+
+    .search-field::-webkit-search-cancel-button { display: none; }
+
+    .search-clear {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      right: 8px;
+      display: grid;
+      width: 36px;
+      height: 36px;
+      padding: 0 0 3px;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: var(--secondary);
+      font-size: 25px;
+      font-weight: 500;
+      line-height: 1;
+      transform: translateY(-50%);
+    }
+
+    .search-clear[hidden] { display: none; }
+
+    .segments {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 13px;
+      padding: 2px;
+      border-radius: 10px;
+      background: var(--surface-2);
+    }
+
+    .segment {
+      min-height: 34px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--secondary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .segment.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+    }
+
+    .suggestions {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+      overflow-y: auto;
+      margin-top: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .suggestions.fade-top {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
+    }
+
+    .suggestions.fade-bottom {
+      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 18px), transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 18px), transparent 100%);
+    }
+
+    .suggestions.fade-both {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+    }
+
+    .suggestion {
+      display: flex;
+      width: 100%;
+      min-height: 54px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--surface);
+      text-align: left;
+    }
+
+    .suggestion:active { background: var(--surface-2); }
+
+    .suggestion-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 17px;
+    }
+
+    .suggestion.add-new { color: var(--text); font-weight: 400; }
+
+    .suggestion.already-listed {
+      color: var(--secondary);
+      cursor: default;
+    }
+
+    .suggestion-status {
+      flex: 0 0 auto;
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .suggestions-empty {
+      padding: 28px 18px;
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--secondary);
+      font-size: 15px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .list-options {
+      margin-top: 12px;
+    }
+
+    .list-option {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      min-height: 58px;
+      background: var(--surface);
+      touch-action: pan-y;
+      transition: transform .16s ease, opacity .15s;
+    }
+
+    .list-option-shell {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 9px;
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .list-overview {
+      padding-top: 18px;
+      animation: overviewIn .2s ease-out;
+    }
+
+    .list-overview[hidden] { display: none; }
+
+    .list-overview .list-option-shell {
+      margin-bottom: 12px;
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, .04);
+    }
+
+    .list-overview .list-option { min-height: 82px; }
+
+    .list-overview .list-select {
+      height: 82px;
+      padding-left: 18px;
+      font-size: 20px;
+    }
+
+    .list-overview .list-select.active {
+      box-shadow: inset 4px 0 var(--accent);
+    }
+
+    .list-action,
+    .list-select {
+      border: 0;
+      background: transparent;
+    }
+
+    .list-select {
+      min-width: 0;
+      height: 58px;
+      overflow: hidden;
+      padding: 0 8px;
+      font-size: 17px;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .list-select.active { color: var(--accent); font-weight: 650; }
+
+    .inline-list-input {
+      min-width: 0;
+      height: 42px;
+      margin: 0 12px 0 18px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 10px;
+      outline: none;
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 17px;
+    }
+
+    .inline-list-input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent); }
+
+    .list-action.save-list-name {
+      display: inline-flex;
+      width: 88px;
+      height: 40px;
+      margin-right: 12px;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      border-radius: 11px;
+      background: color-mix(in srgb, #248a3d 12%, var(--surface));
+      color: #248a3d;
+    }
+
+    .list-action {
+      display: grid;
+      width: 40px;
+      height: 48px;
+      place-items: center;
+      color: var(--secondary);
+    }
+
+    .list-row-actions {
+      display: flex;
+      gap: 8px;
+      margin-right: 12px;
+    }
+
+    .list-icon-action {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 11px;
+    }
+
+    .delete-list-button {
+      background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+      color: var(--danger);
+    }
+
+    .rename-list {
+      background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+      color: var(--accent);
+    }
+
+    .rename-list .small-icon,
+    .delete-list-button .small-icon,
+    .save-list-name .small-icon { width: 18px; height: 18px; }
+
+    .small-icon {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .dialog-card {
+      width: min(calc(100% - 36px), 360px);
+      padding: 20px;
+      border: 0;
+      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .dialog-card h2 { margin: 0 0 8px; font-size: 20px; text-align: center; }
+    .dialog-card p { margin: 0 0 17px; color: var(--secondary); line-height: 1.4; text-align: center; }
+
+    .dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .dialog-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--surface-2);
+      font-weight: 650;
+    }
+
+    .dialog-button.primary { background: var(--accent); color: #fff; }
+    .dialog-button.danger {
+      background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+      color: var(--danger);
+    }
+
+    .error {
+      min-height: 22px;
+      margin: 8px 4px 0;
+      color: var(--danger);
+      font-size: 14px;
+    }
+
+    .error:empty { display: none; }
+
+    .toast {
+      position: fixed;
+      z-index: 30;
+      inset: auto auto calc(98px + env(safe-area-inset-bottom)) 50%;
+      margin: 0;
+      max-width: calc(100% - 40px);
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(28, 28, 30, .92);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.35;
+      opacity: 0;
+      pointer-events: none;
+      text-align: center;
+      transform: translate(-50%, 12px);
+      transition: opacity .18s, transform .18s;
+    }
+
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+    @keyframes rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes sink { from { transform: translateY(0); } to { transform: translateY(100%); } }
+    @keyframes overviewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .view-enter { animation: overviewIn .2s ease-out; }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000;
+        --surface: #1c1c1e;
+        --surface-2: #2c2c2e;
+        --text: #f5f5f7;
+        --secondary: #98989d;
+        --separator: rgba(84, 84, 88, .65);
+        --shadow: 0 -12px 36px rgba(0, 0, 0, .5);
+        --accent: #8b7cf6;
+        --accent-pressed: #7666e2;
+      }
+      .check-button { border-color: #545458; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <button class="list-title" id="listTitle" type="button" aria-expanded="false"><span class="list-title-text" id="listTitleText">Einkauf</span></button>
+    </header>
+
+    <section class="section" id="openSection" aria-labelledby="openHeading">
+      <div class="section-bar"><h2 class="section-heading" id="openHeading">Offen</h2></div>
+      <div class="card" id="openItems" aria-live="polite"></div>
+    </section>
+
+    <section class="section" id="boughtSection" aria-labelledby="boughtHeading">
+      <div class="section-bar">
+        <h2 class="section-heading" id="boughtHeading">Eingekauft</h2>
+        <button class="clear-button" id="clearBought" type="button" hidden><svg class="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg>Entfernen</button>
+      </div>
+      <div class="card" id="boughtItems" aria-live="polite"></div>
+    </section>
+
+    <section class="list-overview" id="listOverview" hidden aria-labelledby="listOverviewHeading">
+      <h2 class="section-heading" id="listOverviewHeading">Deine Listen</h2>
+      <div class="list-options" id="listOptions"></div>
+    </section>
+  </main>
+
+  <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen">+</button>
+
+  <dialog class="sheet" id="addSheet" aria-labelledby="addTitle">
+    <form class="sheet-inner" id="addForm">
+      <div class="sheet-header">
+        <span aria-hidden="true"></span>
+        <h2 id="addTitle">Artikel hinzufügen</h2>
+        <button class="text-button" id="doneAdd" type="button">Fertig</button>
+      </div>
+      <div class="search-wrap">
+        <input class="search-field" id="productName" name="productName" type="search" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="120" placeholder="Artikel suchen" aria-describedby="addError">
+        <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
+      </div>
+      <div class="segments" role="group" aria-label="Sortierung">
+        <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Häufig</button>
+        <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
+      </div>
+      <p class="error" id="addError" role="alert"></p>
+      <div class="suggestions" id="suggestions"></div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog-card" id="listNameDialog" aria-labelledby="listNameTitle">
+    <form id="listNameForm">
+      <h2 id="listNameTitle">Neue Liste</h2>
+      <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="80" placeholder="Listenname" required>
+      <div class="dialog-actions">
+        <button class="dialog-button" id="cancelListName" type="button">Abbrechen</button>
+        <button class="dialog-button primary" type="submit">Sichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog-card" id="deleteListDialog" aria-labelledby="deleteListTitle">
+    <h2 id="deleteListTitle">Liste löschen?</h2>
+    <p id="deleteListText"></p>
+    <div class="dialog-actions">
+      <button class="dialog-button" id="cancelDeleteList" type="button">Abbrechen</button>
+      <button class="dialog-button danger" id="confirmDeleteList" type="button">Löschen</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" popover="manual"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const DB_NAME = "einkaufslisten-app";
+      const DB_VERSION = 1;
+      const DEFAULT_LIST_NAME = "Einkauf";
+      const MAX_LIST_NAME_LENGTH = 40;
+      const MAX_PRODUCT_NAME_LENGTH = 60;
+      const SWIPE_ACTION_WIDTH = 92;
+      const collator = new Intl.Collator("de", { sensitivity: "base" });
+      const state = {
+        db: null,
+        list: null,
+        lists: [],
+        items: [],
+        history: [],
+        quickMode: "frequent",
+        inlineEditingListId: null,
+        pendingListDelete: null,
+        showingLists: false,
+        listLoadToken: 0,
+        operations: new Set()
+      };
+      const els = {
+        listTitle: document.querySelector("#listTitle"),
+        listTitleText: document.querySelector("#listTitleText"),
+        openSection: document.querySelector("#openSection"),
+        boughtSection: document.querySelector("#boughtSection"),
+        listOverview: document.querySelector("#listOverview"),
+        openItems: document.querySelector("#openItems"),
+        boughtItems: document.querySelector("#boughtItems"),
+        clearBought: document.querySelector("#clearBought"),
+        openAdd: document.querySelector("#openAdd"),
+        addSheet: document.querySelector("#addSheet"),
+        addForm: document.querySelector("#addForm"),
+        doneAdd: document.querySelector("#doneAdd"),
+        productName: document.querySelector("#productName"),
+        clearSearch: document.querySelector("#clearSearch"),
+        addError: document.querySelector("#addError"),
+        frequentMode: document.querySelector("#frequentMode"),
+        alphabeticalMode: document.querySelector("#alphabeticalMode"),
+        suggestions: document.querySelector("#suggestions"),
+        listOptions: document.querySelector("#listOptions"),
+        listNameDialog: document.querySelector("#listNameDialog"),
+        listNameForm: document.querySelector("#listNameForm"),
+        listNameTitle: document.querySelector("#listNameTitle"),
+        listNameInput: document.querySelector("#listNameInput"),
+        cancelListName: document.querySelector("#cancelListName"),
+        deleteListDialog: document.querySelector("#deleteListDialog"),
+        deleteListText: document.querySelector("#deleteListText"),
+        cancelDeleteList: document.querySelector("#cancelDeleteList"),
+        confirmDeleteList: document.querySelector("#confirmDeleteList"),
+        toast: document.querySelector("#toast")
+      };
+      let toastHideTimer;
+      let toastCloseTimer;
+      let scrollFadeFrame;
+
+      const id = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const clean = (value) => String(value ?? "").normalize("NFC").trim();
+      const comparable = (value) => clean(value).toLocaleLowerCase("de-DE");
+      const byName = (a, b) => collator.compare(a.productName, b.productName);
+
+      async function runExclusive(key, operation) {
+        if (state.operations.has(key)) return;
+        state.operations.add(key);
+        try {
+          return await operation();
+        } finally {
+          state.operations.delete(key);
+        }
+      }
+
+      function request(requestObject) {
+        return new Promise((resolve, reject) => {
+          requestObject.onsuccess = () => resolve(requestObject.result);
+          requestObject.onerror = () => reject(requestObject.error);
+        });
+      }
+
+      function openDatabase() {
+        return new Promise((resolve, reject) => {
+          const opening = indexedDB.open(DB_NAME, DB_VERSION);
+          let settled = false;
+          opening.onupgradeneeded = () => {
+            const db = opening.result;
+            if (!db.objectStoreNames.contains("lists")) {
+              db.createObjectStore("lists", { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains("items")) {
+              const items = db.createObjectStore("items", { keyPath: "id" });
+              items.createIndex("listId", "listId", { unique: false });
+            }
+            if (!db.objectStoreNames.contains("history")) {
+              const history = db.createObjectStore("history", { keyPath: "id" });
+              history.createIndex("listId", "listId", { unique: false });
+            }
+            if (!db.objectStoreNames.contains("settings")) {
+              db.createObjectStore("settings", { keyPath: "key" });
+            }
+          };
+          opening.onsuccess = () => {
+            const db = opening.result;
+            if (settled) {
+              db.close();
+              return;
+            }
+            settled = true;
+            db.onversionchange = () => db.close();
+            resolve(db);
+          };
+          opening.onerror = () => {
+            if (settled) return;
+            settled = true;
+            reject(opening.error);
+          };
+          opening.onblocked = () => {
+            if (settled) return;
+            settled = true;
+            reject(new Error("Die Datenbank wird noch von einer älteren App-Version verwendet."));
+          };
+        });
+      }
+
+      function store(name, mode = "readonly") {
+        return state.db.transaction(name, mode).objectStore(name);
+      }
+
+      function transact(storeNames, mode, operation) {
+        return new Promise((resolve, reject) => {
+          const transaction = state.db.transaction(storeNames, mode);
+          let result;
+          transaction.oncomplete = () => resolve(result);
+          transaction.onerror = () => reject(transaction.error);
+          transaction.onabort = () => reject(transaction.error || new DOMException("Transaktion abgebrochen", "AbortError"));
+          try {
+            result = operation(transaction);
+          } catch (error) {
+            transaction.abort();
+            reject(error);
+          }
+        });
+      }
+
+      function put(name, value) {
+        return transact([name], "readwrite", (transaction) => {
+          transaction.objectStore(name).put(value);
+        });
+      }
+
+      async function getAll(name) {
+        return request(store(name).getAll());
+      }
+
+      async function getItemsForList(listId) {
+        const objectStore = store("items");
+        return request(objectStore.index("listId").getAll(listId));
+      }
+
+      async function getHistoryForList(listId) {
+        const objectStore = store("history");
+        return request(objectStore.index("listId").getAll(listId));
+      }
+
+      function deleteRecords(storeName, ids) {
+        if (!ids.length) return Promise.resolve();
+        return transact([storeName], "readwrite", (transaction) => {
+          const objectStore = transaction.objectStore(storeName);
+          ids.forEach((recordId) => objectStore.delete(recordId));
+        });
+      }
+
+      function putItemAndHistory(item, historyItem) {
+        return transact(["items", "history"], "readwrite", (transaction) => {
+          transaction.objectStore("items").put(item);
+          if (historyItem) transaction.objectStore("history").put(historyItem);
+        });
+      }
+
+      async function deleteItem(item) {
+        return runExclusive(`item:${item.id}`, async () => {
+          try {
+            await deleteRecords("items", [item.id]);
+            state.items = state.items.filter((entry) => entry.id !== item.id);
+            renderItems();
+            showToast(`${item.productName} entfernt`);
+          } catch (error) {
+            console.error(error);
+            showToast("Artikel konnte nicht entfernt werden");
+            renderItems();
+          }
+        });
+      }
+
+      async function initialiseData() {
+        state.lists = (await getAll("lists")).sort((a, b) =>
+          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
+        );
+        let activeList = state.lists[0];
+        if (!activeList) {
+          activeList = { id: id(), name: DEFAULT_LIST_NAME, sortOrder: 0 };
+          await put("lists", activeList);
+          state.lists = [activeList];
+        }
+        const lastOpened = await request(store("settings").get("lastOpenedListId"));
+        activeList = state.lists.find((list) => list.id === lastOpened?.value) || activeList;
+        state.list = activeList;
+        await put("settings", { key: "lastOpenedListId", value: activeList.id });
+        const data = await loadListData(activeList.id);
+        state.items = data.items;
+        state.history = data.history;
+      }
+
+      async function loadListData(listId) {
+        const [items, history] = await Promise.all([getItemsForList(listId), getHistoryForList(listId)]);
+        return {
+          items: items.sort((a, b) => (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0)),
+          history
+        };
+      }
+
+      function renderItems() {
+        els.listTitleText.textContent = state.showingLists ? "Listen" : state.list.name;
+        els.listTitle.setAttribute("aria-expanded", String(state.showingLists));
+        els.openItems.replaceChildren();
+        els.boughtItems.replaceChildren();
+        const openItems = state.items.filter((item) => !item.checked);
+        const boughtItems = state.items.filter((item) => item.checked);
+        if (!openItems.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          const inner = document.createElement("div");
+          inner.textContent = "Deine Einkaufsliste ist leer";
+          empty.append(inner);
+          els.openItems.append(empty);
+        } else {
+          renderRows(els.openItems, openItems);
+        }
+
+        if (!boughtItems.length) {
+          const placeholder = document.createElement("div");
+          placeholder.className = "bought-placeholder";
+          placeholder.textContent = "Noch keine eingekauften Artikel";
+          els.boughtItems.append(placeholder);
+        } else {
+          renderRows(els.boughtItems, boughtItems);
+        }
+        els.clearBought.hidden = boughtItems.length === 0;
+      }
+
+      function renderRows(container, items) {
+        const fragment = document.createDocumentFragment();
+        items.forEach((item) => {
+          const shell = document.createElement("div");
+          shell.className = "swipe-row";
+          const reveal = document.createElement("button");
+          reveal.type = "button";
+          reveal.className = "delete-reveal";
+          reveal.textContent = "Entfernen";
+          reveal.setAttribute("aria-label", `${item.productName} entfernen`);
+          const row = document.createElement("div");
+          row.className = `item${item.checked ? " bought" : ""}`;
+          const check = document.createElement("button");
+          check.type = "button";
+          check.className = `check-button${item.checked ? " checked" : ""}`;
+          check.textContent = "✓";
+          check.setAttribute("aria-label", item.checked ? `${item.productName} wieder öffnen` : `${item.productName} als gekauft markieren`);
+          check.setAttribute("aria-pressed", String(item.checked));
+          check.addEventListener("click", () => toggleItem(item));
+          const copy = document.createElement("div");
+          copy.className = "item-copy";
+          const name = document.createElement("span");
+          name.className = "item-name";
+          name.textContent = item.productName;
+          copy.append(name);
+          row.append(check, copy);
+          shell.append(reveal, row);
+          bindSwipeGesture(row, reveal, () => deleteItem(item), ".check-button");
+          fragment.append(shell);
+        });
+        container.append(fragment);
+      }
+
+      function bindSwipeGesture(row, reveal, onDelete, ignoreSelector = "") {
+        let startX = 0;
+        let startY = 0;
+        let deltaX = 0;
+        let pointerId;
+        let active = false;
+        let opened = false;
+        let captured = false;
+        let rowWidth = 0;
+
+        const reset = () => {
+          row.classList.remove("dragging");
+          row.style.transform = "";
+          active = false;
+          opened = false;
+          captured = false;
+        };
+
+        row.addEventListener("pointerdown", (event) => {
+          if (event.button !== 0 || (ignoreSelector && event.target.closest(ignoreSelector))) return;
+          pointerId = event.pointerId;
+          startX = event.clientX;
+          startY = event.clientY;
+          deltaX = 0;
+          rowWidth = row.offsetWidth;
+          active = true;
+          captured = false;
+        });
+
+        row.addEventListener("pointermove", (event) => {
+          if (!active || event.pointerId !== pointerId) return;
+          deltaX = event.clientX - startX;
+          const deltaY = event.clientY - startY;
+          const offset = (opened ? -SWIPE_ACTION_WIDTH : 0) + deltaX;
+          if (offset < 0 && Math.abs(deltaX) > Math.abs(deltaY)) {
+            event.preventDefault();
+            if (!captured) {
+              try { row.setPointerCapture?.(pointerId); } catch (_) {}
+              captured = true;
+            }
+            row.classList.add("dragging");
+            row.style.transform = `translateX(${Math.max(-rowWidth, Math.min(0, offset))}px)`;
+          }
+        });
+
+        const finish = (event) => {
+          if (!active || event.pointerId !== pointerId) return;
+          const offset = (opened ? -SWIPE_ACTION_WIDTH : 0) + deltaX;
+          if (offset < -Math.min(180, rowWidth * .45)) {
+            row.dataset.suppressClick = "true";
+            row.style.transform = "translateX(-100%)";
+            active = false;
+            setTimeout(onDelete, 120);
+          } else if (offset < -34) {
+            row.dataset.suppressClick = "true";
+            row.classList.remove("dragging");
+            row.style.transform = `translateX(-${SWIPE_ACTION_WIDTH}px)`;
+            active = false;
+            opened = true;
+          } else {
+            reset();
+          }
+          setTimeout(() => { delete row.dataset.suppressClick; }, 0);
+          pointerId = undefined;
+        };
+
+        row.addEventListener("pointerup", finish);
+        row.addEventListener("pointercancel", reset);
+        row.addEventListener("contextmenu", (event) => event.preventDefault());
+        reveal.addEventListener("click", onDelete);
+      }
+
+      async function toggleItem(item) {
+        return runExclusive(`item:${item.id}`, async () => {
+          const currentItem = state.items.find((entry) => entry.id === item.id);
+          if (!currentItem) return;
+          const willBeChecked = !currentItem.checked;
+          const updatedItem = { ...currentItem, checked: willBeChecked };
+          const existingHistory = state.history.find((entry) => comparable(entry.productName) === comparable(currentItem.productName));
+          const updatedHistory = {
+            ...(existingHistory || { id: id(), listId: state.list.id, productName: currentItem.productName }),
+            purchaseCount: Math.max(0, Number(existingHistory?.purchaseCount || 0) + (willBeChecked ? 1 : -1))
+          };
+
+          try {
+            await putItemAndHistory(updatedItem, updatedHistory);
+            state.items = state.items.map((entry) => entry.id === updatedItem.id ? updatedItem : entry);
+            state.history = existingHistory
+              ? state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry)
+              : [...state.history, updatedHistory];
+            renderItems();
+          } catch (error) {
+            console.error(error);
+            showToast("Änderung konnte nicht gespeichert werden");
+          }
+        });
+      }
+
+      async function clearBoughtItems() {
+        const bought = state.items.filter((item) => item.checked);
+        if (!bought.length) return;
+        return runExclusive("clear-bought", async () => {
+          try {
+            await deleteRecords("items", bought.map((item) => item.id));
+            const removedIds = new Set(bought.map((item) => item.id));
+            state.items = state.items.filter((item) => !removedIds.has(item.id));
+            renderItems();
+            showToast(`${bought.length} Artikel entfernt`);
+          } catch (error) {
+            console.error(error);
+            showToast("Artikel konnten nicht entfernt werden");
+          }
+        });
+      }
+
+      function showToast(message) {
+        clearTimeout(toastHideTimer);
+        clearTimeout(toastCloseTimer);
+        els.toast.textContent = message;
+        try {
+          if (els.toast.showPopover && !els.toast.matches(":popover-open")) els.toast.showPopover();
+        } catch (error) {
+          console.debug("Toast-Popover nicht verfügbar", error);
+        }
+        els.toast.classList.add("visible");
+        toastHideTimer = setTimeout(() => {
+          els.toast.classList.remove("visible");
+          toastCloseTimer = setTimeout(() => {
+            try {
+              if (els.toast.hidePopover && els.toast.matches(":popover-open")) els.toast.hidePopover();
+            } catch (error) {
+              console.debug("Toast-Popover konnte nicht geschlossen werden", error);
+            }
+          }, 180);
+        }, 1800);
+      }
+
+      function showListOverview() {
+        state.showingLists = true;
+        els.openSection.hidden = true;
+        els.boughtSection.hidden = true;
+        els.listOverview.hidden = false;
+        els.listTitleText.textContent = "Listen";
+        els.listTitle.classList.add("overview-mode");
+        els.listTitle.setAttribute("aria-expanded", "true");
+        els.openAdd.classList.add("list-mode");
+        els.openAdd.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Neue Liste</span>';
+        els.openAdd.setAttribute("aria-label", "Liste hinzufügen");
+        renderListOptions();
+      }
+
+      function showShoppingList() {
+        state.showingLists = false;
+        els.openSection.hidden = false;
+        els.boughtSection.hidden = false;
+        els.listOverview.hidden = true;
+        els.listTitleText.textContent = state.list.name;
+        els.listTitle.classList.remove("overview-mode");
+        els.listTitle.setAttribute("aria-expanded", "false");
+        els.openAdd.classList.remove("list-mode");
+        els.openAdd.textContent = "+";
+        els.openAdd.setAttribute("aria-label", "Artikel hinzufügen");
+        els.openSection.classList.remove("view-enter");
+        els.boughtSection.classList.remove("view-enter");
+        void els.openSection.offsetWidth;
+        els.openSection.classList.add("view-enter");
+        els.boughtSection.classList.add("view-enter");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function makeListAction(label, iconPath, className = "") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `list-action ${className}`.trim();
+        button.setAttribute("aria-label", label);
+        button.innerHTML = `<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true">${iconPath}</svg>`;
+        return button;
+      }
+
+      function renderListOptions() {
+        els.listOptions.replaceChildren();
+        const fragment = document.createDocumentFragment();
+        state.lists.forEach((list) => {
+          const shell = document.createElement("div");
+          shell.className = "list-option-shell";
+          shell.dataset.listId = list.id;
+          const row = document.createElement("div");
+          row.className = "list-option";
+          const select = document.createElement("button");
+          select.type = "button";
+          select.className = `list-select${list.id === state.list.id ? " active" : ""}`;
+          select.textContent = list.name;
+          if (list.id === state.list.id) select.setAttribute("aria-current", "true");
+          select.addEventListener("click", () => {
+            if (row.dataset.suppressClick === "true") return;
+            switchList(list);
+          });
+          const rename = makeListAction(`${list.name} umbenennen`, '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>');
+          rename.classList.add("list-icon-action", "rename-list");
+          rename.addEventListener("click", () => startInlineRename(list));
+          const remove = makeListAction(`${list.name} löschen`, '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/>');
+          remove.classList.add("list-icon-action", "delete-list-button");
+          remove.addEventListener("click", () => askDeleteList(list));
+          const actions = document.createElement("div");
+          actions.className = "list-row-actions";
+          actions.append(rename, remove);
+          row.append(select, actions);
+          shell.append(row);
+          fragment.append(shell);
+        });
+        els.listOptions.append(fragment);
+      }
+
+      function cancelInlineRename() {
+        if (!state.inlineEditingListId) return;
+        state.inlineEditingListId = null;
+        renderListOptions();
+      }
+
+      function startInlineRename(list) {
+        state.inlineEditingListId = null;
+        renderListOptions();
+        const shell = [...els.listOptions.querySelectorAll(".list-option-shell")]
+          .find((entry) => entry.dataset.listId === list.id);
+        if (!shell) return;
+        const row = shell.querySelector(".list-option");
+        const select = row.querySelector(".list-select");
+        const actions = row.querySelector(".list-row-actions");
+        state.inlineEditingListId = list.id;
+        const input = document.createElement("input");
+        input.className = "inline-list-input";
+        input.type = "text";
+        input.value = list.name;
+        input.maxLength = 80;
+        input.setAttribute("aria-label", "Listenname");
+        const saveAction = document.createElement("button");
+        saveAction.type = "button";
+        saveAction.className = "list-action save-list-name";
+        saveAction.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
+        saveAction.setAttribute("aria-label", "Listenname sichern");
+        select.replaceWith(input);
+        actions.replaceWith(saveAction);
+
+        const save = async () => {
+          return runExclusive(`rename-list:${list.id}`, async () => {
+            const name = clean(input.value);
+            if (!name) {
+              input.focus();
+              return;
+            }
+            if (name.length > MAX_LIST_NAME_LENGTH) {
+              showToast(`Listenname: maximal ${MAX_LIST_NAME_LENGTH} Zeichen`);
+              input.focus();
+              return;
+            }
+            const duplicate = state.lists.some((entry) => entry.id !== list.id && comparable(entry.name) === comparable(name));
+            if (duplicate) {
+              input.setAttribute("aria-invalid", "true");
+              showToast("Liste bereits vorhanden");
+              input.select();
+              return;
+            }
+            if (name === list.name) {
+              cancelInlineRename();
+              return;
+            }
+
+            saveAction.disabled = true;
+            try {
+              const updatedList = { ...list, name };
+              await put("lists", updatedList);
+              Object.assign(list, updatedList);
+              state.inlineEditingListId = null;
+              renderItems();
+              renderListOptions();
+              showToast("Liste umbenannt");
+            } catch (error) {
+              console.error(error);
+              showToast("Liste konnte nicht umbenannt werden");
+              saveAction.disabled = false;
+            }
+          });
+        };
+
+        saveAction.addEventListener("click", save);
+        input.addEventListener("input", () => input.removeAttribute("aria-invalid"));
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            save();
+          } else if (event.key === "Escape") {
+            cancelInlineRename();
+          }
+        });
+        input.focus({ preventScroll: true });
+        input.select();
+      }
+
+      async function switchList(list) {
+        const loadToken = ++state.listLoadToken;
+        if (list.id === state.list.id) {
+          showShoppingList();
+          return;
+        }
+        try {
+          const data = await loadListData(list.id);
+          if (loadToken !== state.listLoadToken) return;
+          await put("settings", { key: "lastOpenedListId", value: list.id });
+          if (loadToken !== state.listLoadToken) return;
+          state.list = list;
+          state.items = data.items;
+          state.history = data.history;
+          renderItems();
+          showShoppingList();
+        } catch (error) {
+          console.error(error);
+          showToast("Liste konnte nicht geöffnet werden");
+        }
+      }
+
+      function openListEditor() {
+        els.listNameTitle.textContent = "Neue Liste";
+        els.listNameInput.value = "";
+        els.listNameDialog.showModal();
+        els.listNameInput.focus({ preventScroll: true });
+      }
+
+      async function saveListName(event) {
+        event.preventDefault();
+        return runExclusive("create-list", async () => {
+          const name = clean(els.listNameInput.value);
+          if (!name) {
+            els.listNameInput.focus();
+            return;
+          }
+          if (name.length > MAX_LIST_NAME_LENGTH) {
+            showToast(`Listenname: maximal ${MAX_LIST_NAME_LENGTH} Zeichen`);
+            els.listNameInput.focus();
+            return;
+          }
+          const duplicate = state.lists.some((list) => comparable(list.name) === comparable(name));
+          if (duplicate) {
+            showToast("Liste bereits vorhanden");
+            els.listNameInput.select();
+            return;
+          }
+
+          const list = { id: id(), name, sortOrder: state.lists.length };
+          const submitButton = event.currentTarget.querySelector('[type="submit"]');
+          submitButton.disabled = true;
+          try {
+            await transact(["lists", "settings"], "readwrite", (transaction) => {
+              transaction.objectStore("lists").put(list);
+              transaction.objectStore("settings").put({ key: "lastOpenedListId", value: list.id });
+            });
+            state.lists.push(list);
+            state.list = list;
+            state.items = [];
+            state.history = [];
+            els.listNameDialog.close();
+            renderItems();
+            showShoppingList();
+            showToast(`${name} erstellt`);
+          } catch (error) {
+            console.error(error);
+            showToast("Liste konnte nicht erstellt werden");
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+      }
+
+      function askDeleteList(list) {
+        state.pendingListDelete = list;
+        els.deleteListText.textContent = `„${list.name}“ und die Produkthistorie der Liste werden dauerhaft gelöscht. Andere Listen und deren Produkte bleiben unberührt`;
+        els.deleteListDialog.showModal();
+      }
+
+      function deleteListData(transaction, listId) {
+        ["items", "history"].forEach((storeName) => {
+          const objectStore = transaction.objectStore(storeName);
+          const cursorRequest = objectStore.index("listId").openKeyCursor(IDBKeyRange.only(listId));
+          cursorRequest.onsuccess = () => {
+            const cursor = cursorRequest.result;
+            if (!cursor) return;
+            objectStore.delete(cursor.primaryKey);
+            cursor.continue();
+          };
+        });
+      }
+
+      async function deletePendingList() {
+        const list = state.pendingListDelete;
+        if (!list) return;
+        return runExclusive(`delete-list:${list.id}`, async () => {
+          els.confirmDeleteList.disabled = true;
+          try {
+            let nextLists = state.lists.filter((entry) => entry.id !== list.id);
+            if (!nextLists.length) nextLists = [{ id: id(), name: DEFAULT_LIST_NAME, sortOrder: 0 }];
+            nextLists = nextLists.map((entry, index) => ({ ...entry, sortOrder: index }));
+            const deletingActiveList = state.list.id === list.id;
+            const nextActiveList = deletingActiveList
+              ? nextLists[0]
+              : nextLists.find((entry) => entry.id === state.list.id) || nextLists[0];
+            const nextData = deletingActiveList && state.lists.length > 1
+              ? await loadListData(nextActiveList.id)
+              : { items: deletingActiveList ? [] : state.items, history: deletingActiveList ? [] : state.history };
+
+            await transact(["lists", "items", "history", "settings"], "readwrite", (transaction) => {
+              transaction.objectStore("lists").delete(list.id);
+              deleteListData(transaction, list.id);
+              nextLists.forEach((entry) => transaction.objectStore("lists").put(entry));
+              transaction.objectStore("settings").put({ key: "lastOpenedListId", value: nextActiveList.id });
+            });
+
+            state.lists = nextLists;
+            state.list = nextActiveList;
+            state.items = nextData.items;
+            state.history = nextData.history;
+            els.deleteListDialog.close();
+            state.pendingListDelete = null;
+            renderItems();
+            renderListOptions();
+            showToast("Liste gelöscht");
+          } catch (error) {
+            console.error(error);
+            showToast("Liste konnte nicht gelöscht werden");
+          } finally {
+            els.confirmDeleteList.disabled = false;
+          }
+        });
+      }
+
+      function openAddSheet() {
+        els.addForm.reset();
+        els.addError.textContent = "";
+        setQuickMode("frequent");
+        els.addSheet.showModal();
+        els.productName.focus({ preventScroll: true });
+      }
+
+      function closeAddSheet() {
+        if (!els.addSheet.open || els.addSheet.classList.contains("closing")) return;
+        document.activeElement?.blur();
+        els.addSheet.classList.add("closing");
+        setTimeout(() => {
+          els.addSheet.close();
+          els.addSheet.classList.remove("closing");
+          els.openAdd.focus({ preventScroll: true });
+        }, 220);
+      }
+
+      function setQuickMode(mode) {
+        state.quickMode = mode;
+        const frequent = mode === "frequent";
+        els.frequentMode.classList.toggle("active", frequent);
+        els.alphabeticalMode.classList.toggle("active", !frequent);
+        els.frequentMode.setAttribute("aria-pressed", String(frequent));
+        els.alphabeticalMode.setAttribute("aria-pressed", String(!frequent));
+        renderSuggestions();
+      }
+
+      function renderSuggestions() {
+        if (!state.list) return;
+        const query = comparable(els.productName.value);
+        els.clearSearch.hidden = els.productName.value.length === 0;
+        const openNames = new Set(state.items.filter((item) => !item.checked).map((item) => comparable(item.productName)));
+        const knownProductMap = new Map();
+        state.history.forEach((entry) => {
+          const key = comparable(entry.productName);
+          if (key && !knownProductMap.has(key)) knownProductMap.set(key, entry);
+        });
+        state.items.forEach((item) => {
+          const key = comparable(item.productName);
+          if (key && !knownProductMap.has(key)) knownProductMap.set(key, { productName: item.productName, purchaseCount: 0 });
+        });
+        const knownProducts = [...knownProductMap.values()];
+        let matches = knownProducts.filter((entry) => {
+          const name = comparable(entry.productName);
+          return !query || name.includes(query);
+        });
+
+        matches.sort(state.quickMode === "frequent"
+          ? (a, b) => Number(b.purchaseCount || 0) - Number(a.purchaseCount || 0) || byName(a, b)
+          : byName);
+
+        els.suggestions.replaceChildren();
+        const fragment = document.createDocumentFragment();
+        const exactHistoryMatch = knownProductMap.has(query);
+        if (query && !openNames.has(query) && !exactHistoryMatch) {
+          const addNew = document.createElement("button");
+          addNew.type = "button";
+          addNew.className = "suggestion add-new";
+          addNew.textContent = clean(els.productName.value);
+          addNew.addEventListener("click", () => addProduct(els.productName.value));
+          fragment.append(addNew);
+        }
+
+        matches.forEach((entry) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "suggestion";
+          const isOnList = openNames.has(comparable(entry.productName));
+          if (isOnList) {
+            button.classList.add("already-listed");
+            button.disabled = true;
+          }
+          const name = document.createElement("span");
+          name.className = "suggestion-name";
+          name.textContent = entry.productName;
+          button.append(name);
+          if (isOnList) {
+            const status = document.createElement("span");
+            status.className = "suggestion-status";
+            status.textContent = "Auf der Liste";
+            button.append(status);
+          } else {
+            button.addEventListener("click", () => addProduct(entry.productName));
+          }
+          fragment.append(button);
+        });
+
+        if (!fragment.childNodes.length) {
+          const empty = document.createElement("div");
+          empty.className = "suggestions-empty";
+          if (query) {
+            empty.textContent = "Kein Treffer";
+          } else if (!state.history.length) {
+            empty.textContent = "Tippe oben einen Artikelnamen ein";
+          } else {
+            empty.textContent = "Alle bekannten Produkte stehen bereits auf der Liste";
+          }
+          fragment.append(empty);
+        }
+        els.suggestions.append(fragment);
+        scheduleScrollFade();
+      }
+
+      function updateScrollFade() {
+        const element = els.suggestions;
+        const hasTop = element.scrollTop > 3;
+        const hasBottom = element.scrollTop + element.clientHeight < element.scrollHeight - 3;
+        element.classList.remove("fade-top", "fade-bottom", "fade-both");
+        if (hasTop && hasBottom) element.classList.add("fade-both");
+        else if (hasTop) element.classList.add("fade-top");
+        else if (hasBottom) element.classList.add("fade-bottom");
+      }
+
+      function scheduleScrollFade() {
+        if (scrollFadeFrame) return;
+        scrollFadeFrame = requestAnimationFrame(() => {
+          scrollFadeFrame = 0;
+          updateScrollFade();
+        });
+      }
+
+      async function addProduct(value) {
+        return runExclusive("add-product", async () => {
+          const productName = clean(value);
+          if (!productName) {
+            els.addError.textContent = "Bitte gib einen Artikelnamen ein";
+            els.productName.focus();
+            return;
+          }
+          if (productName.length > MAX_PRODUCT_NAME_LENGTH) {
+            els.addError.textContent = "";
+            showToast(`Artikelname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
+            els.productName.focus();
+            return;
+          }
+
+          const productKey = comparable(productName);
+          const openDuplicate = state.items.find((item) => !item.checked && comparable(item.productName) === productKey);
+          if (openDuplicate) {
+            els.addError.textContent = "";
+            renderSuggestions();
+            els.productName.focus();
+            return;
+          }
+
+          try {
+            const boughtItem = state.items.find((item) => item.checked && comparable(item.productName) === productKey);
+            const existingHistory = state.history.find((entry) => comparable(entry.productName) === productKey);
+            if (boughtItem) {
+              const reopenedItem = { ...boughtItem, checked: false, createdAt: Date.now() };
+              const updatedHistory = existingHistory
+                ? { ...existingHistory, purchaseCount: Math.max(0, Number(existingHistory.purchaseCount || 0) - 1) }
+                : null;
+              await putItemAndHistory(reopenedItem, updatedHistory);
+              state.items = [...state.items.filter((item) => item.id !== reopenedItem.id), reopenedItem];
+              if (updatedHistory) {
+                state.history = state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry);
+              }
+              finishAddingProduct(reopenedItem.productName);
+              return;
+            }
+
+            const item = {
+              id: id(),
+              listId: state.list.id,
+              productName,
+              checked: false,
+              createdAt: Date.now()
+            };
+            const historyItem = existingHistory ? null : {
+              id: id(),
+              listId: state.list.id,
+              productName,
+              purchaseCount: 0
+            };
+            await putItemAndHistory(item, historyItem);
+            state.items.push(item);
+            if (historyItem) state.history.push(historyItem);
+            finishAddingProduct(productName);
+          } catch (error) {
+            console.error(error);
+            showToast("Artikel konnte nicht hinzugefügt werden");
+          }
+        });
+      }
+
+      function finishAddingProduct(productName) {
+        renderItems();
+        els.productName.value = "";
+        els.addError.textContent = "";
+        renderSuggestions();
+        els.productName.focus({ preventScroll: true });
+        showToast(`${productName} hinzugefügt`);
+      }
+
+      function submitQuickAdd(event) {
+        event.preventDefault();
+        addProduct(els.productName.value);
+      }
+
+      els.openAdd.addEventListener("click", () => state.showingLists ? openListEditor() : openAddSheet());
+      els.listTitle.addEventListener("click", () => state.showingLists ? showShoppingList() : showListOverview());
+      document.addEventListener("pointerdown", (event) => {
+        const editingId = state.inlineEditingListId;
+        if (!editingId || event.target.closest(`[data-list-id="${editingId}"]`)) return;
+        setTimeout(() => {
+          if (state.inlineEditingListId === editingId) cancelInlineRename();
+        }, 0);
+      });
+      els.listNameForm.addEventListener("submit", saveListName);
+      els.cancelListName.addEventListener("click", () => els.listNameDialog.close());
+      els.cancelDeleteList.addEventListener("click", () => {
+        state.pendingListDelete = null;
+        els.deleteListDialog.close();
+        renderListOptions();
+      });
+      els.confirmDeleteList.addEventListener("click", deletePendingList);
+      els.clearBought.addEventListener("click", clearBoughtItems);
+      els.doneAdd.addEventListener("click", closeAddSheet);
+      els.clearSearch.addEventListener("click", () => {
+        els.productName.value = "";
+        els.addError.textContent = "";
+        renderSuggestions();
+        els.productName.focus({ preventScroll: true });
+      });
+      els.addForm.addEventListener("submit", submitQuickAdd);
+      els.frequentMode.addEventListener("click", () => setQuickMode("frequent"));
+      els.alphabeticalMode.addEventListener("click", () => setQuickMode("alphabetical"));
+      els.productName.addEventListener("input", () => {
+        els.addError.textContent = "";
+        renderSuggestions();
+      });
+      els.productName.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" || event.isComposing) return;
+        event.preventDefault();
+        addProduct(els.productName.value);
+      });
+      els.suggestions.addEventListener("scroll", scheduleScrollFade, { passive: true });
+      els.addSheet.addEventListener("click", (event) => {
+        if (event.target === els.addSheet) closeAddSheet();
+      });
+      els.addSheet.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        closeAddSheet();
+      });
+      els.deleteListDialog.addEventListener("cancel", () => {
+        state.pendingListDelete = null;
+        renderListOptions();
+      });
+
+      async function start() {
+        try {
+          state.db = await openDatabase();
+          await initialiseData();
+          renderItems();
+        } catch (error) {
+          console.error(error);
+          els.openItems.textContent = "Die lokale Speicherung konnte nicht geöffnet werden";
+          els.openAdd.disabled = true;
+        }
+      }
+
+      start();
+
+      if ("serviceWorker" in navigator && location.protocol !== "file:") {
+        addEventListener("load", () => {
+          navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" }).catch((error) => {
+            console.error("Service Worker konnte nicht registriert werden", error);
+          });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
