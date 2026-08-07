@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = "einkauf-app-";
-const CACHE_NAME = `${CACHE_PREFIX}v1.0.0`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.3.0`;
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -47,11 +47,15 @@ self.addEventListener("fetch", (event) => {
       try {
         const response = await event.preloadResponse || await fetch(request);
         if (response?.ok) {
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(OFFLINE_URL, response.clone());
+          try {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(OFFLINE_URL, response.clone());
+          } catch (error) {
+            console.warn("Offline-Kopie konnte nicht aktualisiert werden", error);
+          }
         }
         return response;
-      } catch (error) {
+      } catch {
         return await caches.match(OFFLINE_URL) || Response.error();
       }
     })());

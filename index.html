@@ -3,29 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#41436A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.0.0">
+  <meta name="application-version" content="1.3.0">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
   <title>Einkauf</title>
   <style>
     :root {
-      color-scheme: light dark;
-      --bg: #f2f2f7;
+      color-scheme: light;
+      --bg: #41436A;
       --surface: #fff;
-      --surface-2: #e9e9ee;
-      --text: #111114;
-      --secondary: #73737a;
-      --separator: rgba(60, 60, 67, .16);
-      --accent: #6d5ce7;
-      --accent-pressed: #5b4bce;
-      --danger: #ff3b30;
-      --shadow: 0 12px 36px rgba(0, 0, 0, .12);
+      --surface-2: #FE9677;
+      --text: #41436A;
+      --secondary: #984063;
+      --separator: #FE9677;
+      --accent: #FE9677;
+      --accent-pressed: #984063;
+      --danger: #F64668;
+      --shadow: 0 12px 36px color-mix(in srgb, #41436A 28%, transparent);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -39,8 +38,18 @@
     body {
       margin: 0;
       background: var(--bg);
+      color: #fff;
       overscroll-behavior-y: none;
     }
+
+    body.list-overview-mode {
+      --bg: #FE9677;
+      --accent: #41436A;
+      --accent-pressed: #984063;
+      background: #FE9677;
+    }
+
+    body.list-overview-mode .list-title { color: #41436A; }
 
     button, input { font: inherit; }
     button { color: inherit; cursor: pointer; }
@@ -49,6 +58,12 @@
     :focus-visible {
       outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
       outline-offset: 2px;
+    }
+
+    input:focus,
+    input:focus-visible {
+      outline: none;
+      box-shadow: none !important;
     }
 
     .app {
@@ -66,7 +81,7 @@
       align-items: center;
       min-height: 82px;
       padding-top: 8px;
-      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
       backdrop-filter: blur(18px) saturate(160%);
       -webkit-backdrop-filter: blur(18px) saturate(160%);
     }
@@ -83,6 +98,7 @@
       font-weight: 750;
       letter-spacing: -.9px;
       text-align: left;
+      color: #fff;
     }
 
     .list-title-text {
@@ -97,8 +113,8 @@
       width: 9px;
       height: 9px;
       margin: -5px 0 0 2px;
-      border-right: 2.5px solid var(--secondary);
-      border-bottom: 2.5px solid var(--secondary);
+      border-right: 2.5px solid #FE9677;
+      border-bottom: 2.5px solid #FE9677;
       transform: rotate(45deg);
     }
 
@@ -109,17 +125,19 @@
 
     .section { margin-top: 9px; }
 
+    #boughtSection { margin-top: 29px; }
+
     .section-bar {
       display: flex;
       height: 39px;
       align-items: center;
       justify-content: space-between;
-      padding: 0 10px 7px 0;
+      padding: 0 0 7px;
     }
 
     .section-heading {
       margin: 0;
-      color: var(--secondary);
+      color: #FE9677;
       font-size: 13px;
       font-weight: 650;
       letter-spacing: .45px;
@@ -130,6 +148,7 @@
       overflow: hidden;
       border-radius: 15px;
       background: var(--surface);
+      color: var(--text);
     }
 
     .swipe-row {
@@ -138,7 +157,7 @@
       background: var(--danger);
     }
 
-    .swipe-row + .swipe-row .item { box-shadow: inset 0 1px var(--separator); }
+    .swipe-row + .swipe-row .item { box-shadow: inset 0 1px #984063; }
 
     .delete-reveal {
       position: absolute;
@@ -173,7 +192,7 @@
       margin-right: 13px;
       padding: 0;
       place-items: center;
-      border: 2px solid #c7c7cc;
+      border: 2px solid #984063;
       border-radius: 50%;
       background: transparent;
       color: transparent;
@@ -185,14 +204,19 @@
     .check-button:active { transform: scale(.88); }
 
     .check-button.checked {
-      border-color: var(--accent);
-      background: var(--accent);
+      border-color: #984063;
+      background: #984063;
       color: #fff;
     }
 
     .item-copy {
       min-width: 0;
       flex: 1;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      text-align: left;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
@@ -206,24 +230,45 @@
       overflow-wrap: anywhere;
       font-size: 18px;
       line-height: 1.3;
+      color: #984063;
+    }
+
+    .item-quantity {
+      display: block;
+      margin-top: 2px;
+      overflow: hidden;
+      color: color-mix(in srgb, #984063 72%, transparent);
+      font-size: 14px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .quantity-button.item-quantity-button {
+      flex: 0 0 auto;
+      margin: 0 -8px 0 10px;
     }
 
     .item.bought .item-name {
-      color: var(--secondary);
+      color: color-mix(in srgb, #984063 52%, transparent);
       text-decoration: line-through;
       text-decoration-thickness: 1.5px;
     }
 
+    .item.bought .item-quantity { color: color-mix(in srgb, #984063 52%, transparent); }
+
     .clear-button {
-      display: inline-flex;
+      display: grid;
+      width: 32px;
+      height: 32px;
       align-items: center;
-      gap: 7px;
       min-height: 32px;
-      padding: 0 11px;
+      padding: 0;
+      place-items: center;
       border: 0;
-      border-radius: 999px;
-      background: color-mix(in srgb, var(--accent) 15%, var(--surface));
-      color: var(--accent);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--danger) 15%, var(--surface));
+      color: var(--danger);
       font-size: 14px;
       font-weight: 600;
     }
@@ -274,8 +319,8 @@
       border: 0;
       border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 10px 26px rgba(109, 92, 231, .3);
-      color: #fff;
+      box-shadow: 0 10px 26px color-mix(in srgb, #984063 36%, transparent);
+      color: #41436A;
       font-size: 40px;
       font-weight: 300;
       line-height: 1;
@@ -293,7 +338,10 @@
       border-radius: 999px;
       font-size: 16px;
       font-weight: 650;
+      color: #fff;
     }
+
+    body.list-overview-mode .add-button.list-mode { background: #984063; }
 
     .add-button.list-mode .small-icon { width: 18px; height: 18px; }
 
@@ -303,20 +351,20 @@
     }
 
     dialog::backdrop {
-      background: rgba(0, 0, 0, .32);
+      background: color-mix(in srgb, #41436A 72%, transparent);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
     }
 
     .sheet {
       width: min(100%, 520px);
-      height: 74dvh;
-      max-height: 700px;
+      height: 100dvh;
+      max-height: none;
       max-width: none;
-      margin: auto auto 0;
+      margin: 0 auto;
       padding: 0;
       border: 0;
-      border-radius: 22px 22px 0 0;
+      border-radius: 0;
       background: var(--bg);
       box-shadow: var(--shadow);
     }
@@ -326,10 +374,41 @@
     .sheet.closing { animation: sink .22s cubic-bezier(.55, 0, .8, .25); }
 
     .sheet-inner {
+      position: relative;
       display: flex;
       height: 100%;
+      overflow: hidden;
       flex-direction: column;
-      padding: 8px 18px calc(18px + env(safe-area-inset-bottom));
+      padding: 0;
+    }
+
+    .sheet-page {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: calc(8px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+      transition: opacity .22s ease, transform .24s cubic-bezier(.2, .75, .25, 1);
+    }
+
+    .search-page { transform: translateX(0); }
+
+    .quantity-page {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+    }
+
+    .sheet-inner.quantity-mode .search-page {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-24%);
+    }
+
+    .sheet-inner.quantity-mode .quantity-page {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
     }
 
     .sheet-header {
@@ -339,19 +418,15 @@
       min-height: 52px;
     }
 
-    .sheet-header h2 { margin: 0; font-size: 18px; text-align: center; }
-
-    .text-button {
-      min-height: 44px;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: var(--accent);
-      font-size: 16px;
+    .sheet-header h2 {
+      margin: 0;
+      overflow: hidden;
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-
-    .text-button:first-child { text-align: left; }
-    .text-button:last-child { text-align: right; font-weight: 650; }
 
     .search-field {
       width: 100%;
@@ -365,8 +440,6 @@
       color: var(--text);
       font-size: 18px;
     }
-
-    .search-field:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent); }
 
     .search-wrap {
       position: relative;
@@ -402,10 +475,10 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 2px;
-      margin-top: 13px;
+      margin-top: 10px;
       padding: 2px;
       border-radius: 10px;
-      background: var(--surface-2);
+      background: #fff;
     }
 
     .segment {
@@ -413,15 +486,15 @@
       border: 0;
       border-radius: 8px;
       background: transparent;
-      color: var(--secondary);
+      color: #984063;
       font-size: 14px;
       font-weight: 600;
     }
 
     .segment.active {
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+      background: #984063;
+      color: #fff;
+      box-shadow: none;
     }
 
     .suggestions {
@@ -429,7 +502,7 @@
       flex: 1 1 auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 0;
       overflow: hidden;
       overflow-y: auto;
       margin-top: 10px;
@@ -452,20 +525,35 @@
     }
 
     .suggestion {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       width: 100%;
+      min-height: 54px;
+      align-items: center;
+      overflow: hidden;
+      border-radius: 0;
+      background: var(--surface);
+    }
+
+    .suggestion + .suggestion { box-shadow: inset 0 1px #984063; }
+    .suggestion:first-child { border-radius: 14px 14px 0 0; }
+    .suggestion:last-child { border-radius: 0 0 14px 14px; }
+    .suggestion:only-child { border-radius: 14px; }
+
+    .suggestion-main {
+      display: flex;
+      min-width: 0;
       min-height: 54px;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
       padding: 10px 14px;
       border: 0;
-      border-radius: 14px;
-      background: var(--surface);
+      background: transparent;
       text-align: left;
     }
 
-    .suggestion:active { background: var(--surface-2); }
+    .suggestion-main:active { background: var(--surface-2); }
 
     .suggestion-name {
       min-width: 0;
@@ -473,18 +561,45 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 17px;
+      color: #984063;
     }
 
-    .suggestion.add-new { color: var(--text); font-weight: 400; }
+    .suggestion.add-new .suggestion-main { color: var(--text); font-weight: 400; }
 
-    .suggestion.already-listed {
-      color: var(--secondary);
+    .suggestion.already-listed .suggestion-main {
+      opacity: .46;
       cursor: default;
+    }
+
+    .quantity-button {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      margin-right: 8px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 11px;
+      background: #FE9677;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: -.3px;
+    }
+
+    .quantity-icon {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .suggestion-status {
       flex: 0 0 auto;
-      color: var(--secondary);
+      color: #984063;
       font-size: 13px;
       font-weight: 600;
     }
@@ -498,6 +613,82 @@
       line-height: 1.4;
       text-align: center;
     }
+
+    .quantity-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .quantity-label {
+      margin: 0 0 0 2px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .35px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .quantity-input {
+      width: 100%;
+      height: 58px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      outline: none;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 24px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .unit-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 0;
+    }
+
+    .unit-chip {
+      min-height: 38px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 999px;
+      background: #fff;
+      color: #984063;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .unit-chip.active {
+      background: #984063;
+      color: #fff;
+    }
+
+    .quantity-add {
+      min-height: 50px;
+      margin-top: auto;
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .back-button {
+      display: inline-flex;
+      min-height: 44px;
+      padding: 0;
+      align-items: center;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .back-button .small-icon { width: 21px; height: 21px; }
 
     .list-options {
       margin-top: 12px;
@@ -524,18 +715,22 @@
 
     .list-overview {
       padding-top: 18px;
+      color: #41436A;
       animation: overviewIn .2s ease-out;
     }
+
+    .list-overview .section-heading { color: #41436A; }
 
     .list-overview[hidden] { display: none; }
 
     .list-overview .list-option-shell {
       margin-bottom: 12px;
       border-radius: 20px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, .04);
+      background: var(--danger);
+      box-shadow: 0 5px 20px color-mix(in srgb, #41436A 18%, transparent);
     }
 
-    .list-overview .list-option { min-height: 82px; }
+    .list-overview .list-option { min-height: 82px; background: #41436A; color: #fff; }
 
     .list-overview .list-select {
       height: 82px;
@@ -543,9 +738,7 @@
       font-size: 20px;
     }
 
-    .list-overview .list-select.active {
-      box-shadow: inset 4px 0 var(--accent);
-    }
+    .list-overview .list-select.active { color: #FE9677; box-shadow: none; }
 
     .list-action,
     .list-select {
@@ -574,24 +767,22 @@
       border: 0;
       border-radius: 10px;
       outline: none;
-      background: var(--surface-2);
-      color: var(--text);
+      background: #fff;
+      color: #41436A;
       font-size: 17px;
     }
 
-    .inline-list-input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent); }
-
     .list-action.save-list-name {
       display: inline-flex;
-      width: 88px;
+      width: 40px;
       height: 40px;
       margin-right: 12px;
       padding: 0;
       align-items: center;
       justify-content: center;
       border-radius: 11px;
-      background: color-mix(in srgb, #248a3d 12%, var(--surface));
-      color: #248a3d;
+      background: #984063;
+      color: #fff;
     }
 
     .list-action {
@@ -618,19 +809,21 @@
       border-radius: 11px;
     }
 
-    .delete-list-button {
-      background: color-mix(in srgb, var(--danger) 12%, var(--surface));
-      color: var(--danger);
-    }
-
     .rename-list {
       background: color-mix(in srgb, var(--accent) 12%, var(--surface));
       color: var(--accent);
     }
 
+    .list-overview .rename-list { background: transparent; color: #fff; }
+
     .rename-list .small-icon,
-    .delete-list-button .small-icon,
     .save-list-name .small-icon { width: 18px; height: 18px; }
+
+    .save-list-name .small-icon {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.7;
+    }
 
     .small-icon {
       width: 18px;
@@ -670,16 +863,32 @@
       font-weight: 650;
     }
 
-    .dialog-button.primary { background: var(--accent); color: #fff; }
-    .dialog-button.danger {
-      background: color-mix(in srgb, var(--danger) 12%, var(--surface));
-      color: var(--danger);
+    #listNameDialog #cancelListName {
+      border: 1.5px solid #41436A;
+      background: transparent;
+      color: #41436A;
     }
 
+    #listNameDialog .dialog-button.primary { background: #984063; color: #fff; }
+
+    #deleteListDialog #cancelDeleteList {
+      border: 1.5px solid #41436A;
+      background: transparent;
+      color: #41436A;
+    }
+
+    #deleteListDialog #confirmDeleteList {
+      background: #F64668;
+      color: #fff;
+    }
+
+    #deleteListDialog #deleteListText { color: #41436A; }
+
+    .dialog-button.primary { background: var(--accent); color: #fff; }
     .error {
       min-height: 22px;
       margin: 8px 4px 0;
-      color: var(--danger);
+      color: #984063;
       font-size: 14px;
     }
 
@@ -694,7 +903,7 @@
       padding: 11px 16px;
       border: 0;
       border-radius: 999px;
-      background: rgba(28, 28, 30, .92);
+      background: #984063;
       color: #fff;
       font-size: 14px;
       font-weight: 600;
@@ -708,26 +917,13 @@
 
     .toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
+    body.list-overview-mode .toast { background: #41436A; color: #fff; }
+
     @keyframes rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes sink { from { transform: translateY(0); } to { transform: translateY(100%); } }
     @keyframes overviewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     .view-enter { animation: overviewIn .2s ease-out; }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #000;
-        --surface: #1c1c1e;
-        --surface-2: #2c2c2e;
-        --text: #f5f5f7;
-        --secondary: #98989d;
-        --separator: rgba(84, 84, 88, .65);
-        --shadow: 0 -12px 36px rgba(0, 0, 0, .5);
-        --accent: #8b7cf6;
-        --accent-pressed: #7666e2;
-      }
-      .check-button { border-color: #545458; }
-    }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -748,7 +944,7 @@
     <section class="section" id="boughtSection" aria-labelledby="boughtHeading">
       <div class="section-bar">
         <h2 class="section-heading" id="boughtHeading">Eingekauft</h2>
-        <button class="clear-button" id="clearBought" type="button" hidden><svg class="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg>Entfernen</button>
+        <button class="clear-button" id="clearBought" type="button" aria-label="Eingekaufte Artikel entfernen" hidden><svg class="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg></button>
       </div>
       <div class="card" id="boughtItems" aria-live="polite"></div>
     </section>
@@ -763,28 +959,50 @@
 
   <dialog class="sheet" id="addSheet" aria-labelledby="addTitle">
     <form class="sheet-inner" id="addForm">
-      <div class="sheet-header">
-        <span aria-hidden="true"></span>
-        <h2 id="addTitle">Artikel hinzufügen</h2>
-        <button class="text-button" id="doneAdd" type="button">Fertig</button>
+      <div class="sheet-page search-page" id="searchPage">
+        <div class="sheet-header">
+          <button class="back-button" id="doneAdd" type="button" aria-label="Zurück zur Einkaufsliste"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2 id="addTitle">Artikel hinzufügen</h2>
+          <span aria-hidden="true"></span>
+        </div>
+        <div class="search-wrap">
+          <input class="search-field" id="productName" name="productName" type="search" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="61" placeholder="Artikel suchen" aria-describedby="addError">
+          <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
+        </div>
+        <div class="segments" role="group" aria-label="Sortierung">
+          <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Häufig</button>
+          <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
+        </div>
+        <p class="error" id="addError" role="alert"></p>
+        <div class="suggestions" id="suggestions"></div>
       </div>
-      <div class="search-wrap">
-        <input class="search-field" id="productName" name="productName" type="search" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="120" placeholder="Artikel suchen" aria-describedby="addError">
-        <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
+
+      <div class="sheet-page quantity-page" id="quantityPage" aria-hidden="true" inert>
+        <div class="sheet-header">
+          <button class="back-button" id="backFromQuantity" type="button" aria-label="Zurück zur Artikelauswahl"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2 id="quantityTitle"></h2>
+          <span aria-hidden="true"></span>
+        </div>
+        <div class="quantity-controls">
+          <label class="quantity-label" for="quantityValue">Menge</label>
+          <input class="quantity-input" id="quantityValue" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" maxlength="12" placeholder="1">
+          <div class="unit-options" id="unitOptions" role="group" aria-label="Einheit">
+            <button class="unit-chip active" type="button" data-unit="Stück" aria-pressed="true">Stück</button>
+            <button class="unit-chip" type="button" data-unit="g" aria-pressed="false">g</button>
+            <button class="unit-chip" type="button" data-unit="kg" aria-pressed="false">kg</button>
+            <button class="unit-chip" type="button" data-unit="ml" aria-pressed="false">ml</button>
+            <button class="unit-chip" type="button" data-unit="l" aria-pressed="false">l</button>
+          </div>
+        </div>
+        <button class="quantity-add" id="addWithQuantity" type="submit">+ Hinzufügen</button>
       </div>
-      <div class="segments" role="group" aria-label="Sortierung">
-        <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Häufig</button>
-        <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
-      </div>
-      <p class="error" id="addError" role="alert"></p>
-      <div class="suggestions" id="suggestions"></div>
     </form>
   </dialog>
 
   <dialog class="dialog-card" id="listNameDialog" aria-labelledby="listNameTitle">
     <form id="listNameForm">
       <h2 id="listNameTitle">Neue Liste</h2>
-      <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="80" placeholder="Listenname" required>
+      <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Listenname" required>
       <div class="dialog-actions">
         <button class="dialog-button" id="cancelListName" type="button">Abbrechen</button>
         <button class="dialog-button primary" type="submit">Sichern</button>
@@ -808,23 +1026,30 @@
       "use strict";
 
       const DB_NAME = "einkaufslisten-app";
-      const DB_VERSION = 1;
+      const DB_VERSION = 2;
       const DEFAULT_LIST_NAME = "Einkauf";
       const MAX_LIST_NAME_LENGTH = 40;
       const MAX_PRODUCT_NAME_LENGTH = 60;
       const SWIPE_ACTION_WIDTH = 92;
+      const QUANTITY_ICON_MARKUP = '<svg class="quantity-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="m2 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="M7 21h10M12 3v18M3 7h18"/></svg>';
       const collator = new Intl.Collator("de", { sensitivity: "base" });
+      const quantityFormatter = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 3 });
       const state = {
         db: null,
         list: null,
         lists: [],
         items: [],
         history: [],
+        products: [],
         quickMode: "frequent",
         inlineEditingListId: null,
         pendingListDelete: null,
         showingLists: false,
         listLoadToken: 0,
+        quantityProductName: null,
+        quantityUnit: "Stück",
+        quantityEditingItemId: null,
+        quantityEntrySource: "add",
         operations: new Set()
       };
       const els = {
@@ -846,6 +1071,13 @@
         frequentMode: document.querySelector("#frequentMode"),
         alphabeticalMode: document.querySelector("#alphabeticalMode"),
         suggestions: document.querySelector("#suggestions"),
+        searchPage: document.querySelector("#searchPage"),
+        quantityPage: document.querySelector("#quantityPage"),
+        quantityTitle: document.querySelector("#quantityTitle"),
+        quantityValue: document.querySelector("#quantityValue"),
+        unitOptions: document.querySelector("#unitOptions"),
+        backFromQuantity: document.querySelector("#backFromQuantity"),
+        addWithQuantity: document.querySelector("#addWithQuantity"),
         listOptions: document.querySelector("#listOptions"),
         listNameDialog: document.querySelector("#listNameDialog"),
         listNameForm: document.querySelector("#listNameForm"),
@@ -861,11 +1093,23 @@
       let toastHideTimer;
       let toastCloseTimer;
       let scrollFadeFrame;
+      let suggestionFrame;
 
       const id = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      const clean = (value) => String(value ?? "").normalize("NFC").trim();
+      const clean = (value) => String(value ?? "").normalize("NFC").replace(/\s+/gu, " ").trim();
       const comparable = (value) => clean(value).toLocaleLowerCase("de-DE");
       const byName = (a, b) => collator.compare(a.productName, b.productName);
+
+      function parseQuantity(value) {
+        const normalized = clean(value).replace(/\s+/g, "").replace(",", ".");
+        if (!/^\d+(?:\.\d{1,3})?$/.test(normalized)) return null;
+        const number = Number(normalized);
+        return Number.isFinite(number) && number > 0 && number <= 999999 ? String(number) : null;
+      }
+
+      function formatQuantity(value) {
+        return quantityFormatter.format(Number(value));
+      }
 
       async function runExclusive(key, operation) {
         if (state.operations.has(key)) return;
@@ -890,20 +1134,18 @@
           let settled = false;
           opening.onupgradeneeded = () => {
             const db = opening.result;
-            if (!db.objectStoreNames.contains("lists")) {
-              db.createObjectStore("lists", { keyPath: "id" });
-            }
-            if (!db.objectStoreNames.contains("items")) {
-              const items = db.createObjectStore("items", { keyPath: "id" });
-              items.createIndex("listId", "listId", { unique: false });
-            }
-            if (!db.objectStoreNames.contains("history")) {
-              const history = db.createObjectStore("history", { keyPath: "id" });
-              history.createIndex("listId", "listId", { unique: false });
-            }
-            if (!db.objectStoreNames.contains("settings")) {
-              db.createObjectStore("settings", { keyPath: "key" });
-            }
+            const upgradeTransaction = opening.transaction;
+            const ensureStore = (name, options) => db.objectStoreNames.contains(name)
+              ? upgradeTransaction.objectStore(name)
+              : db.createObjectStore(name, options);
+            ensureStore("lists", { keyPath: "id" });
+            const items = ensureStore("items", { keyPath: "id" });
+            const history = ensureStore("history", { keyPath: "id" });
+            const products = ensureStore("products", { keyPath: "id" });
+            ensureStore("settings", { keyPath: "key" });
+            if (!items.indexNames.contains("listId")) items.createIndex("listId", "listId");
+            if (!history.indexNames.contains("listId")) history.createIndex("listId", "listId");
+            if (!products.indexNames.contains("key")) products.createIndex("key", "key", { unique: true });
           };
           opening.onsuccess = () => {
             const db = opening.result;
@@ -912,7 +1154,12 @@
               return;
             }
             settled = true;
-            db.onversionchange = () => db.close();
+            db.onversionchange = () => {
+              db.close();
+              state.db = null;
+              els.openAdd.disabled = true;
+              showToast("Die App wurde aktualisiert. Bitte lade die Seite neu");
+            };
             resolve(db);
           };
           opening.onerror = () => {
@@ -968,6 +1215,45 @@
         return request(objectStore.index("listId").getAll(listId));
       }
 
+      async function migrateProductPool() {
+        const [products, items, history] = await Promise.all([
+          getAll("products"),
+          getAll("items"),
+          getAll("history")
+        ]);
+        const productsById = new Map(products.map((product) => [product.id, product]));
+        const productsByKey = new Map(products.map((product) => [product.key, product]));
+        const records = [...history, ...items];
+        let changed = products.length === 0 && records.length > 0;
+
+        records.forEach((record) => {
+          if (record.productId && productsById.has(record.productId)) return;
+          const productName = clean(record.productName);
+          if (!productName) return;
+          const key = comparable(productName);
+          let product = productsByKey.get(key);
+          if (!product) {
+            product = { id: id(), name: productName, key, createdAt: Number(record.createdAt) || Date.now() };
+            products.push(product);
+            productsById.set(product.id, product);
+            productsByKey.set(key, product);
+          }
+          record.productId = product.id;
+          changed = true;
+        });
+
+        if (!changed) return products;
+        await transact(["products", "items", "history"], "readwrite", (transaction) => {
+          const productStore = transaction.objectStore("products");
+          const itemStore = transaction.objectStore("items");
+          const historyStore = transaction.objectStore("history");
+          products.forEach((product) => productStore.put(product));
+          items.forEach(({ productName: _productName, ...item }) => item.productId && itemStore.put(item));
+          history.forEach(({ productName: _productName, ...entry }) => entry.productId && historyStore.put(entry));
+        });
+        return products;
+      }
+
       function deleteRecords(storeName, ids) {
         if (!ids.length) return Promise.resolve();
         return transact([storeName], "readwrite", (transaction) => {
@@ -976,11 +1262,45 @@
         });
       }
 
-      function putItemAndHistory(item, historyItem) {
-        return transact(["items", "history"], "readwrite", (transaction) => {
-          transaction.objectStore("items").put(item);
-          if (historyItem) transaction.objectStore("history").put(historyItem);
+      async function removeUnusedProducts() {
+        const [items, history] = await Promise.all([getAll("items"), getAll("history")]);
+        const usedProductIds = new Set([
+          ...items.map((item) => item.productId),
+          ...history.map((entry) => entry.productId)
+        ].filter(Boolean));
+        const unusedProductIds = state.products
+          .filter((product) => !usedProductIds.has(product.id))
+          .map((product) => product.id);
+        await deleteRecords("products", unusedProductIds);
+        if (unusedProductIds.length) {
+          const unused = new Set(unusedProductIds);
+          state.products = state.products.filter((product) => !unused.has(product.id));
+        }
+      }
+
+      function putProductItemAndHistory(product, item, historyItem) {
+        const storeNames = ["items"];
+        if (product) storeNames.push("products");
+        if (historyItem) storeNames.push("history");
+        return transact(storeNames, "readwrite", (transaction) => {
+          if (product) transaction.objectStore("products").put(product);
+          const { productName: _productName, ...storedItem } = item;
+          transaction.objectStore("items").put(storedItem);
+          if (historyItem) {
+            const { productName: _historyProductName, ...storedHistory } = historyItem;
+            transaction.objectStore("history").put(storedHistory);
+          }
         });
+      }
+
+      function makeQuantityButton(label, onClick, className = "") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `quantity-button ${className}`.trim();
+        button.innerHTML = QUANTITY_ICON_MARKUP;
+        button.setAttribute("aria-label", label);
+        button.addEventListener("click", onClick);
+        return button;
       }
 
       async function deleteItem(item) {
@@ -999,6 +1319,8 @@
       }
 
       async function initialiseData() {
+        state.products = await migrateProductPool();
+        await removeUnusedProducts();
         state.lists = (await getAll("lists")).sort((a, b) =>
           (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
         );
@@ -1019,8 +1341,11 @@
 
       async function loadListData(listId) {
         const [items, history] = await Promise.all([getItemsForList(listId), getHistoryForList(listId)]);
+        const productNames = new Map(state.products.map((product) => [product.id, product.name]));
         return {
-          items: items.sort((a, b) => (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0)),
+          items: items
+            .map((item) => ({ ...item, productName: productNames.get(item.productId) || "Unbekannter Artikel" }))
+            .sort((a, b) => (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0)),
           history
         };
       }
@@ -1079,9 +1404,23 @@
           name.className = "item-name";
           name.textContent = item.productName;
           copy.append(name);
+          if (item.quantityValue && item.quantityUnit) {
+            const quantity = document.createElement("span");
+            quantity.className = "item-quantity";
+            quantity.textContent = `${formatQuantity(item.quantityValue)} ${item.quantityUnit}`;
+            copy.append(quantity);
+          }
           row.append(check, copy);
+          if (!item.checked) {
+            const quantityButton = makeQuantityButton(
+              `Menge für ${item.productName} ändern`,
+              () => openQuantityEditor(item),
+              "item-quantity-button"
+            );
+            row.append(quantityButton);
+          }
           shell.append(reveal, row);
-          bindSwipeGesture(row, reveal, () => deleteItem(item), ".check-button");
+          bindSwipeGesture(row, reveal, () => deleteItem(item), ".check-button, .item-quantity-button");
           fragment.append(shell);
         });
         container.append(fragment);
@@ -1165,14 +1504,14 @@
           if (!currentItem) return;
           const willBeChecked = !currentItem.checked;
           const updatedItem = { ...currentItem, checked: willBeChecked };
-          const existingHistory = state.history.find((entry) => comparable(entry.productName) === comparable(currentItem.productName));
+          const existingHistory = state.history.find((entry) => entry.productId === currentItem.productId);
           const updatedHistory = {
-            ...(existingHistory || { id: id(), listId: state.list.id, productName: currentItem.productName }),
+            ...(existingHistory || { id: id(), listId: state.list.id, productId: currentItem.productId }),
             purchaseCount: Math.max(0, Number(existingHistory?.purchaseCount || 0) + (willBeChecked ? 1 : -1))
           };
 
           try {
-            await putItemAndHistory(updatedItem, updatedHistory);
+            await putProductItemAndHistory(null, updatedItem, updatedHistory);
             state.items = state.items.map((entry) => entry.id === updatedItem.id ? updatedItem : entry);
             state.history = existingHistory
               ? state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry)
@@ -1226,6 +1565,7 @@
 
       function showListOverview() {
         state.showingLists = true;
+        document.body.classList.add("list-overview-mode");
         els.openSection.hidden = true;
         els.boughtSection.hidden = true;
         els.listOverview.hidden = false;
@@ -1240,6 +1580,7 @@
 
       function showShoppingList() {
         state.showingLists = false;
+        document.body.classList.remove("list-overview-mode");
         els.openSection.hidden = false;
         els.boughtSection.hidden = false;
         els.listOverview.hidden = true;
@@ -1275,6 +1616,11 @@
           shell.dataset.listId = list.id;
           const row = document.createElement("div");
           row.className = "list-option";
+          const reveal = document.createElement("button");
+          reveal.type = "button";
+          reveal.className = "delete-reveal";
+          reveal.textContent = "Entfernen";
+          reveal.setAttribute("aria-label", `${list.name} entfernen`);
           const select = document.createElement("button");
           select.type = "button";
           select.className = `list-select${list.id === state.list.id ? " active" : ""}`;
@@ -1287,14 +1633,12 @@
           const rename = makeListAction(`${list.name} umbenennen`, '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>');
           rename.classList.add("list-icon-action", "rename-list");
           rename.addEventListener("click", () => startInlineRename(list));
-          const remove = makeListAction(`${list.name} löschen`, '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/>');
-          remove.classList.add("list-icon-action", "delete-list-button");
-          remove.addEventListener("click", () => askDeleteList(list));
           const actions = document.createElement("div");
           actions.className = "list-row-actions";
-          actions.append(rename, remove);
+          actions.append(rename);
           row.append(select, actions);
-          shell.append(row);
+          shell.append(reveal, row);
+          bindSwipeGesture(row, reveal, () => askDeleteList(list), ".list-action, input");
           fragment.append(shell);
         });
         els.listOptions.append(fragment);
@@ -1320,7 +1664,7 @@
         input.className = "inline-list-input";
         input.type = "text";
         input.value = list.name;
-        input.maxLength = 80;
+        input.maxLength = MAX_LIST_NAME_LENGTH + 1;
         input.setAttribute("aria-label", "Listenname");
         const saveAction = document.createElement("button");
         saveAction.type = "button";
@@ -1410,6 +1754,7 @@
       function openListEditor() {
         els.listNameTitle.textContent = "Neue Liste";
         els.listNameInput.value = "";
+        els.listNameInput.removeAttribute("aria-invalid");
         els.listNameDialog.showModal();
         els.listNameInput.focus({ preventScroll: true });
       }
@@ -1429,6 +1774,7 @@
           }
           const duplicate = state.lists.some((list) => comparable(list.name) === comparable(name));
           if (duplicate) {
+            els.listNameInput.setAttribute("aria-invalid", "true");
             showToast("Liste bereits vorhanden");
             els.listNameInput.select();
             return;
@@ -1461,7 +1807,7 @@
 
       function askDeleteList(list) {
         state.pendingListDelete = list;
-        els.deleteListText.textContent = `„${list.name}“ und die Produkthistorie der Liste werden dauerhaft gelöscht. Andere Listen und deren Produkte bleiben unberührt`;
+        els.deleteListText.textContent = `„${list.name}“ wird dauerhaft gelöscht. Artikel und andere Listen bleiben unberührt.`;
         els.deleteListDialog.showModal();
       }
 
@@ -1501,6 +1847,7 @@
               nextLists.forEach((entry) => transaction.objectStore("lists").put(entry));
               transaction.objectStore("settings").put({ key: "lastOpenedListId", value: nextActiveList.id });
             });
+            await removeUnusedProducts();
 
             state.lists = nextLists;
             state.list = nextActiveList;
@@ -1523,6 +1870,7 @@
       function openAddSheet() {
         els.addForm.reset();
         els.addError.textContent = "";
+        resetQuantityPage();
         setQuickMode("frequent");
         els.addSheet.showModal();
         els.productName.focus({ preventScroll: true });
@@ -1535,8 +1883,89 @@
         setTimeout(() => {
           els.addSheet.close();
           els.addSheet.classList.remove("closing");
+          resetQuantityPage();
           els.openAdd.focus({ preventScroll: true });
         }, 220);
+      }
+
+      function setQuantityUnit(unit) {
+        state.quantityUnit = unit;
+        els.unitOptions.querySelectorAll(".unit-chip").forEach((button) => {
+          const active = button.dataset.unit === unit;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+      }
+
+      function resetQuantityPage() {
+        state.quantityProductName = null;
+        state.quantityUnit = "Stück";
+        state.quantityEditingItemId = null;
+        state.quantityEntrySource = "add";
+        els.addForm.classList.remove("quantity-mode");
+        els.quantityPage.setAttribute("aria-hidden", "true");
+        els.quantityPage.inert = true;
+        els.searchPage.inert = false;
+        els.quantityValue.value = "";
+        els.quantityValue.removeAttribute("aria-invalid");
+        els.quantityTitle.textContent = "";
+        els.addWithQuantity.textContent = "+ Hinzufügen";
+        setQuantityUnit("Stück");
+      }
+
+      function openQuantityPage(productName, item = null) {
+        const normalizedName = clean(productName);
+        if (!normalizedName) return;
+        if (normalizedName.length > MAX_PRODUCT_NAME_LENGTH) {
+          showToast(`Artikelname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
+          return;
+        }
+        state.quantityProductName = normalizedName;
+        state.quantityEditingItemId = item?.id || null;
+        state.quantityEntrySource = item ? "list" : "add";
+        els.quantityTitle.textContent = normalizedName;
+        els.quantityValue.value = item?.quantityValue ? formatQuantity(item.quantityValue) : "";
+        els.addWithQuantity.textContent = item ? "Speichern" : "+ Hinzufügen";
+        setQuantityUnit(item?.quantityUnit || "Stück");
+        els.addForm.classList.add("quantity-mode");
+        els.quantityPage.setAttribute("aria-hidden", "false");
+        els.quantityPage.inert = false;
+        els.searchPage.inert = true;
+        requestAnimationFrame(() => els.quantityValue.focus({ preventScroll: true }));
+      }
+
+      function closeQuantityPage({ focus = true } = {}) {
+        resetQuantityPage();
+        if (focus) requestAnimationFrame(() => els.productName.focus({ preventScroll: true }));
+      }
+
+      function openQuantityEditor(item) {
+        els.addForm.reset();
+        els.addError.textContent = "";
+        resetQuantityPage();
+        els.addSheet.showModal();
+        openQuantityPage(item.productName, item);
+      }
+
+      async function saveItemQuantity(itemId, quantityValue, quantityUnit) {
+        return runExclusive(`item:${itemId}`, async () => {
+          const item = state.items.find((entry) => entry.id === itemId && !entry.checked);
+          if (!item) {
+            closeAddSheet();
+            return;
+          }
+          const updatedItem = { ...item, quantityValue, quantityUnit };
+          try {
+            await putProductItemAndHistory(null, updatedItem, null);
+            state.items = state.items.map((entry) => entry.id === itemId ? updatedItem : entry);
+            renderItems();
+            closeAddSheet();
+            showToast("Menge gespeichert");
+          } catch (error) {
+            console.error(error);
+            showToast("Menge konnte nicht gespeichert werden");
+          }
+        });
       }
 
       function setQuickMode(mode) {
@@ -1550,24 +1979,24 @@
       }
 
       function renderSuggestions() {
+        if (suggestionFrame) {
+          cancelAnimationFrame(suggestionFrame);
+          suggestionFrame = 0;
+        }
         if (!state.list) return;
         const query = comparable(els.productName.value);
         els.clearSearch.hidden = els.productName.value.length === 0;
-        const openNames = new Set(state.items.filter((item) => !item.checked).map((item) => comparable(item.productName)));
-        const knownProductMap = new Map();
-        state.history.forEach((entry) => {
-          const key = comparable(entry.productName);
-          if (key && !knownProductMap.has(key)) knownProductMap.set(key, entry);
-        });
-        state.items.forEach((item) => {
-          const key = comparable(item.productName);
-          if (key && !knownProductMap.has(key)) knownProductMap.set(key, { productName: item.productName, purchaseCount: 0 });
-        });
-        const knownProducts = [...knownProductMap.values()];
-        let matches = knownProducts.filter((entry) => {
-          const name = comparable(entry.productName);
-          return !query || name.includes(query);
-        });
+        const openItems = state.items.filter((item) => !item.checked);
+        const openProductIds = new Set(openItems.map((item) => item.productId));
+        const openNames = new Set(openItems.map((item) => comparable(item.productName)));
+        const frequencyByProduct = new Map(state.history.map((entry) => [entry.productId, Number(entry.purchaseCount || 0)]));
+        const knownProducts = state.products.map((product) => ({
+          productId: product.id,
+          productName: product.name,
+          productKey: product.key || comparable(product.name),
+          purchaseCount: frequencyByProduct.get(product.id) || 0
+        }));
+        let matches = knownProducts.filter((entry) => !query || entry.productKey.includes(query));
 
         matches.sort(state.quickMode === "frequent"
           ? (a, b) => Number(b.purchaseCount || 0) - Number(a.purchaseCount || 0) || byName(a, b)
@@ -1575,38 +2004,14 @@
 
         els.suggestions.replaceChildren();
         const fragment = document.createDocumentFragment();
-        const exactHistoryMatch = knownProductMap.has(query);
-        if (query && !openNames.has(query) && !exactHistoryMatch) {
-          const addNew = document.createElement("button");
-          addNew.type = "button";
-          addNew.className = "suggestion add-new";
-          addNew.textContent = clean(els.productName.value);
-          addNew.addEventListener("click", () => addProduct(els.productName.value));
-          fragment.append(addNew);
+        const exactProductMatch = knownProducts.some((entry) => entry.productKey === query);
+        if (query && !openNames.has(query) && !exactProductMatch) {
+          fragment.append(createSuggestion(clean(els.productName.value), { isNew: true }));
         }
 
         matches.forEach((entry) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "suggestion";
-          const isOnList = openNames.has(comparable(entry.productName));
-          if (isOnList) {
-            button.classList.add("already-listed");
-            button.disabled = true;
-          }
-          const name = document.createElement("span");
-          name.className = "suggestion-name";
-          name.textContent = entry.productName;
-          button.append(name);
-          if (isOnList) {
-            const status = document.createElement("span");
-            status.className = "suggestion-status";
-            status.textContent = "Auf der Liste";
-            button.append(status);
-          } else {
-            button.addEventListener("click", () => addProduct(entry.productName));
-          }
-          fragment.append(button);
+          const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
+          fragment.append(createSuggestion(entry.productName, { isOnList }));
         });
 
         if (!fragment.childNodes.length) {
@@ -1614,7 +2019,7 @@
           empty.className = "suggestions-empty";
           if (query) {
             empty.textContent = "Kein Treffer";
-          } else if (!state.history.length) {
+          } else if (!state.products.length) {
             empty.textContent = "Tippe oben einen Artikelnamen ein";
           } else {
             empty.textContent = "Alle bekannten Produkte stehen bereits auf der Liste";
@@ -1623,6 +2028,44 @@
         }
         els.suggestions.append(fragment);
         scheduleScrollFade();
+      }
+
+      function scheduleSuggestions() {
+        if (suggestionFrame) return;
+        suggestionFrame = requestAnimationFrame(() => {
+          suggestionFrame = 0;
+          renderSuggestions();
+        });
+      }
+
+      function createSuggestion(productName, { isOnList = false, isNew = false } = {}) {
+        const row = document.createElement("div");
+        row.className = `suggestion${isOnList ? " already-listed" : ""}${isNew ? " add-new" : ""}`;
+        const main = document.createElement("button");
+        main.type = "button";
+        main.className = "suggestion-main";
+        const name = document.createElement("span");
+        name.className = "suggestion-name";
+        name.textContent = productName;
+        main.append(name);
+        row.append(main);
+
+        if (isOnList) {
+          main.disabled = true;
+          const status = document.createElement("span");
+          status.className = "suggestion-status";
+          status.textContent = "Auf der Liste";
+          main.append(status);
+          return row;
+        }
+
+        main.addEventListener("click", () => addProduct(productName));
+        const quantityButton = makeQuantityButton(
+          `Menge für ${productName} hinzufügen`,
+          () => openQuantityPage(productName)
+        );
+        row.append(quantityButton);
+        return row;
       }
 
       function updateScrollFade() {
@@ -1643,7 +2086,7 @@
         });
       }
 
-      async function addProduct(value) {
+      async function addProduct(value, quantity = null) {
         return runExclusive("add-product", async () => {
           const productName = clean(value);
           if (!productName) {
@@ -1668,18 +2111,31 @@
           }
 
           try {
+            let product = state.products.find((entry) => entry.key === productKey);
+            const newProduct = !product;
+            if (!product) {
+              product = { id: id(), name: productName, key: productKey, createdAt: Date.now() };
+            }
             const boughtItem = state.items.find((item) => item.checked && comparable(item.productName) === productKey);
-            const existingHistory = state.history.find((entry) => comparable(entry.productName) === productKey);
+            const existingHistory = state.history.find((entry) => entry.productId === product.id);
             if (boughtItem) {
-              const reopenedItem = { ...boughtItem, checked: false, createdAt: Date.now() };
+              const reopenedItem = {
+                ...boughtItem,
+                checked: false,
+                createdAt: Date.now(),
+                quantityValue: quantity?.value ?? null,
+                quantityUnit: quantity?.unit ?? null
+              };
               const updatedHistory = existingHistory
                 ? { ...existingHistory, purchaseCount: Math.max(0, Number(existingHistory.purchaseCount || 0) - 1) }
                 : null;
-              await putItemAndHistory(reopenedItem, updatedHistory);
+              await putProductItemAndHistory(newProduct ? product : null, reopenedItem, updatedHistory);
+              if (newProduct) state.products.push(product);
               state.items = [...state.items.filter((item) => item.id !== reopenedItem.id), reopenedItem];
               if (updatedHistory) {
                 state.history = state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry);
               }
+              if (quantity) closeQuantityPage({ focus: false });
               finishAddingProduct(reopenedItem.productName);
               return;
             }
@@ -1687,19 +2143,24 @@
             const item = {
               id: id(),
               listId: state.list.id,
+              productId: product.id,
               productName,
               checked: false,
-              createdAt: Date.now()
+              createdAt: Date.now(),
+              quantityValue: quantity?.value ?? null,
+              quantityUnit: quantity?.unit ?? null
             };
             const historyItem = existingHistory ? null : {
               id: id(),
               listId: state.list.id,
-              productName,
+              productId: product.id,
               purchaseCount: 0
             };
-            await putItemAndHistory(item, historyItem);
+            await putProductItemAndHistory(newProduct ? product : null, item, historyItem);
+            if (newProduct) state.products.push(product);
             state.items.push(item);
             if (historyItem) state.history.push(historyItem);
+            if (quantity) closeQuantityPage({ focus: false });
             finishAddingProduct(productName);
           } catch (error) {
             console.error(error);
@@ -1717,9 +2178,28 @@
         showToast(`${productName} hinzugefügt`);
       }
 
-      function submitQuickAdd(event) {
+      function submitAddForm(event) {
         event.preventDefault();
-        addProduct(els.productName.value);
+        if (!els.addForm.classList.contains("quantity-mode")) {
+          addProduct(els.productName.value);
+          return;
+        }
+        const quantityValue = parseQuantity(els.quantityValue.value);
+        if (!quantityValue) {
+          els.quantityValue.setAttribute("aria-invalid", "true");
+          showToast("Bitte gib eine gültige Menge größer als 0 ein");
+          els.quantityValue.focus();
+          return;
+        }
+        if (!state.quantityProductName) {
+          closeQuantityPage();
+          return;
+        }
+        if (state.quantityEditingItemId) {
+          saveItemQuantity(state.quantityEditingItemId, quantityValue, state.quantityUnit);
+          return;
+        }
+        addProduct(state.quantityProductName, { value: quantityValue, unit: state.quantityUnit });
       }
 
       els.openAdd.addEventListener("click", () => state.showingLists ? openListEditor() : openAddSheet());
@@ -1732,6 +2212,7 @@
         }, 0);
       });
       els.listNameForm.addEventListener("submit", saveListName);
+      els.listNameInput.addEventListener("input", () => els.listNameInput.removeAttribute("aria-invalid"));
       els.cancelListName.addEventListener("click", () => els.listNameDialog.close());
       els.cancelDeleteList.addEventListener("click", () => {
         state.pendingListDelete = null;
@@ -1747,12 +2228,27 @@
         renderSuggestions();
         els.productName.focus({ preventScroll: true });
       });
-      els.addForm.addEventListener("submit", submitQuickAdd);
+      els.addForm.addEventListener("submit", submitAddForm);
+      els.backFromQuantity.addEventListener("click", () => {
+        if (state.quantityEntrySource === "list") closeAddSheet();
+        else closeQuantityPage();
+      });
+      els.unitOptions.addEventListener("click", (event) => {
+        const button = event.target.closest(".unit-chip");
+        if (button) setQuantityUnit(button.dataset.unit);
+      });
+      els.quantityValue.addEventListener("input", () => {
+        els.quantityValue.removeAttribute("aria-invalid");
+      });
+      els.quantityValue.addEventListener("blur", () => {
+        const value = parseQuantity(els.quantityValue.value);
+        if (value) els.quantityValue.value = formatQuantity(value);
+      });
       els.frequentMode.addEventListener("click", () => setQuickMode("frequent"));
       els.alphabeticalMode.addEventListener("click", () => setQuickMode("alphabetical"));
       els.productName.addEventListener("input", () => {
         els.addError.textContent = "";
-        renderSuggestions();
+        scheduleSuggestions();
       });
       els.productName.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" || event.isComposing) return;

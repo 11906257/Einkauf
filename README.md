@@ -1,32 +1,29 @@
 # Einkauf
 
-Version 1.0.0 – build-freie Progressive Web App ohne externe Abhängigkeiten. Alle Dateien können direkt auf GitHub Pages veröffentlicht werden. Einkaufslisten und Produkthistorien bleiben ausschließlich im IndexedDB-Speicher des jeweiligen Geräts.
+**Einkauf** ist eine schnelle und übersichtliche Progressive Web App für Einkaufslisten. Sie funktioniert direkt im Browser und kann auf Smartphone oder Tablet wie eine App zum Home-Bildschirm hinzugefügt werden.
 
-## Lokal prüfen
+## Funktionen
 
-Im Projektordner einen lokalen Webserver starten und anschließend die angezeigte Adresse im Browser öffnen. Ein Webserver ist erforderlich, damit der Service Worker funktioniert.
+- Mehrere voneinander unabhängige Einkaufslisten erstellen und verwalten
+- Artikel schnell über die persönliche Produktauswahl hinzufügen
+- Vorschläge nach Kaufhäufigkeit oder alphabetisch sortieren
+- Optionale Mengen in Stück, Gramm, Kilogramm, Milliliter oder Liter angeben
+- Mengen offener Artikel nachträglich ändern
+- Artikel abhaken und wieder auf die offene Liste setzen
+- Artikel und Listen mit einer Wischbewegung entfernen
+- Listen direkt umbenennen
+- Auch ohne Internetverbindung verwenden
 
-```sh
-python3 -m http.server 4173
-```
+Alle Listen greifen auf einen gemeinsamen Produktkatalog zu. Wie häufig ein Produkt verwendet wurde, wird für jede Liste separat gespeichert und verbessert dort die Sortierung der Vorschläge.
 
-## Veröffentlichung auf GitHub Pages
+## Datenschutz
 
-1. Den gesamten Inhalt dieses Ordners in die oberste Ebene eines GitHub-Repositorys übertragen.
-2. Unter **Settings → Pages → Build and deployment** die Option **Deploy from a branch** auswählen.
-3. Den gewünschten Branch, üblicherweise `main`, und den Ordner `/ (root)` auswählen und speichern.
-4. Nach der Veröffentlichung die von GitHub angezeigte Pages-Adresse einmal öffnen und anschließend zum Offline-Test neu laden.
+Die App stellt **keine externen Verbindungen** her und überträgt keine persönlichen Daten. Listen, Produkte und Kaufhäufigkeiten werden ausschließlich lokal in der Browser-Datenbank des verwendeten Geräts gespeichert.
 
-Relative Pfade und die `.nojekyll`-Datei sorgen dafür, dass die App auch unter einem Repository-Unterpfad korrekt ausgeliefert wird.
+Dadurch bleiben die Daten privat, werden aber nicht automatisch zwischen Geräten synchronisiert. Werden die Website-Daten des Browsers gelöscht, werden auch die gespeicherten Einkaufslisten entfernt.
 
-### Neue Version veröffentlichen
+## Progressive Web App
 
-Bei jeder veröffentlichten Version muss `CACHE_NAME` in `service-worker.js` auf eine neue eindeutige Version gesetzt werden, zum Beispiel `einkauf-app-v1.0.1`. Dadurch installiert der Browser den neuen App-Shell-Cache und entfernt ausschließlich ältere Caches dieser App.
+Die App kann über GitHub Pages bereitgestellt werden. Nach dem ersten Aufruf steht sie auch offline zur Verfügung und lässt sich auf unterstützten Geräten zum Home-Bildschirm hinzufügen.
 
-## Funktionsumfang
-
-Beim ersten Start wird automatisch eine leere Liste „Einkauf“ angelegt. Es werden keine Beispielprodukte mitgeliefert. Die App unterstützt mehrere eigenständige Listen, schnelles Hinzufügen, Abhaken und Entfernen per Wisch. Produkthistorie und Kaufhäufigkeit werden unsichtbar und getrennt pro Liste gespeichert. Long Press, Artikelbearbeitung, Mengenangaben und eine manuelle Listensortierung sind bewusst nicht Bestandteil dieser Version.
-
-## Datenschutz und Sicherung
-
-Es werden keine Daten übertragen. Das Löschen der Browser- oder Websitedaten entfernt deshalb auch alle Einkaufslisten; eine Cloud-Synchronisierung oder Exportfunktion existiert nicht.
+Beim ersten Start wird automatisch eine leere Liste **„Einkauf“** angelegt. Die App enthält keine Beispiel- oder Dummy-Produkte.
