@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.5.4">
+  <meta name="application-version" content="1.6.0">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -16,11 +16,9 @@
     :root {
       color-scheme: only light;
       --bg: #41436A;
-      --surface: #fff;
-      --surface-2: #FE9677;
+      --surface: #F3E6DF;
       --text: #41436A;
       --secondary: #984063;
-      --separator: #FE9677;
       --accent: #FE9677;
       --accent-pressed: #984063;
       --danger: #F64668;
@@ -38,18 +36,19 @@
     body {
       margin: 0;
       background: var(--bg);
-      color: #fff;
+      color: #F3E6DF;
       overscroll-behavior-y: none;
     }
 
     body.list-overview-mode {
-      --bg: #FE9677;
+      --bg: #F3E6DF;
       --accent: #41436A;
       --accent-pressed: #984063;
-      background: #FE9677;
+      background: #F3E6DF;
     }
 
-    body.list-overview-mode .list-title { color: #41436A; }
+    body.list-overview-mode .list-title,
+    body.list-overview-mode .settings-trigger { color: #41436A; }
 
     button, input { font: inherit; }
     button { color: inherit; cursor: pointer; }
@@ -60,7 +59,6 @@
 
     input:focus,
     input:focus-visible {
-      outline: none;
       box-shadow: none !important;
     }
 
@@ -97,7 +95,7 @@
       font-weight: 750;
       letter-spacing: -.9px;
       text-align: left;
-      color: #fff;
+      color: #F3E6DF;
     }
 
     .list-title-text {
@@ -112,14 +110,12 @@
       width: 9px;
       height: 9px;
       margin: -5px 0 0 2px;
-      border-right: 2.5px solid #FE9677;
-      border-bottom: 2.5px solid #FE9677;
+      border-right: 2.5px solid #F3E6DF;
+      border-bottom: 2.5px solid #F3E6DF;
       transform: rotate(45deg);
     }
 
-    .list-title:disabled { opacity: 1; }
-
-    .list-title:not(:disabled):active { opacity: .65; }
+    .list-title:active { opacity: .65; }
     .list-title.overview-mode::after { display: none; }
 
     .settings-trigger {
@@ -151,7 +147,7 @@
 
     .section-heading {
       margin: 0;
-      color: #FE9677;
+      color: #F3E6DF;
       font-size: 13px;
       font-weight: 650;
       letter-spacing: .45px;
@@ -165,13 +161,42 @@
       color: var(--text);
     }
 
+    .card.grouped-card {
+      overflow: visible;
+      border-radius: 0;
+      background: transparent;
+    }
+
     .swipe-row {
       position: relative;
       overflow: hidden;
       background: var(--danger);
     }
 
-    .swipe-row + .swipe-row .item { box-shadow: inset 0 1px #984063; }
+    .swipe-row + .swipe-row .item { border-top: 1px solid #984063; }
+
+    .product-group-heading {
+      display: inline-flex;
+      min-height: 24px;
+      margin: 0 0 6px;
+      padding: 4px 10px;
+      align-items: center;
+      border-radius: 999px;
+      background: #984063;
+      color: #F3E6DF;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .product-group + .product-group { margin-top: 16px; }
+
+    .product-group-items {
+      overflow: hidden;
+      border-radius: 15px;
+      background: var(--surface);
+    }
 
     .delete-reveal {
       position: absolute;
@@ -179,7 +204,7 @@
       display: grid;
       width: 92px;
       place-items: center;
-      color: #fff;
+      color: #F3E6DF;
       font-size: 14px;
       font-weight: 650;
       border: 0;
@@ -206,7 +231,7 @@
       margin-right: 13px;
       padding: 0;
       place-items: center;
-      border: 2px solid #984063;
+      border: 2px solid #41436A;
       border-radius: 50%;
       background: transparent;
       color: transparent;
@@ -220,7 +245,7 @@
     .check-button.checked {
       border-color: #984063;
       background: #984063;
-      color: #fff;
+      color: #F3E6DF;
     }
 
     .item-copy {
@@ -241,10 +266,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      overflow-wrap: anywhere;
       font-size: 18px;
       line-height: 1.3;
-      color: #984063;
+      color: #41436A;
     }
 
     .item-quantity {
@@ -275,13 +299,12 @@
       display: grid;
       width: 32px;
       height: 32px;
-      align-items: center;
       min-height: 32px;
       padding: 0;
       place-items: center;
       border: 0;
       border-radius: 50%;
-      background: color-mix(in srgb, var(--danger) 15%, var(--surface));
+      background: #F3E6DF;
       color: var(--danger);
       font-size: 14px;
       font-weight: 600;
@@ -301,14 +324,20 @@
 
     .empty {
       display: grid;
+      width: 100%;
       min-height: 62px;
       padding: 8px 17px;
       place-items: center;
+      border: 0;
+      background: transparent;
       color: var(--secondary);
       font-size: 15px;
       line-height: 1.4;
       text-align: center;
     }
+
+    #openItems .item-copy,
+    #openItems .empty { cursor: pointer; }
 
     .bought-placeholder {
       display: grid;
@@ -340,24 +369,9 @@
       line-height: 1;
     }
 
+    .add-button[hidden] { display: none; }
+
     .add-button:active { transform: scale(.94); background: var(--accent-pressed); }
-
-    .add-button.list-mode {
-      display: inline-flex;
-      width: auto;
-      padding: 0 18px;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      border-radius: 999px;
-      font-size: 16px;
-      font-weight: 650;
-      color: #fff;
-    }
-
-    body.list-overview-mode .add-button.list-mode { background: #984063; }
-
-    .add-button.list-mode .small-icon { width: 18px; height: 18px; }
 
     dialog {
       color: var(--text);
@@ -372,6 +386,12 @@
       -webkit-backdrop-filter: blur(2px);
     }
 
+    .settings-sheet::backdrop {
+      background: #F3E6DF;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
     .sheet {
       width: min(100%, 520px);
       height: 100dvh;
@@ -382,7 +402,7 @@
       border: 0;
       border-radius: 0;
       background: var(--bg);
-      box-shadow: var(--shadow);
+      box-shadow: none;
     }
 
     .sheet[open] { animation: rise .22s cubic-bezier(.2, .75, .25, 1); }
@@ -391,10 +411,8 @@
 
     .sheet-inner {
       position: relative;
-      display: flex;
       height: 100%;
       overflow: hidden;
-      flex-direction: column;
       padding: 0;
     }
 
@@ -407,9 +425,13 @@
       transition: opacity .22s ease, transform .24s cubic-bezier(.2, .75, .25, 1);
     }
 
-    .search-page { transform: translateX(0); }
+    .search-page {
+      background: #FE9677;
+      transform: translateX(0);
+    }
 
     .quantity-page {
+      background: #984063;
       opacity: 0;
       pointer-events: none;
       transform: translateX(100%);
@@ -437,7 +459,7 @@
     .sheet-header h2 {
       margin: 0;
       overflow: hidden;
-      color: #fff;
+      color: #F3E6DF;
       font-size: 18px;
       text-align: center;
       text-overflow: ellipsis;
@@ -446,23 +468,20 @@
 
     .search-field {
       width: 100%;
-      height: 52px;
-      margin-top: 8px;
+      height: 58px;
       padding: 0 50px 0 16px;
       border: 0;
-      border-radius: 13px;
-      outline: none;
-      background: var(--surface);
-      color: var(--text);
-      font-size: 18px;
+      border-radius: 14px;
+      background: #F3E6DF;
+      color: #984063;
+      caret-color: #984063;
+      font-size: 24px;
     }
 
     .search-wrap {
       position: relative;
-      margin-top: 8px;
+      margin-top: 10px;
     }
-
-    .search-wrap .search-field { margin-top: 0; }
 
     .search-field::-webkit-search-cancel-button { display: none; }
 
@@ -488,28 +507,41 @@
     .search-clear[hidden] { display: none; }
 
     .segments {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px;
+      display: flex;
+      height: 40px;
+      flex: 0 0 40px;
+      gap: 3px;
       margin-top: 10px;
       padding: 2px;
-      border-radius: 10px;
-      background: #fff;
+      overflow: hidden;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
     }
 
     .segment {
-      min-height: 34px;
+      display: flex;
+      height: auto;
+      min-height: 0;
+      min-width: 0;
+      flex: 1 1 0;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
       border: 0;
       border-radius: 8px;
+      appearance: none;
+      -webkit-appearance: none;
       background: transparent;
-      color: #984063;
+      color: #41436A;
       font-size: 14px;
       font-weight: 600;
+      line-height: 1;
     }
 
     .segment.active {
-      background: #984063;
-      color: #fff;
+      background: #41436A;
+      color: #FE9677;
       box-shadow: none;
     }
 
@@ -519,7 +551,7 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      overflow: hidden;
+      overflow-x: hidden;
       overflow-y: auto;
       margin-top: 10px;
       -webkit-overflow-scrolling: touch;
@@ -548,10 +580,10 @@
       align-items: center;
       overflow: hidden;
       border-radius: 0;
-      background: var(--surface);
+      background: #F3E6DF;
     }
 
-    .suggestion + .suggestion { box-shadow: inset 0 1px #984063; }
+    .suggestion + .suggestion { border-top: 1px solid #984063; }
     .suggestion:first-child { border-radius: 14px 14px 0 0; }
     .suggestion:last-child { border-radius: 0 0 14px 14px; }
     .suggestion:only-child { border-radius: 14px; }
@@ -569,9 +601,37 @@
       text-align: left;
     }
 
-    .suggestion-main:active { background: var(--surface-2); }
+    .suggestion-main:active {
+      background: #984063;
+      color: #F3E6DF;
+    }
 
-    .suggestion:has(.suggestion-main:active) { background: var(--surface-2); }
+    .suggestion:has(.suggestion-main:active) { background: #984063; }
+
+    .suggestion-main:active .suggestion-name,
+    .suggestion-main:active .suggestion-status { color: #F3E6DF; }
+
+    .suggestion-category + .suggestion-category { margin-top: 16px; }
+
+    .suggestion-category-heading {
+      display: inline-flex;
+      min-height: 24px;
+      margin-bottom: 6px;
+      padding: 4px 10px;
+      align-items: center;
+      border-radius: 999px;
+      background: #984063;
+      color: #F3E6DF;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .suggestion-category-items {
+      overflow: hidden;
+      border-radius: 14px;
+    }
 
     .suggestion-name {
       min-width: 0;
@@ -598,8 +658,8 @@
       place-items: center;
       border: 0;
       border-radius: 11px;
-      background: #FE9677;
-      color: #fff;
+      background: #984063;
+      color: #F3E6DF;
       font-size: 12px;
       font-weight: 750;
       letter-spacing: -.3px;
@@ -628,7 +688,7 @@
       padding: 8px 17px;
       place-items: center;
       border-radius: 14px;
-      background: var(--surface);
+      background: #F3E6DF;
       color: var(--secondary);
       font-size: 15px;
       line-height: 1.4;
@@ -638,13 +698,13 @@
     .quantity-controls {
       display: flex;
       flex-direction: column;
-      gap: 9px;
+      gap: 10px;
       margin-top: 10px;
     }
 
     .quantity-label {
       margin: 0 0 0 2px;
-      color: #fff;
+      color: #F3E6DF;
       font-size: 13px;
       font-weight: 650;
       letter-spacing: .35px;
@@ -652,18 +712,43 @@
       text-transform: uppercase;
     }
 
+    .quantity-input-wrap {
+      position: relative;
+    }
+
     .quantity-input {
       width: 100%;
       height: 58px;
-      padding: 0 16px;
+      padding: 0 50px 0 16px;
       border: 0;
       border-radius: 14px;
-      outline: none;
-      background: var(--surface);
-      color: var(--text);
+      background: #F3E6DF;
+      color: #984063;
+      caret-color: #984063;
       font-size: 24px;
       font-variant-numeric: tabular-nums;
     }
+
+    .quantity-clear {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      right: 8px;
+      display: grid;
+      width: 36px;
+      height: 36px;
+      padding: 0 0 3px;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: #984063;
+      font-size: 25px;
+      font-weight: 500;
+      line-height: 1;
+      transform: translateY(-50%);
+    }
+
+    .quantity-clear[hidden] { display: none; }
 
     .unit-options {
       display: flex;
@@ -672,32 +757,64 @@
       margin-top: 0;
     }
 
+    .quantity-group-control {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .group-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .group-chip {
+      min-height: 38px;
+      padding: 0 15px;
+      border: 1.5px solid #F3E6DF;
+      border-radius: 999px;
+      background: transparent;
+      color: #F3E6DF;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .group-chip.active {
+      background: #F3E6DF;
+      color: #984063;
+    }
+
     .unit-chip {
       min-height: 38px;
       padding: 0 15px;
-      border: 0;
+      border: 1.5px solid #F3E6DF;
       border-radius: 999px;
-      background: #fff;
-      color: #984063;
+      background: transparent;
+      color: #F3E6DF;
       font-size: 14px;
       font-weight: 650;
     }
 
     .unit-chip.active {
-      background: #984063;
-      color: #fff;
+      background: #F3E6DF;
+      color: #984063;
     }
 
     .quantity-add {
-      min-height: 50px;
-      margin-top: auto;
+      min-height: 44px;
+      padding: 0;
       border: 0;
-      border-radius: 14px;
-      background: var(--accent);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
+      background: transparent;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 650;
+      justify-self: end;
+      text-align: right;
     }
+
+    .quantity-page .sheet-header { grid-template-columns: 64px minmax(0, 1fr) 88px; }
 
     .back-button {
       display: inline-flex;
@@ -711,17 +828,71 @@
 
     .back-button .small-icon { width: 21px; height: 21px; }
 
+    .search-page .back-button,
+    .quantity-page .back-button { color: #F3E6DF; }
+
+    .search-page .sheet-header h2,
+    .search-page .back-button { color: #41436A; }
+
+    .search-page .search-field::placeholder {
+      color: #8E8E93;
+      opacity: 1;
+    }
+
+    .search-page .search-clear { color: #984063; }
+
+    .quantity-page .sheet-header h2,
+    .quantity-page .back-button,
+    .quantity-page .quantity-add { color: #F3E6DF; }
+
+    #addSheet { background: #FE9677; }
+
+    #addSheet::backdrop {
+      background: #FE9677;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    #addSheet.quantity-mode { background: #984063; }
+
+    #addSheet.quantity-mode::backdrop { background: #984063; }
+
+
     .settings-sheet .sheet-header h2 { color: #41436A; }
 
+    .settings-main-page,
+    .settings-groups-page { background: #F3E6DF; }
+
+    .settings-groups-page {
+      overflow-x: hidden;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .settings-inner.groups-mode .settings-main-page {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-24%);
+    }
+
+    .settings-inner.groups-mode .settings-groups-page {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
     .settings-content {
-      margin-top: 18px;
+      margin-top: 10px;
       color: #41436A;
     }
 
-    .settings-content + .settings-content { margin-top: 26px; }
+    .settings-content + .settings-content { margin-top: 20px; }
 
     .settings-heading {
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       font-size: 13px;
       font-weight: 650;
       letter-spacing: .45px;
@@ -729,9 +900,8 @@
     }
 
     .settings-card {
-      overflow: hidden;
-      border-radius: 15px;
-      background: #fff;
+      display: grid;
+      gap: 10px;
     }
 
     .settings-action {
@@ -742,33 +912,41 @@
       padding: 11px 15px;
       align-items: center;
       border: 0;
-      background: transparent;
+      border-radius: 14px;
+      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
       color: #41436A;
       text-align: left;
     }
-
-    .settings-action + .settings-action { box-shadow: inset 0 1px #984063; }
 
     .settings-action-icon {
       display: grid;
       width: 34px;
       height: 34px;
       place-items: center;
-      border-radius: 10px;
-      background: color-mix(in srgb, #984063 12%, #fff);
-      color: #984063;
+      background: transparent;
+      color: #41436A;
     }
 
     .settings-action-icon .small-icon { width: 19px; height: 19px; }
 
-    .settings-action.danger { color: #F64668; }
+    .cleanup-count-icon {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1;
+    }
 
-    .settings-action.danger .settings-action-icon {
-      background: color-mix(in srgb, #F64668 12%, #fff);
+    .settings-action.danger {
+      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
       color: #F64668;
     }
 
-    .settings-action.danger .settings-action-description { color: #984063; }
+    .settings-action.danger .settings-action-icon {
+      background: transparent;
+      color: #F64668;
+    }
+
+    .settings-action.danger .settings-action-description { color: #41436A; }
 
     .settings-action-title {
       display: block;
@@ -779,16 +957,106 @@
     .settings-action-description {
       display: block;
       margin-top: 2px;
-      color: #984063;
+      color: #41436A;
       font-size: 13px;
       line-height: 1.3;
     }
 
-    .settings-note {
-      margin: 10px 4px 0;
+    .group-manager {
+      display: grid;
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid #41436A;
+      border-radius: 14px;
+      background: #F3E6DF;
+    }
+
+    .group-manager-empty {
+      padding: 16px;
+      background: transparent;
       color: #41436A;
-      font-size: 13px;
-      line-height: 1.4;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .group-manager-row {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(2, 38px);
+      min-height: 54px;
+      padding: 8px 10px 8px 15px;
+      align-items: center;
+      gap: 4px;
+      border-radius: 0;
+      background: #F3E6DF;
+      color: #41436A;
+      touch-action: pan-y;
+      transition: transform .16s ease;
+    }
+
+    .group-manager-row.dragging { transition: none; }
+
+    .group-swipe-row {
+      position: relative;
+      overflow: hidden;
+      background: #F64668;
+    }
+
+    .group-swipe-row > .delete-reveal { z-index: 0; }
+
+    .group-swipe-row + .group-swipe-row .group-manager-row { border-top: 1px solid #41436A; }
+
+    .group-manager-name {
+      overflow: hidden;
+      font-size: 15px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .group-manager-button,
+    .group-add-button {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 10px;
+      background: #F3E6DF;
+      color: #41436A;
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    .group-manager-button:disabled { opacity: .3; }
+
+    .group-add-button {
+      width: 44px;
+      height: 44px;
+      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .group-add-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .group-add-input {
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 12px;
+      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
+      color: #41436A;
+      caret-color: #984063;
+      font: inherit;
     }
 
     .list-options {
@@ -800,8 +1068,9 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      min-height: 58px;
-      background: var(--surface);
+      min-height: 82px;
+      background: #41436A;
+      color: #F3E6DF;
       touch-action: pan-y;
       transition: transform .16s ease, opacity .15s;
     }
@@ -809,9 +1078,10 @@
     .list-option-shell {
       position: relative;
       overflow: hidden;
-      margin-bottom: 9px;
-      border-radius: 14px;
-      background: var(--surface);
+      margin-bottom: 12px;
+      border-radius: 20px;
+      background: var(--danger);
+      box-shadow: 0 5px 20px color-mix(in srgb, #41436A 18%, transparent);
     }
 
     .list-overview {
@@ -824,22 +1094,25 @@
 
     .list-overview[hidden] { display: none; }
 
-    .list-overview .list-option-shell {
-      margin-bottom: 12px;
-      border-radius: 20px;
-      background: var(--danger);
-      box-shadow: 0 5px 20px color-mix(in srgb, #41436A 18%, transparent);
-    }
-
-    .list-overview .list-option { min-height: 82px; background: #41436A; color: #fff; }
-
-    .list-overview .list-select {
+    .list-add-tile {
+      display: grid;
+      width: 100%;
       height: 82px;
-      padding-left: 18px;
-      font-size: 20px;
+      padding: 0 0 5px;
+      place-items: center;
+      border: 2px solid #41436A;
+      border-radius: 20px;
+      background: transparent;
+      color: #41436A;
+      font-size: 42px;
+      font-weight: 300;
+      line-height: 1;
     }
 
-    .list-overview .list-select.active { color: #FE9677; box-shadow: none; }
+    .list-add-tile:active {
+      background: #41436A;
+      color: #F3E6DF;
+    }
 
     .list-action,
     .list-select {
@@ -849,28 +1122,29 @@
 
     .list-select {
       min-width: 0;
-      height: 58px;
+      height: 82px;
       overflow: hidden;
-      padding: 0 8px;
-      font-size: 17px;
+      padding: 0 8px 0 18px;
+      color: #F3E6DF;
+      font-size: 24px;
       text-align: left;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .list-select.active { color: var(--accent); font-weight: 650; }
+    .list-select.active { font-weight: 400; }
 
     .inline-list-input {
       min-width: 0;
-      height: 42px;
-      margin: 0 12px 0 18px;
-      padding: 0 10px;
+      height: 82px;
+      margin: 0;
+      padding: 0 18px;
       border: 0;
-      border-radius: 10px;
-      outline: none;
-      background: #fff;
-      color: #41436A;
-      font-size: 17px;
+      border-radius: 0;
+      background: transparent;
+      color: #F3E6DF;
+      font-size: 24px;
+      font-weight: 400;
     }
 
     .list-action.save-list-name {
@@ -882,8 +1156,9 @@
       align-items: center;
       justify-content: center;
       border-radius: 11px;
-      background: #984063;
-      color: #fff;
+      background: #F3E6DF;
+      box-shadow: 0 7px 22px color-mix(in srgb, #41436A 38%, transparent);
+      color: #41436A;
     }
 
     .list-action {
@@ -911,14 +1186,16 @@
     }
 
     .rename-list {
-      background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-      color: var(--accent);
+      background: transparent;
+      color: #F3E6DF;
     }
 
-    .list-overview .rename-list { background: transparent; color: #fff; }
+    .inline-list-input::selection {
+      background: #F3E6DF;
+      color: #41436A;
+    }
 
-    .rename-list .small-icon,
-    .save-list-name .small-icon { width: 18px; height: 18px; }
+    .rename-list .small-icon { width: 18px; height: 18px; }
 
     .save-list-name .small-icon {
       width: 22px;
@@ -937,17 +1214,23 @@
     }
 
     .dialog-card {
+      position: fixed;
+      inset: auto;
+      top: 33.333%;
+      left: 50%;
       width: min(calc(100% - 36px), 360px);
+      margin: 0;
       padding: 20px;
       border: 0;
       border-radius: 18px;
       background: var(--surface);
       color: var(--text);
       box-shadow: var(--shadow);
+      transform: translate(-50%, -50%);
     }
 
     .dialog-card h2 { margin: 0 0 8px; font-size: 20px; text-align: center; }
-    .dialog-card p { margin: 0 0 17px; color: var(--secondary); line-height: 1.4; text-align: center; }
+    .dialog-card p { margin: 0 0 17px; color: #41436A; line-height: 1.4; text-align: center; }
 
     .dialog-actions {
       display: grid;
@@ -960,58 +1243,19 @@
       min-height: 46px;
       border: 0;
       border-radius: 12px;
-      background: var(--surface-2);
+      background: transparent;
       font-weight: 650;
     }
 
-    #listNameDialog #cancelListName {
+    .dialog-button.cancel {
       border: 1.5px solid #41436A;
-      background: transparent;
       color: #41436A;
     }
 
-    #listNameDialog .dialog-button.primary { background: #984063; color: #fff; }
-
-    #deleteListDialog #cancelDeleteList {
-      border: 1.5px solid #41436A;
-      background: transparent;
-      color: #41436A;
-    }
-
-    #deleteListDialog #confirmDeleteList {
+    .dialog-button.danger {
       background: #F64668;
-      color: #fff;
+      color: #F3E6DF;
     }
-
-    #deleteListDialog #deleteListText { color: #41436A; }
-
-    #importBackupDialog p { color: #41436A; }
-
-    #importBackupDialog #cancelImportBackup {
-      border: 1.5px solid #41436A;
-      background: transparent;
-      color: #41436A;
-    }
-
-    #importBackupDialog #confirmImportBackup {
-      background: #F64668;
-      color: #fff;
-    }
-
-    #cleanupProductsDialog p { color: #41436A; }
-
-    #cleanupProductsDialog #cancelCleanupProducts {
-      border: 1.5px solid #41436A;
-      background: transparent;
-      color: #41436A;
-    }
-
-    #cleanupProductsDialog #confirmCleanupProducts {
-      background: #F64668;
-      color: #fff;
-    }
-
-    .dialog-button.primary { background: var(--accent); color: #fff; }
     .toast {
       position: fixed;
       z-index: 30;
@@ -1021,8 +1265,6 @@
       padding: 11px 16px;
       border: 0;
       border-radius: 999px;
-      background: #984063;
-      color: #fff;
       font-size: 14px;
       font-weight: 600;
       line-height: 1.35;
@@ -1035,7 +1277,15 @@
 
     .toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
-    body.list-overview-mode .toast { background: #41436A; color: #fff; }
+    #toast {
+      background: #F3E6DF;
+      color: #41436A;
+    }
+
+    body.list-overview-mode #toast {
+      background: #41436A;
+      color: #F3E6DF;
+    }
 
     @keyframes rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes sink { from { transform: translateY(0); } to { transform: translateY(100%); } }
@@ -1085,11 +1335,12 @@
           <span aria-hidden="true"></span>
         </div>
         <div class="search-wrap">
-          <input class="search-field" id="productName" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="61" placeholder="Artikel suchen" aria-label="Artikel suchen">
+          <input class="search-field" id="productName" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Artikel suchen" aria-label="Artikel suchen">
           <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
         </div>
         <div class="segments" role="group" aria-label="Sortierung">
           <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Häufig</button>
+          <button class="segment" id="categoryMode" type="button" aria-pressed="false">Artikelgruppen</button>
           <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
         </div>
         <div class="suggestions" id="suggestions"></div>
@@ -1099,11 +1350,14 @@
         <div class="sheet-header">
           <button class="back-button" id="backFromQuantity" type="button" aria-label="Zurück zur Artikelauswahl"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
           <h2 id="quantityTitle"></h2>
-          <span aria-hidden="true"></span>
+          <button class="quantity-add" id="addWithQuantity" type="submit">Hinzufügen</button>
         </div>
         <div class="quantity-controls">
           <label class="quantity-label" for="quantityValue">Menge</label>
-          <input class="quantity-input" id="quantityValue" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" maxlength="12" placeholder="1">
+          <div class="quantity-input-wrap">
+            <input class="quantity-input" id="quantityValue" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" maxlength="12" placeholder="1">
+            <button class="quantity-clear" id="clearQuantity" type="button" aria-label="Menge löschen" hidden>×</button>
+          </div>
           <div class="unit-options" id="unitOptions" role="group" aria-label="Einheit">
             <button class="unit-chip active" type="button" data-unit="Stück" aria-pressed="true">Stück</button>
             <button class="unit-chip" type="button" data-unit="g" aria-pressed="false">g</button>
@@ -1111,19 +1365,11 @@
             <button class="unit-chip" type="button" data-unit="ml" aria-pressed="false">ml</button>
             <button class="unit-chip" type="button" data-unit="l" aria-pressed="false">l</button>
           </div>
+          <div class="quantity-group-control">
+            <p class="quantity-label">Artikelgruppe</p>
+            <div class="group-options" id="quantityGroupOptions" role="group" aria-label="Artikelgruppe"></div>
+          </div>
         </div>
-        <button class="quantity-add" id="addWithQuantity" type="submit">+ Hinzufügen</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog class="dialog-card" id="listNameDialog" aria-labelledby="listNameTitle">
-    <form id="listNameForm" autocomplete="off" novalidate>
-      <h2 id="listNameTitle">Neue Liste</h2>
-      <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Listenname">
-      <div class="dialog-actions">
-        <button class="dialog-button" id="cancelListName" type="button">Abbrechen</button>
-        <button class="dialog-button primary" type="submit">Sichern</button>
       </div>
     </form>
   </dialog>
@@ -1132,18 +1378,28 @@
     <h2 id="deleteListTitle">Liste löschen?</h2>
     <p id="deleteListText"></p>
     <div class="dialog-actions">
-      <button class="dialog-button" id="cancelDeleteList" type="button">Abbrechen</button>
+      <button class="dialog-button cancel" id="cancelDeleteList" type="button">Abbrechen</button>
       <button class="dialog-button danger" id="confirmDeleteList" type="button">Löschen</button>
     </div>
   </dialog>
 
   <dialog class="sheet settings-sheet" id="settingsSheet" aria-labelledby="settingsTitle">
-    <div class="sheet-page">
+    <div class="sheet-inner settings-inner" id="settingsInner">
+    <div class="sheet-page settings-main-page" id="settingsMainPage" aria-hidden="false">
       <div class="sheet-header">
         <button class="back-button" id="closeSettings" type="button" aria-label="Zurück zu den Listen"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         <h2 id="settingsTitle">Einstellungen</h2>
         <span aria-hidden="true"></span>
       </div>
+      <section class="settings-content" aria-labelledby="groupsHeading">
+        <h3 class="settings-heading" id="groupsHeading">Artikelgruppen</h3>
+        <div class="settings-card">
+          <button class="settings-action" id="openGroups" type="button">
+            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+            <span><span class="settings-action-title">Artikelgruppen bearbeiten</span><span class="settings-action-description">Gruppen anlegen und sortieren</span></span>
+          </button>
+        </div>
+      </section>
       <section class="settings-content" aria-labelledby="backupHeading">
         <h3 class="settings-heading" id="backupHeading">Datensicherung</h3>
         <div class="settings-card">
@@ -1153,35 +1409,48 @@
           </button>
           <button class="settings-action" id="importBackup" type="button">
             <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg></span>
-            <span><span class="settings-action-title">Backup importieren</span><span class="settings-action-description">Daten aus einer JSON-Datei wiederherstellen</span></span>
+            <span><span class="settings-action-title">Backup importieren</span><span class="settings-action-description">Alle Daten durch ein JSON-Backup ersetzen</span></span>
           </button>
         </div>
-        <p class="settings-note">Backups enthalten alle Listen, Artikel, Mengen und Kaufhäufigkeiten. Beim Import werden die aktuellen Daten vollständig ersetzt.</p>
       </section>
       <section class="settings-content" aria-labelledby="cleanupHeading">
         <h3 class="settings-heading" id="cleanupHeading">Artikel bereinigen</h3>
         <div class="settings-card">
           <button class="settings-action danger" id="cleanupRareProducts" type="button">
-            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg></span>
+            <span class="settings-action-icon"><span class="cleanup-count-icon" aria-hidden="true">1x</span></span>
             <span><span class="settings-action-title">Selten gekaufte Artikel löschen</span><span class="settings-action-description">Artikel mit höchstens einem Kauf entfernen</span></span>
           </button>
           <button class="settings-action danger" id="cleanupOldProducts" type="button">
-            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></span>
             <span><span class="settings-action-title">Lange ungenutzte Artikel löschen</span><span class="settings-action-description">Seit über einem Jahr nicht gekaufte Artikel entfernen</span></span>
           </button>
         </div>
-        <p class="settings-note">Die Bereinigung gilt für alle Listen und entfernt auch zugehörige Listeneinträge und Kaufhistorien.</p>
       </section>
       <input id="backupFile" type="file" accept="application/json,.json" hidden>
+    </div>
+    <div class="sheet-page settings-groups-page" id="settingsGroupsPage" aria-hidden="true" inert>
+      <div class="sheet-header">
+        <button class="back-button" id="closeGroups" type="button" aria-label="Zurück zu den Einstellungen"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <h2 id="groupsPageTitle">Artikelgruppen</h2>
+        <span aria-hidden="true"></span>
+      </div>
+      <section class="settings-content" aria-label="Artikelgruppen verwalten">
+        <div class="group-manager" id="groupManager"></div>
+        <form class="group-add-form" id="groupAddForm">
+          <input class="group-add-input" id="groupName" type="text" maxlength="40" autocomplete="off" placeholder="Neue Artikelgruppe" aria-label="Neue Artikelgruppe">
+          <button class="group-add-button" type="submit" aria-label="Artikelgruppe hinzufügen">+</button>
+        </form>
+      </section>
+    </div>
     </div>
   </dialog>
 
   <dialog class="dialog-card" id="importBackupDialog" aria-labelledby="importBackupTitle" tabindex="-1">
     <h2 id="importBackupTitle">Backup importieren?</h2>
-    <p>Alle vorhandenen Listen und Artikel werden durch die Daten aus dem Backup ersetzt.</p>
+    <p>Alle vorhandenen Listen, Artikel und Artikelgruppen werden durch die Daten aus dem Backup ersetzt.</p>
     <div class="dialog-actions">
-      <button class="dialog-button" id="cancelImportBackup" type="button">Abbrechen</button>
-      <button class="dialog-button danger" id="confirmImportBackup" type="button">Wiederherstellen</button>
+      <button class="dialog-button cancel" id="cancelImportBackup" type="button">Abbrechen</button>
+      <button class="dialog-button danger" id="confirmImportBackup" type="button">Importieren</button>
     </div>
   </dialog>
 
@@ -1189,7 +1458,7 @@
     <h2 id="cleanupProductsTitle">Artikel löschen?</h2>
     <p id="cleanupProductsText"></p>
     <div class="dialog-actions">
-      <button class="dialog-button" id="cancelCleanupProducts" type="button">Abbrechen</button>
+      <button class="dialog-button cancel" id="cancelCleanupProducts" type="button">Abbrechen</button>
       <button class="dialog-button danger" id="confirmCleanupProducts" type="button">Löschen</button>
     </div>
   </dialog>
@@ -1201,16 +1470,16 @@
       "use strict";
 
       const DB_NAME = "einkaufslisten-app";
-      const DB_VERSION = 4;
+      const DB_VERSION = 5;
       const DEFAULT_LIST_NAME = "Einkauf";
       const MAX_LIST_NAME_LENGTH = 40;
-      const MAX_PRODUCT_NAME_LENGTH = 60;
+      const MAX_PRODUCT_NAME_LENGTH = 40;
       const SWIPE_ACTION_WIDTH = 92;
       const BACKUP_FORMAT = "einkauf-backup";
       const BACKUP_VERSION = 1;
       const MAX_BACKUP_BYTES = 10 * 1024 * 1024;
       const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
-      const BACKUP_STORE_NAMES = ["lists", "products", "items", "history", "settings"];
+      const BACKUP_STORE_NAMES = ["lists", "groups", "products", "items", "history", "settings"];
       const QUANTITY_UNITS = new Set(["Stück", "g", "kg", "ml", "l"]);
       const QUANTITY_ICON_MARKUP = '<svg class="quantity-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="m2 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="M7 21h10M12 3v18M3 7h18"/></svg>';
       const collator = new Intl.Collator("de", { sensitivity: "base" });
@@ -1225,6 +1494,7 @@
         items: [],
         history: [],
         products: [],
+        groups: [],
         quickMode: "frequent",
         inlineEditingListId: null,
         pendingListDelete: null,
@@ -1234,6 +1504,7 @@
         listLoadToken: 0,
         quantityProductName: null,
         quantityUnit: "Stück",
+        quantityGroupId: null,
         quantityEditingItemId: null,
         quantityEntrySource: "add",
         operations: new Set()
@@ -1257,29 +1528,35 @@
         clearSearch: document.querySelector("#clearSearch"),
         frequentMode: document.querySelector("#frequentMode"),
         alphabeticalMode: document.querySelector("#alphabeticalMode"),
+        categoryMode: document.querySelector("#categoryMode"),
         suggestions: document.querySelector("#suggestions"),
         searchPage: document.querySelector("#searchPage"),
         quantityPage: document.querySelector("#quantityPage"),
         quantityTitle: document.querySelector("#quantityTitle"),
         quantityValue: document.querySelector("#quantityValue"),
+        clearQuantity: document.querySelector("#clearQuantity"),
         unitOptions: document.querySelector("#unitOptions"),
+        quantityGroupOptions: document.querySelector("#quantityGroupOptions"),
         backFromQuantity: document.querySelector("#backFromQuantity"),
         addWithQuantity: document.querySelector("#addWithQuantity"),
         listOptions: document.querySelector("#listOptions"),
-        listNameDialog: document.querySelector("#listNameDialog"),
-        listNameForm: document.querySelector("#listNameForm"),
-        listNameTitle: document.querySelector("#listNameTitle"),
-        listNameInput: document.querySelector("#listNameInput"),
-        cancelListName: document.querySelector("#cancelListName"),
         deleteListDialog: document.querySelector("#deleteListDialog"),
         deleteListText: document.querySelector("#deleteListText"),
         cancelDeleteList: document.querySelector("#cancelDeleteList"),
         confirmDeleteList: document.querySelector("#confirmDeleteList"),
         settingsSheet: document.querySelector("#settingsSheet"),
+        settingsInner: document.querySelector("#settingsInner"),
+        settingsMainPage: document.querySelector("#settingsMainPage"),
         closeSettings: document.querySelector("#closeSettings"),
+        openGroups: document.querySelector("#openGroups"),
+        closeGroups: document.querySelector("#closeGroups"),
+        settingsGroupsPage: document.querySelector("#settingsGroupsPage"),
         exportBackup: document.querySelector("#exportBackup"),
         importBackup: document.querySelector("#importBackup"),
         backupFile: document.querySelector("#backupFile"),
+        groupManager: document.querySelector("#groupManager"),
+        groupAddForm: document.querySelector("#groupAddForm"),
+        groupName: document.querySelector("#groupName"),
         importBackupDialog: document.querySelector("#importBackupDialog"),
         cancelImportBackup: document.querySelector("#cancelImportBackup"),
         confirmImportBackup: document.querySelector("#confirmImportBackup"),
@@ -1340,6 +1617,7 @@
               ? upgradeTransaction.objectStore(name)
               : db.createObjectStore(name, options);
             ensureStore("lists", { keyPath: "id" });
+            ensureStore("groups", { keyPath: "id" });
             const items = ensureStore("items", { keyPath: "id" });
             const history = ensureStore("history", { keyPath: "id" });
             const products = ensureStore("products", { keyPath: "id" });
@@ -1390,7 +1668,6 @@
               db.close();
               state.db = null;
               els.openAdd.disabled = true;
-              showToast("Die App wurde aktualisiert. Bitte lade die Seite neu");
             };
             resolve(db);
           };
@@ -1456,7 +1733,7 @@
         const productsById = new Map(products.map((product) => [product.id, product]));
         const productsByKey = new Map(products.map((product) => [product.key, product]));
         const records = [...history, ...items];
-        let changed = products.length === 0 && records.length > 0;
+        let changed = false;
 
         records.forEach((record) => {
           if (record.productId && productsById.has(record.productId)) return;
@@ -1465,7 +1742,7 @@
           const key = comparable(productName);
           let product = productsByKey.get(key);
           if (!product) {
-            product = { id: id(), name: productName, key, createdAt: Number(record.createdAt) || Date.now() };
+            product = { id: id(), name: productName, key, groupId: null, createdAt: Number(record.createdAt) || Date.now() };
             products.push(product);
             productsById.set(product.id, product);
             productsByKey.set(key, product);
@@ -1474,16 +1751,25 @@
           changed = true;
         });
 
+        const usedProductIds = new Set(records.map((record) => record.productId).filter(Boolean));
+        const unusedProductIds = new Set(products
+          .filter((product) => !usedProductIds.has(product.id))
+          .map((product) => product.id));
+        if (unusedProductIds.size) changed = true;
+
         if (!changed) return products;
         await transact(["products", "items", "history"], "readwrite", (transaction) => {
           const productStore = transaction.objectStore("products");
           const itemStore = transaction.objectStore("items");
           const historyStore = transaction.objectStore("history");
-          products.forEach((product) => productStore.put(product));
+          products.forEach((product) => {
+            if (unusedProductIds.has(product.id)) productStore.delete(product.id);
+            else productStore.put(product);
+          });
           items.forEach(({ productName: _productName, ...item }) => item.productId && itemStore.put(item));
           history.forEach(({ productName: _productName, ...entry }) => entry.productId && historyStore.put(entry));
         });
-        return products;
+        return products.filter((product) => !unusedProductIds.has(product.id));
       }
 
       function deleteRecords(storeName, ids) {
@@ -1492,22 +1778,6 @@
           const objectStore = transaction.objectStore(storeName);
           ids.forEach((recordId) => objectStore.delete(recordId));
         });
-      }
-
-      async function removeUnusedProducts() {
-        const [items, history] = await Promise.all([getAll("items"), getAll("history")]);
-        const usedProductIds = new Set([
-          ...items.map((item) => item.productId),
-          ...history.map((entry) => entry.productId)
-        ].filter(Boolean));
-        const unusedProductIds = state.products
-          .filter((product) => !usedProductIds.has(product.id))
-          .map((product) => product.id);
-        await deleteRecords("products", unusedProductIds);
-        if (unusedProductIds.length) {
-          const unused = new Set(unusedProductIds);
-          state.products = state.products.filter((product) => !unused.has(product.id));
-        }
       }
 
       function putProductItemAndHistory(product, item, historyItem) {
@@ -1541,18 +1811,21 @@
             await deleteRecords("items", [item.id]);
             state.items = state.items.filter((entry) => entry.id !== item.id);
             renderItems();
-            showToast(`${item.productName} entfernt`);
           } catch (error) {
             console.error(error);
-            showToast("Artikel konnte nicht entfernt werden");
             renderItems();
           }
         });
       }
 
       async function initialiseData() {
-        state.products = await migrateProductPool();
-        await removeUnusedProducts();
+        [state.products, state.groups] = await Promise.all([
+          migrateProductPool(),
+          getAll("groups")
+        ]);
+        state.groups.sort((a, b) =>
+          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
+        );
         state.lists = (await getAll("lists")).sort((a, b) =>
           (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
         );
@@ -1562,7 +1835,13 @@
           await put("lists", activeList);
           state.lists = [activeList];
         }
-        const lastOpened = await request(store("settings").get("lastOpenedListId"));
+        const [lastOpened, savedQuickMode] = await Promise.all([
+          request(store("settings").get("lastOpenedListId")),
+          request(store("settings").get("quickMode"))
+        ]);
+        if (["frequent", "category", "alphabetical"].includes(savedQuickMode?.value)) {
+          state.quickMode = savedQuickMode.value;
+        }
         activeList = state.lists.find((list) => list.id === lastOpened?.value) || activeList;
         state.list = activeList;
         await put("settings", { key: "lastOpenedListId", value: activeList.id });
@@ -1585,19 +1864,24 @@
       function renderItems() {
         els.listTitleText.textContent = state.showingLists ? "Listen" : state.list.name;
         els.listTitle.setAttribute("aria-expanded", String(state.showingLists));
+        els.openItems.classList.remove("grouped-card");
+        els.boughtItems.classList.remove("grouped-card");
         els.openItems.replaceChildren();
         els.boughtItems.replaceChildren();
         const openItems = state.items.filter((item) => !item.checked);
         const boughtItems = state.items.filter((item) => item.checked);
         if (!openItems.length) {
-          const empty = document.createElement("div");
+          const empty = document.createElement("button");
+          empty.type = "button";
           empty.className = "empty";
+          empty.setAttribute("aria-label", "Artikel hinzufügen");
           const inner = document.createElement("div");
           inner.textContent = "Deine Einkaufsliste ist leer";
           empty.append(inner);
+          empty.addEventListener("click", openAddSheet);
           els.openItems.append(empty);
         } else {
-          renderRows(els.openItems, openItems);
+          renderGroupedRows(els.openItems, openItems);
         }
 
         if (!boughtItems.length) {
@@ -1606,9 +1890,50 @@
           placeholder.textContent = "Noch keine eingekauften Artikel";
           els.boughtItems.append(placeholder);
         } else {
-          renderRows(els.boughtItems, boughtItems);
+          renderRows(els.boughtItems, sortItemsByGroup(boughtItems));
         }
         els.clearBought.hidden = boughtItems.length === 0;
+      }
+
+      function sortItemsByGroup(items) {
+        const groupOrder = new Map(state.groups.map((group, index) => [group.id, index]));
+        const productGroups = new Map(state.products.map((product) => [product.id, product.groupId]));
+        const fallbackOrder = state.groups.length;
+        return [...items].sort((a, b) => {
+          const aOrder = groupOrder.get(productGroups.get(a.productId)) ?? fallbackOrder;
+          const bOrder = groupOrder.get(productGroups.get(b.productId)) ?? fallbackOrder;
+          return aOrder - bOrder;
+        });
+      }
+
+      function renderGroupedRows(container, items) {
+        container.classList.add("grouped-card");
+        const knownGroupIds = new Set(state.groups.map((group) => group.id));
+        const groupByProductId = new Map(state.products.map((product) => [
+          product.id,
+          knownGroupIds.has(product.groupId) ? product.groupId : null
+        ]));
+        const itemsByGroup = new Map();
+        items.forEach((item) => {
+          const groupId = groupByProductId.get(item.productId) || null;
+          if (!itemsByGroup.has(groupId)) itemsByGroup.set(groupId, []);
+          itemsByGroup.get(groupId).push(item);
+        });
+
+        [...state.groups, { id: null, name: "Sonstiges" }].forEach((group) => {
+          const groupItems = itemsByGroup.get(group.id);
+          if (!groupItems?.length) return;
+          const section = document.createElement("div");
+          section.className = "product-group";
+          const heading = document.createElement("div");
+          heading.className = "product-group-heading";
+          heading.textContent = group.name;
+          const rows = document.createElement("div");
+          rows.className = "product-group-items";
+          section.append(heading, rows);
+          container.append(section);
+          renderRows(rows, groupItems);
+        });
       }
 
       function renderRows(container, items) {
@@ -1650,6 +1975,10 @@
               "item-quantity-button"
             );
             row.append(quantityButton);
+            row.addEventListener("click", (event) => {
+              if (event.target.closest("button") || row.dataset.suppressClick === "true" || row.style.transform) return;
+              openAddSheet();
+            });
           }
           shell.append(reveal, row);
           bindSwipeGesture(row, reveal, () => deleteItem(item), ".check-button, .item-quantity-button");
@@ -1753,7 +2082,6 @@
             renderItems();
           } catch (error) {
             console.error(error);
-            showToast("Änderung konnte nicht gespeichert werden");
           }
         });
       }
@@ -1767,7 +2095,6 @@
             const removedIds = new Set(bought.map((item) => item.id));
             state.items = state.items.filter((item) => !removedIds.has(item.id));
             renderItems();
-            showToast(`${bought.length} Artikel entfernt`);
           } catch (error) {
             console.error(error);
             showToast("Artikel konnten nicht entfernt werden");
@@ -1781,30 +2108,149 @@
         els.toast.textContent = message;
         try {
           if (els.toast.showPopover && !els.toast.matches(":popover-open")) els.toast.showPopover();
-        } catch (error) {
-          console.debug("Toast-Popover nicht verfügbar", error);
-        }
+        } catch {}
         els.toast.classList.add("visible");
         toastHideTimer = setTimeout(() => {
           els.toast.classList.remove("visible");
           toastCloseTimer = setTimeout(() => {
             try {
               if (els.toast.hidePopover && els.toast.matches(":popover-open")) els.toast.hidePopover();
-            } catch (error) {
-              console.debug("Toast-Popover konnte nicht geschlossen werden", error);
-            }
+            } catch {}
           }, 180);
-        }, 1800);
+        }, 1500);
+      }
+
+      function renderGroupManager() {
+        els.groupManager.replaceChildren();
+        if (!state.groups.length) {
+          const empty = document.createElement("div");
+          empty.className = "group-manager-empty";
+          empty.textContent = "Noch keine Artikelgruppen";
+          els.groupManager.append(empty);
+          return;
+        }
+        state.groups.forEach((group, index) => {
+          const shell = document.createElement("div");
+          shell.className = "group-swipe-row";
+          const reveal = document.createElement("button");
+          reveal.type = "button";
+          reveal.className = "delete-reveal";
+          reveal.textContent = "Entfernen";
+          reveal.setAttribute("aria-label", `${group.name} entfernen`);
+          const row = document.createElement("div");
+          row.className = "group-manager-row";
+          const name = document.createElement("span");
+          name.className = "group-manager-name";
+          name.textContent = group.name;
+          const up = document.createElement("button");
+          up.type = "button";
+          up.className = "group-manager-button";
+          up.textContent = "↑";
+          up.setAttribute("aria-label", `${group.name} nach oben`);
+          up.disabled = index === 0;
+          up.addEventListener("click", () => moveGroup(group.id, -1).catch(console.error));
+          const down = document.createElement("button");
+          down.type = "button";
+          down.className = "group-manager-button";
+          down.textContent = "↓";
+          down.setAttribute("aria-label", `${group.name} nach unten`);
+          down.disabled = index === state.groups.length - 1;
+          down.addEventListener("click", () => moveGroup(group.id, 1).catch(console.error));
+          row.append(name, up, down);
+          shell.append(reveal, row);
+          bindSwipeGesture(row, reveal, () => deleteGroup(group.id).catch(console.error), ".group-manager-button");
+          els.groupManager.append(shell);
+        });
+      }
+
+      async function addGroup(name) {
+        const normalizedName = clean(name);
+        if (!normalizedName) {
+          showToast("Bitte gib einen Artikelgruppennamen ein");
+          return;
+        }
+        if (normalizedName.length > MAX_PRODUCT_NAME_LENGTH) {
+          showToast(`Artikelgruppenname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
+          return;
+        }
+        const key = comparable(normalizedName);
+        if (state.groups.some((group) => comparable(group.name) === key)) {
+          showToast("Artikelgruppe bereits vorhanden");
+          return;
+        }
+        const group = { id: id(), name: normalizedName, key, sortOrder: state.groups.length };
+        await put("groups", group);
+        state.groups.push(group);
+        els.groupName.value = "";
+        renderGroupManager();
+        renderQuantityGroupOptions();
+      }
+
+      async function moveGroup(groupId, direction) {
+        const index = state.groups.findIndex((group) => group.id === groupId);
+        const targetIndex = index + direction;
+        if (index < 0 || targetIndex < 0 || targetIndex >= state.groups.length) return;
+        const reorderedGroups = [...state.groups];
+        [reorderedGroups[index], reorderedGroups[targetIndex]] = [reorderedGroups[targetIndex], reorderedGroups[index]];
+        const updatedGroups = reorderedGroups.map((group, sortOrder) => ({ ...group, sortOrder }));
+        await transact(["groups"], "readwrite", (transaction) => {
+          const groupStore = transaction.objectStore("groups");
+          updatedGroups.forEach((group) => groupStore.put(group));
+        });
+        state.groups = updatedGroups;
+        renderGroupManager();
+        renderItems();
+      }
+
+      async function deleteGroup(groupId) {
+        const affectedProducts = state.products.filter((product) => product.groupId === groupId);
+        const remainingGroups = state.groups
+          .filter((group) => group.id !== groupId)
+          .map((group, sortOrder) => ({ ...group, sortOrder }));
+        await transact(["groups", "products"], "readwrite", (transaction) => {
+          const groupStore = transaction.objectStore("groups");
+          groupStore.delete(groupId);
+          remainingGroups.forEach((group) => groupStore.put(group));
+          const productStore = transaction.objectStore("products");
+          affectedProducts.forEach((product) => productStore.put({ ...product, groupId: null }));
+        });
+        state.groups = remainingGroups;
+        state.products = state.products.map((product) => product.groupId === groupId ? { ...product, groupId: null } : product);
+        if (state.quantityGroupId === groupId) state.quantityGroupId = null;
+        renderGroupManager();
+        renderQuantityGroupOptions();
+        renderItems();
       }
 
       function openSettingsSheet() {
         if (!state.showingLists || els.settingsSheet.open) return;
+        closeGroupsPage();
         els.settingsSheet.showModal();
         els.closeSettings.focus({ preventScroll: true });
       }
 
+      function openGroupsPage() {
+        renderGroupManager();
+        els.settingsInner.classList.add("groups-mode");
+        els.settingsMainPage.inert = true;
+        els.settingsMainPage.setAttribute("aria-hidden", "true");
+        els.settingsGroupsPage.inert = false;
+        els.settingsGroupsPage.setAttribute("aria-hidden", "false");
+        focusPageInput(els.groupName, () => els.settingsInner.classList.contains("groups-mode"));
+      }
+
+      function closeGroupsPage({ restoreFocus = false } = {}) {
+        els.settingsInner.classList.remove("groups-mode");
+        els.settingsMainPage.inert = false;
+        els.settingsMainPage.setAttribute("aria-hidden", "false");
+        els.settingsGroupsPage.inert = true;
+        els.settingsGroupsPage.setAttribute("aria-hidden", "true");
+        if (restoreFocus) els.openGroups.focus({ preventScroll: true });
+      }
+
       function closeSettingsSheet({ immediate = false, restoreFocus = true } = {}) {
         if (!els.settingsSheet.open || els.settingsSheet.classList.contains("closing")) return;
+        closeGroupsPage();
         if (immediate) {
           els.settingsSheet.close();
           if (restoreFocus) els.openSettings.focus({ preventScroll: true });
@@ -1830,21 +2276,18 @@
               createdAt: new Date().toISOString(),
               data
             };
-            const contents = JSON.stringify(backup, null, 2);
+            const contents = JSON.stringify(backup);
             const filename = `einkauf-backup-${new Date().toISOString().slice(0, 10)}.json`;
             const blob = new Blob([contents], { type: "application/json" });
             const file = typeof File === "function" ? new File([blob], filename, { type: blob.type }) : null;
             let canShareFile = false;
             try {
               canShareFile = Boolean(file && navigator.share && navigator.canShare?.({ files: [file] }));
-            } catch (error) {
-              console.debug("Dateifreigabe nicht verfügbar", error);
-            }
+            } catch {}
 
             if (canShareFile) {
               try {
                 await navigator.share({ files: [file], title: "Einkauf Backup" });
-                showToast("Backup exportiert");
                 return;
               } catch (error) {
                 if (error?.name === "AbortError") return;
@@ -1859,10 +2302,8 @@
             link.click();
             link.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showToast("Backup exportiert");
           } catch (error) {
             console.error(error);
-            showToast("Backup konnte nicht exportiert werden");
           } finally {
             els.exportBackup.disabled = false;
           }
@@ -1878,8 +2319,9 @@
 
         if (!isObject(value) || value.format !== BACKUP_FORMAT || value.version !== BACKUP_VERSION || !isObject(value.data)) invalid();
         const { lists: rawLists, products: rawProducts, items: rawItems, history: rawHistory, settings: rawSettings } = value.data;
-        if (![rawLists, rawProducts, rawItems, rawHistory, rawSettings].every(Array.isArray)) invalid();
-        if (!rawLists.length || rawLists.length > 500 || rawProducts.length > 25000 || rawItems.length > 50000 || rawHistory.length > 50000 || rawSettings.length > 100) invalid();
+        const rawGroups = value.data.groups ?? [];
+        if (![rawLists, rawGroups, rawProducts, rawItems, rawHistory, rawSettings].every(Array.isArray)) invalid();
+        if (!rawLists.length || rawLists.length > 500 || rawGroups.length > 500 || rawProducts.length > 25000 || rawItems.length > 50000 || rawHistory.length > 50000 || rawSettings.length > 100) invalid();
 
         const lists = rawLists.map((entry, index) => {
           if (!isObject(entry) || !validId(entry.id)) invalid();
@@ -1890,11 +2332,22 @@
         if (!unique(lists.map((entry) => entry.id)) || !unique(lists.map((entry) => comparable(entry.name)))) invalid();
         const listIds = new Set(lists.map((entry) => entry.id));
 
+        const groups = rawGroups.map((entry, index) => {
+          if (!isObject(entry) || !validId(entry.id)) invalid();
+          const name = clean(entry.name);
+          if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
+          return { id: entry.id, name, key: comparable(name), sortOrder: index };
+        });
+        if (!unique(groups.map((entry) => entry.id)) || !unique(groups.map((entry) => entry.key))) invalid();
+        const groupIds = new Set(groups.map((entry) => entry.id));
+
         const products = rawProducts.map((entry) => {
           if (!isObject(entry) || !validId(entry.id) || !validTime(entry.createdAt)) invalid();
           const name = clean(entry.name);
           if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
-          return { id: entry.id, name, key: comparable(name), createdAt: entry.createdAt };
+          const groupId = entry.groupId === null || entry.groupId === undefined ? null : entry.groupId;
+          if (groupId !== null && (!validId(groupId) || !groupIds.has(groupId))) invalid();
+          return { id: entry.id, name, key: comparable(name), groupId, createdAt: entry.createdAt };
         });
         if (!unique(products.map((entry) => entry.id)) || !unique(products.map((entry) => entry.key))) invalid();
         const productIds = new Set(products.map((entry) => entry.id));
@@ -1939,13 +2392,22 @@
 
         const requestedActiveList = rawSettings.find((entry) => isObject(entry) && entry.key === "lastOpenedListId")?.value;
         const activeListId = listIds.has(requestedActiveList) ? requestedActiveList : lists[0].id;
+        const requestedQuickMode = rawSettings.find((entry) => isObject(entry) && entry.key === "quickMode")?.value;
+        const quickMode = ["frequent", "category", "alphabetical"].includes(requestedQuickMode)
+          ? requestedQuickMode
+          : "frequent";
         return {
           lists,
+          groups,
           products,
           items,
           history,
-          settings: [{ key: "lastOpenedListId", value: activeListId }],
-          activeListId
+          settings: [
+            { key: "lastOpenedListId", value: activeListId },
+            { key: "quickMode", value: quickMode }
+          ],
+          activeListId,
+          quickMode
         };
       }
 
@@ -1977,6 +2439,7 @@
             await transact(BACKUP_STORE_NAMES, "readwrite", (transaction) => {
               BACKUP_STORE_NAMES.forEach((name) => transaction.objectStore(name).clear());
               backup.lists.forEach((entry) => transaction.objectStore("lists").put(entry));
+              backup.groups.forEach((entry) => transaction.objectStore("groups").put(entry));
               backup.products.forEach((entry) => transaction.objectStore("products").put(entry));
               backup.items.forEach((entry) => transaction.objectStore("items").put(entry));
               backup.history.forEach((entry) => transaction.objectStore("history").put(entry));
@@ -1985,7 +2448,9 @@
 
             const productNames = new Map(backup.products.map((product) => [product.id, product.name]));
             state.products = backup.products;
+            state.groups = backup.groups;
             state.lists = backup.lists;
+            state.quickMode = backup.quickMode;
             state.list = backup.lists.find((list) => list.id === backup.activeListId) || backup.lists[0];
             state.items = backup.items
               .filter((item) => item.listId === state.list.id)
@@ -1998,10 +2463,9 @@
             closeSettingsSheet({ immediate: true, restoreFocus: false });
             renderItems();
             showShoppingList();
-            showToast("Backup wiederhergestellt");
+            showToast("Backup importiert");
           } catch (error) {
             console.error(error);
-            showToast("Backup konnte nicht wiederhergestellt werden");
           } finally {
             els.confirmImportBackup.disabled = false;
           }
@@ -2047,7 +2511,6 @@
           els.cleanupProductsDialog.focus({ preventScroll: true });
         } catch (error) {
           console.error(error);
-          showToast("Artikel konnten nicht geprüft werden");
         }
       }
 
@@ -2063,7 +2526,6 @@
             if (!productIds.size) {
               state.pendingProductCleanup = null;
               els.cleanupProductsDialog.close();
-              showToast("Keine passenden Artikel mehr gefunden");
               return;
             }
             await transact(["products", "items", "history"], "readwrite", (transaction) => {
@@ -2088,7 +2550,6 @@
             showToast(`${productIds.size} Artikel entfernt`);
           } catch (error) {
             console.error(error);
-            showToast("Artikel konnten nicht gelöscht werden");
           } finally {
             els.confirmCleanupProducts.disabled = false;
           }
@@ -2097,7 +2558,7 @@
 
       function showListOverview() {
         state.showingLists = true;
-        els.themeColor.content = "#FE9677";
+        els.themeColor.content = "#F3E6DF";
         document.body.classList.add("list-overview-mode");
         els.openSection.hidden = true;
         els.boughtSection.hidden = true;
@@ -2105,9 +2566,7 @@
         els.listTitleText.textContent = "Listen";
         els.listTitle.classList.add("overview-mode");
         els.listTitle.setAttribute("aria-expanded", "true");
-        els.openAdd.classList.add("list-mode");
-        els.openAdd.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Neue Liste</span>';
-        els.openAdd.setAttribute("aria-label", "Liste hinzufügen");
+        els.openAdd.hidden = true;
         els.openSettings.hidden = false;
         renderListOptions();
       }
@@ -2122,9 +2581,7 @@
         els.listTitleText.textContent = state.list.name;
         els.listTitle.classList.remove("overview-mode");
         els.listTitle.setAttribute("aria-expanded", "false");
-        els.openAdd.classList.remove("list-mode");
-        els.openAdd.textContent = "+";
-        els.openAdd.setAttribute("aria-label", "Artikel hinzufügen");
+        els.openAdd.hidden = false;
         els.openSettings.hidden = true;
         els.openSection.classList.remove("view-enter");
         els.boughtSection.classList.remove("view-enter");
@@ -2177,7 +2634,38 @@
           bindSwipeGesture(row, reveal, () => askDeleteList(list), ".list-action, input");
           fragment.append(shell);
         });
+        const addTile = document.createElement("button");
+        addTile.type = "button";
+        addTile.className = "list-add-tile";
+        addTile.textContent = "+";
+        addTile.setAttribute("aria-label", "Liste hinzufügen");
+        addTile.addEventListener("click", createListAndEdit);
+        fragment.append(addTile);
         els.listOptions.append(fragment);
+      }
+
+      function nextDefaultListName() {
+        const names = new Set(state.lists.map((list) => comparable(list.name)));
+        if (!names.has(comparable(DEFAULT_LIST_NAME))) return DEFAULT_LIST_NAME;
+        let suffix = 1;
+        while (names.has(comparable(`${DEFAULT_LIST_NAME} ${suffix}`))) suffix += 1;
+        return `${DEFAULT_LIST_NAME} ${suffix}`;
+      }
+
+      function createListAndEdit() {
+        return runExclusive("create-list", async () => {
+          const list = { id: id(), name: nextDefaultListName(), sortOrder: state.lists.length };
+          state.lists.push(list);
+          startInlineRename(list);
+          try {
+            await put("lists", list);
+          } catch (error) {
+            console.error(error);
+            state.lists = state.lists.filter((entry) => entry.id !== list.id);
+            if (state.inlineEditingListId === list.id) state.inlineEditingListId = null;
+            renderListOptions();
+          }
+        });
       }
 
       function cancelInlineRename() {
@@ -2243,10 +2731,8 @@
               state.inlineEditingListId = null;
               renderItems();
               renderListOptions();
-              showToast("Liste umbenannt");
             } catch (error) {
               console.error(error);
-              showToast("Liste konnte nicht umbenannt werden");
               saveAction.disabled = false;
             }
           });
@@ -2288,64 +2774,13 @@
         }
       }
 
-      function openListEditor() {
-        els.listNameTitle.textContent = "Neue Liste";
-        els.listNameInput.value = "";
-        els.listNameInput.removeAttribute("aria-invalid");
-        els.listNameDialog.showModal();
-        els.listNameInput.focus({ preventScroll: true });
-      }
-
-      async function saveListName(event) {
-        event.preventDefault();
-        return runExclusive("create-list", async () => {
-          const name = clean(els.listNameInput.value);
-          if (!name) {
-            showToast("Bitte gib einen Listennamen ein");
-            els.listNameInput.focus();
-            return;
-          }
-          if (name.length > MAX_LIST_NAME_LENGTH) {
-            showToast(`Listenname: maximal ${MAX_LIST_NAME_LENGTH} Zeichen`);
-            els.listNameInput.focus();
-            return;
-          }
-          const duplicate = state.lists.some((list) => comparable(list.name) === comparable(name));
-          if (duplicate) {
-            els.listNameInput.setAttribute("aria-invalid", "true");
-            showToast("Liste bereits vorhanden");
-            els.listNameInput.select();
-            return;
-          }
-
-          const list = { id: id(), name, sortOrder: state.lists.length };
-          const submitButton = event.currentTarget.querySelector('[type="submit"]');
-          submitButton.disabled = true;
-          try {
-            await transact(["lists", "settings"], "readwrite", (transaction) => {
-              transaction.objectStore("lists").put(list);
-              transaction.objectStore("settings").put({ key: "lastOpenedListId", value: list.id });
-            });
-            state.lists.push(list);
-            state.list = list;
-            state.items = [];
-            state.history = [];
-            els.listNameDialog.close();
-            renderItems();
-            showShoppingList();
-            showToast(`${name} erstellt`);
-          } catch (error) {
-            console.error(error);
-            showToast("Liste konnte nicht erstellt werden");
-          } finally {
-            submitButton.disabled = false;
-          }
-        });
-      }
-
       function askDeleteList(list) {
         state.pendingListDelete = list;
-        els.deleteListText.textContent = `„${list.name}“ wird dauerhaft gelöscht. Artikel und andere Listen bleiben unberührt.`;
+        els.deleteListText.replaceChildren(
+          document.createTextNode(`„${list.name}“ wird dauerhaft gelöscht.`),
+          document.createElement("br"),
+          document.createTextNode("Artikel und andere Listen bleiben unberührt.")
+        );
         els.deleteListDialog.showModal();
         els.deleteListDialog.focus({ preventScroll: true });
       }
@@ -2411,27 +2846,32 @@
             showToast("Liste gelöscht");
           } catch (error) {
             console.error(error);
-            showToast("Liste konnte nicht gelöscht werden");
           } finally {
             els.confirmDeleteList.disabled = false;
           }
         });
       }
 
+      function focusPageInput(input, isCurrentPage) {
+        const applyFocus = () => {
+          if (isCurrentPage()) input.focus({ preventScroll: true });
+        };
+        applyFocus();
+        requestAnimationFrame(applyFocus);
+        setTimeout(applyFocus, 260);
+      }
+
       function focusProductSearch() {
-        if (!els.addSheet.open || els.addForm.classList.contains("quantity-mode")) return;
-        els.productName.focus({ preventScroll: true });
-        requestAnimationFrame(() => {
-          if (els.addSheet.open && !els.addForm.classList.contains("quantity-mode") && document.activeElement !== els.productName) {
-            els.productName.focus({ preventScroll: true });
-          }
-        });
+        focusPageInput(els.productName, () =>
+          els.addSheet.open && !els.addForm.classList.contains("quantity-mode")
+        );
       }
 
       function openAddSheet() {
         els.addForm.reset();
         resetQuantityPage();
-        setQuickMode("frequent");
+        setQuickMode(state.quickMode, { persist: false });
+        els.themeColor.content = "#FE9677";
         els.addSheet.showModal();
         focusProductSearch();
       }
@@ -2444,6 +2884,7 @@
           els.addSheet.close();
           els.addSheet.classList.remove("closing");
           resetQuantityPage();
+          els.themeColor.content = state.showingLists ? "#F3E6DF" : "#41436A";
           els.openAdd.focus({ preventScroll: true });
         }, 220);
       }
@@ -2457,20 +2898,47 @@
         });
       }
 
+      function setQuantityGroup(groupId) {
+        state.quantityGroupId = state.groups.some((group) => group.id === groupId) ? groupId : null;
+        renderQuantityGroupOptions();
+      }
+
+      function renderQuantityGroupOptions() {
+        els.quantityGroupOptions.replaceChildren();
+        [...state.groups, { id: null, name: "Keine Gruppe" }].forEach((group) => {
+          const button = document.createElement("button");
+          const active = group.id === state.quantityGroupId;
+          button.type = "button";
+          button.className = `group-chip${active ? " active" : ""}`;
+          button.textContent = group.name;
+          button.setAttribute("aria-pressed", String(active));
+          button.addEventListener("click", () => setQuantityGroup(group.id));
+          els.quantityGroupOptions.append(button);
+        });
+      }
+
+      function syncQuantityClear() {
+        els.clearQuantity.hidden = els.quantityValue.value.length === 0;
+      }
+
       function resetQuantityPage() {
         state.quantityProductName = null;
         state.quantityUnit = "Stück";
+        state.quantityGroupId = null;
         state.quantityEditingItemId = null;
         state.quantityEntrySource = "add";
+        els.addSheet.classList.remove("quantity-mode");
         els.addForm.classList.remove("quantity-mode");
         els.quantityPage.setAttribute("aria-hidden", "true");
         els.quantityPage.inert = true;
         els.searchPage.inert = false;
         els.quantityValue.value = "";
+        syncQuantityClear();
         els.quantityValue.removeAttribute("aria-invalid");
         els.quantityTitle.textContent = "";
-        els.addWithQuantity.textContent = "+ Hinzufügen";
+        els.addWithQuantity.textContent = "Hinzufügen";
         setQuantityUnit("Stück");
+        renderQuantityGroupOptions();
       }
 
       function openQuantityPage(productName, item = null) {
@@ -2483,10 +2951,16 @@
         state.quantityProductName = normalizedName;
         state.quantityEditingItemId = item?.id || null;
         state.quantityEntrySource = item ? "list" : "add";
+        const product = state.products.find((entry) => entry.key === comparable(normalizedName));
+        state.quantityGroupId = product?.groupId || null;
+        els.themeColor.content = "#984063";
         els.quantityTitle.textContent = normalizedName;
         els.quantityValue.value = item?.quantityValue ? formatQuantity(item.quantityValue) : "";
-        els.addWithQuantity.textContent = item ? "Speichern" : "+ Hinzufügen";
+        syncQuantityClear();
+        els.addWithQuantity.textContent = item ? "Speichern" : "Hinzufügen";
         setQuantityUnit(item?.quantityUnit || "Stück");
+        renderQuantityGroupOptions();
+        els.addSheet.classList.add("quantity-mode");
         els.addForm.classList.add("quantity-mode");
         els.quantityPage.setAttribute("aria-hidden", "false");
         els.quantityPage.inert = false;
@@ -2495,16 +2969,14 @@
       }
 
       function focusQuantityInput() {
-        els.quantityValue.focus({ preventScroll: true });
-        requestAnimationFrame(() => {
-          if (els.addSheet.open && state.quantityProductName && document.activeElement !== els.quantityValue) {
-            els.quantityValue.focus({ preventScroll: true });
-          }
-        });
+        focusPageInput(els.quantityValue, () =>
+          els.addSheet.open && els.addForm.classList.contains("quantity-mode") && Boolean(state.quantityProductName)
+        );
       }
 
       function closeQuantityPage({ focus = true } = {}) {
         resetQuantityPage();
+        els.themeColor.content = "#FE9677";
         if (focus) focusProductSearch();
       }
 
@@ -2523,26 +2995,34 @@
             return;
           }
           const updatedItem = { ...item, quantityValue, quantityUnit };
+          const product = state.products.find((entry) => entry.id === item.productId);
+          const updatedProduct = product && product.groupId !== state.quantityGroupId
+            ? { ...product, groupId: state.quantityGroupId }
+            : null;
           try {
-            await putProductItemAndHistory(null, updatedItem, null);
+            await putProductItemAndHistory(updatedProduct, updatedItem, null);
             state.items = state.items.map((entry) => entry.id === itemId ? updatedItem : entry);
+            if (updatedProduct) {
+              state.products = state.products.map((entry) => entry.id === updatedProduct.id ? updatedProduct : entry);
+            }
             renderItems();
             closeAddSheet();
-            showToast("Menge gespeichert");
+            if (quantityValue) showToast("Menge gespeichert");
           } catch (error) {
             console.error(error);
-            showToast("Menge konnte nicht gespeichert werden");
           }
         });
       }
 
-      function setQuickMode(mode) {
+      function setQuickMode(mode, { persist = true } = {}) {
         state.quickMode = mode;
-        const frequent = mode === "frequent";
-        els.frequentMode.classList.toggle("active", frequent);
-        els.alphabeticalMode.classList.toggle("active", !frequent);
-        els.frequentMode.setAttribute("aria-pressed", String(frequent));
-        els.alphabeticalMode.setAttribute("aria-pressed", String(!frequent));
+        [[els.frequentMode, "frequent"], [els.alphabeticalMode, "alphabetical"], [els.categoryMode, "category"]]
+          .forEach(([button, buttonMode]) => {
+            const active = mode === buttonMode;
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-pressed", String(active));
+          });
+        if (persist) put("settings", { key: "quickMode", value: mode }).catch(console.error);
         renderSuggestions();
       }
 
@@ -2562,13 +3042,16 @@
           productId: product.id,
           productName: product.name,
           productKey: product.key || comparable(product.name),
+          groupId: product.groupId || null,
           purchaseCount: frequencyByProduct.get(product.id) || 0
         }));
         let matches = knownProducts.filter((entry) => !query || entry.productKey.includes(query));
 
-        matches.sort(state.quickMode === "frequent"
-          ? (a, b) => Number(b.purchaseCount || 0) - Number(a.purchaseCount || 0) || byName(a, b)
-          : byName);
+        if (state.quickMode !== "category") {
+          matches.sort(state.quickMode === "frequent"
+            ? (a, b) => Number(b.purchaseCount || 0) - Number(a.purchaseCount || 0) || byName(a, b)
+            : byName);
+        }
 
         els.suggestions.replaceChildren();
         const fragment = document.createDocumentFragment();
@@ -2577,10 +3060,14 @@
           fragment.append(createSuggestion(clean(els.productName.value), { isNew: true }));
         }
 
-        matches.forEach((entry) => {
-          const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
-          fragment.append(createSuggestion(entry.productName, { isOnList }));
-        });
+        if (state.quickMode === "category") {
+          appendCategorySuggestions(fragment, matches, openProductIds, openNames);
+        } else {
+          matches.forEach((entry) => {
+            const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
+            fragment.append(createSuggestion(entry.productName, { isOnList }));
+          });
+        }
 
         if (!fragment.childNodes.length) {
           const empty = document.createElement("div");
@@ -2596,6 +3083,29 @@
         }
         els.suggestions.append(fragment);
         scheduleScrollFade();
+      }
+
+      function appendCategorySuggestions(fragment, matches, openProductIds, openNames) {
+        const knownGroupIds = new Set(state.groups.map((group) => group.id));
+        [...state.groups, { id: null, name: "Sonstiges" }].forEach((group) => {
+          const groupMatches = matches
+            .filter((entry) => (knownGroupIds.has(entry.groupId) ? entry.groupId : null) === group.id)
+            .sort((a, b) => Number(b.purchaseCount || 0) - Number(a.purchaseCount || 0) || byName(a, b));
+          if (!groupMatches.length) return;
+          const section = document.createElement("div");
+          section.className = "suggestion-category";
+          const heading = document.createElement("div");
+          heading.className = "suggestion-category-heading";
+          heading.textContent = group.name;
+          const rows = document.createElement("div");
+          rows.className = "suggestion-category-items";
+          groupMatches.forEach((entry) => {
+            const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
+            rows.append(createSuggestion(entry.productName, { isOnList }));
+          });
+          section.append(heading, rows);
+          fragment.append(section);
+        });
       }
 
       function scheduleSuggestions() {
@@ -2680,8 +3190,15 @@
             let product = state.products.find((entry) => entry.key === productKey);
             const newProduct = !product;
             if (!product) {
-              product = { id: id(), name: productName, key: productKey, createdAt: Date.now() };
+              product = { id: id(), name: productName, key: productKey, groupId: quantity?.groupId || null, createdAt: Date.now() };
             }
+            const groupedProduct = !newProduct && quantity && product.groupId !== (quantity.groupId || null)
+              ? { ...product, groupId: quantity.groupId || null }
+              : product;
+            product = groupedProduct;
+            const productToSave = newProduct || groupedProduct !== state.products.find((entry) => entry.id === product.id)
+              ? product
+              : null;
             const boughtItem = state.items.find((item) => item.checked && comparable(item.productName) === productKey);
             const existingHistory = state.history.find((entry) => entry.productId === product.id);
             if (boughtItem) {
@@ -2699,14 +3216,15 @@
                     lastPurchasedAt: Number(existingHistory.purchaseCount || 0) <= 1 ? null : existingHistory.lastPurchasedAt ?? null
                   }
                 : null;
-              await putProductItemAndHistory(newProduct ? product : null, reopenedItem, updatedHistory);
+              await putProductItemAndHistory(productToSave, reopenedItem, updatedHistory);
               if (newProduct) state.products.push(product);
+              else if (productToSave) state.products = state.products.map((entry) => entry.id === product.id ? product : entry);
               state.items = [...state.items.filter((item) => item.id !== reopenedItem.id), reopenedItem];
               if (updatedHistory) {
                 state.history = state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry);
               }
               if (quantity) closeQuantityPage({ focus: false });
-              finishAddingProduct(reopenedItem.productName);
+              finishAddingProduct(reopenedItem.productName, Boolean(quantity));
               return;
             }
 
@@ -2727,25 +3245,25 @@
               purchaseCount: 0,
               lastPurchasedAt: null
             };
-            await putProductItemAndHistory(newProduct ? product : null, item, historyItem);
+            await putProductItemAndHistory(productToSave, item, historyItem);
             if (newProduct) state.products.push(product);
+            else if (productToSave) state.products = state.products.map((entry) => entry.id === product.id ? product : entry);
             state.items.push(item);
             if (historyItem) state.history.push(historyItem);
             if (quantity) closeQuantityPage({ focus: false });
-            finishAddingProduct(productName);
+            finishAddingProduct(productName, Boolean(quantity));
           } catch (error) {
             console.error(error);
-            showToast("Artikel konnte nicht hinzugefügt werden");
           }
         });
       }
 
-      function finishAddingProduct(productName) {
+      function finishAddingProduct(productName, notify = false) {
         renderItems();
         els.productName.value = "";
         renderSuggestions();
         focusProductSearch();
-        showToast(`${productName} hinzugefügt`);
+        if (notify) showToast(`${productName} hinzugefügt`);
       }
 
       function submitAddForm(event) {
@@ -2754,8 +3272,9 @@
           addProduct(els.productName.value);
           return;
         }
-        const quantityValue = parseQuantity(els.quantityValue.value);
-        if (!quantityValue) {
+        const rawQuantity = clean(els.quantityValue.value);
+        const quantityValue = rawQuantity ? parseQuantity(rawQuantity) : null;
+        if (rawQuantity && !quantityValue) {
           els.quantityValue.setAttribute("aria-invalid", "true");
           showToast("Bitte gib eine gültige Menge ein");
           els.quantityValue.focus();
@@ -2765,20 +3284,40 @@
           closeQuantityPage();
           return;
         }
-        if (state.quantityEditingItemId) {
-          saveItemQuantity(state.quantityEditingItemId, quantityValue, state.quantityUnit);
+        const product = state.products.find((entry) => entry.key === comparable(state.quantityProductName));
+        const groupChanged = (product?.groupId || null) !== state.quantityGroupId;
+        if (!quantityValue && !groupChanged) {
+          focusQuantityInput();
           return;
         }
-        addProduct(state.quantityProductName, { value: quantityValue, unit: state.quantityUnit });
+        if (state.quantityEditingItemId) {
+          saveItemQuantity(
+            state.quantityEditingItemId,
+            quantityValue,
+            quantityValue ? state.quantityUnit : null
+          );
+          return;
+        }
+        addProduct(state.quantityProductName, {
+          value: quantityValue,
+          unit: quantityValue ? state.quantityUnit : null,
+          groupId: state.quantityGroupId
+        });
       }
 
-      els.openAdd.addEventListener("click", () => state.showingLists ? openListEditor() : openAddSheet());
+      els.openAdd.addEventListener("click", openAddSheet);
       els.openSettings.addEventListener("click", openSettingsSheet);
       els.closeSettings.addEventListener("click", () => closeSettingsSheet());
+      els.openGroups.addEventListener("click", openGroupsPage);
+      els.closeGroups.addEventListener("click", () => closeGroupsPage({ restoreFocus: true }));
       els.exportBackup.addEventListener("click", exportBackup);
       els.importBackup.addEventListener("click", () => {
         els.backupFile.value = "";
         els.backupFile.click();
+      });
+      els.groupAddForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        addGroup(els.groupName.value).catch(console.error);
       });
       els.backupFile.addEventListener("change", selectBackupFile);
       els.cleanupRareProducts.addEventListener("click", () => askCleanupProducts("rare"));
@@ -2796,14 +3335,11 @@
       els.listTitle.addEventListener("click", () => state.showingLists ? showShoppingList() : showListOverview());
       document.addEventListener("pointerdown", (event) => {
         const editingId = state.inlineEditingListId;
-        if (!editingId || event.target.closest(`[data-list-id="${editingId}"]`)) return;
+        if (!editingId || event.target.closest(".rename-list") || event.target.closest(`[data-list-id="${editingId}"]`)) return;
         setTimeout(() => {
           if (state.inlineEditingListId === editingId) cancelInlineRename();
         }, 0);
       });
-      els.listNameForm.addEventListener("submit", saveListName);
-      els.listNameInput.addEventListener("input", () => els.listNameInput.removeAttribute("aria-invalid"));
-      els.cancelListName.addEventListener("click", () => els.listNameDialog.close());
       els.cancelDeleteList.addEventListener("click", () => {
         state.pendingListDelete = null;
         els.deleteListDialog.close();
@@ -2826,8 +3362,15 @@
         const button = event.target.closest(".unit-chip");
         if (button) setQuantityUnit(button.dataset.unit);
       });
+      els.clearQuantity.addEventListener("click", () => {
+        els.quantityValue.value = "";
+        els.quantityValue.removeAttribute("aria-invalid");
+        syncQuantityClear();
+        focusQuantityInput();
+      });
       els.quantityValue.addEventListener("input", () => {
         els.quantityValue.removeAttribute("aria-invalid");
+        syncQuantityClear();
       });
       els.quantityValue.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" || event.isComposing) return;
@@ -2840,6 +3383,7 @@
       });
       els.frequentMode.addEventListener("click", () => setQuickMode("frequent"));
       els.alphabeticalMode.addEventListener("click", () => setQuickMode("alphabetical"));
+      els.categoryMode.addEventListener("click", () => setQuickMode("category"));
       els.productName.addEventListener("input", () => {
         scheduleSuggestions();
       });

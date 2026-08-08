@@ -6,13 +6,15 @@
 
 - Mehrere voneinander unabhängige Einkaufslisten erstellen und verwalten
 - Artikel schnell über die persönliche Produktauswahl hinzufügen
-- Vorschläge nach Kaufhäufigkeit oder alphabetisch sortieren
+- Vorschläge nach Kaufhäufigkeit, Artikelgruppen oder alphabetisch sortieren
 - Optionale Mengen in Stück, Gramm, Kilogramm, Milliliter oder Liter angeben
 - Mengen offener Artikel nachträglich ändern
+- Artikel globalen Artikelgruppen zuordnen und gruppiert anzeigen
+- Reihenfolge der Artikelgruppen in den Einstellungen festlegen
 - Artikel abhaken und wieder auf die offene Liste setzen
 - Artikel und Listen mit einer Wischbewegung entfernen
 - Listen direkt umbenennen
-- Alle Daten als JSON-Backup sichern und wiederherstellen
+- Alle Daten als JSON-Backup exportieren und importieren
 - Selten oder lange nicht gekaufte Artikel gezielt bereinigen
 - Auch ohne Internetverbindung verwenden
 
@@ -24,7 +26,7 @@ Die App stellt **keine externen Verbindungen** her und überträgt keine persön
 
 Dadurch bleiben die Daten privat, werden aber nicht automatisch zwischen Geräten synchronisiert. Werden die Website-Daten des Browsers gelöscht, werden auch die gespeicherten Einkaufslisten entfernt.
 
-Über die Einstellungen kann jederzeit eine lokale Backup-Datei erstellt werden. Sie enthält alle Listen, Artikel, Mengen und Kaufhäufigkeiten und kann später auf demselben oder einem anderen Gerät wiederhergestellt werden.
+Über die Einstellungen kann jederzeit eine lokale Backup-Datei erstellt werden. Sie enthält alle Listen, Artikel, Artikelgruppen, Mengen und Kaufhäufigkeiten und kann später auf demselben oder einem anderen Gerät importiert werden.
 
 ## Progressive Web App
 
