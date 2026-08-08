@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.2">
+  <meta name="application-version" content="1.10.3">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -96,6 +96,21 @@
       background: var(--bg);
       transform: translateX(-50%);
     }
+
+    .topbar::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -18px;
+      left: 0;
+      height: 18px;
+      background: linear-gradient(to bottom, var(--bg), transparent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+    }
+
+    body.page-scrolled .topbar::after { opacity: 1; }
 
     .list-title {
       display: inline-flex;
@@ -408,8 +423,12 @@
     }
 
     .sheet {
+      position: fixed;
+      top: 0;
+      bottom: 0;
       width: min(100%, 520px);
-      height: 100dvh;
+      height: auto;
+      min-height: 100%;
       max-height: none;
       max-width: none;
       margin: 0 auto;
@@ -427,6 +446,7 @@
     .sheet-inner {
       position: relative;
       height: 100%;
+      min-height: 100%;
       overflow: hidden;
       padding: 0;
     }
@@ -490,7 +510,7 @@
       background: #F3E6DF;
       color: #984063;
       caret-color: #984063;
-      font-size: 24px;
+      font-size: 20px;
     }
 
     .search-wrap {
@@ -756,7 +776,7 @@
       background: #F3E6DF;
       color: #984063;
       caret-color: #984063;
-      font-size: 24px;
+      font-size: 20px;
       font-variant-numeric: tabular-nums;
     }
 
@@ -3601,6 +3621,13 @@
         state.pendingProductDelete = null;
         renderSuggestions();
       });
+
+      function syncPageScrollFade() {
+        document.body.classList.toggle("page-scrolled", window.scrollY > 3);
+      }
+
+      window.addEventListener("scroll", syncPageScrollFade, { passive: true });
+      syncPageScrollFade();
 
       async function start() {
         try {
