@@ -7,14 +7,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.3.0">
+  <meta name="application-version" content="1.5.0">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
   <title>Einkauf</title>
   <style>
     :root {
-      color-scheme: light;
+      color-scheme: only light;
       --bg: #41436A;
       --surface: #fff;
       --surface-2: #FE9677;
@@ -55,10 +55,8 @@
     button { color: inherit; cursor: pointer; }
     button:disabled { cursor: default; }
 
-    :focus-visible {
-      outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
-      outline-offset: 2px;
-    }
+    :focus,
+    :focus-visible { outline: none; }
 
     input:focus,
     input:focus-visible {
@@ -79,6 +77,7 @@
       top: 0;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       min-height: 82px;
       padding-top: 8px;
       background: color-mix(in srgb, var(--bg) 92%, transparent);
@@ -122,6 +121,21 @@
 
     .list-title:not(:disabled):active { opacity: .65; }
     .list-title.overview-mode::after { display: none; }
+
+    .settings-trigger {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: #41436A;
+    }
+
+    .settings-trigger[hidden] { display: none; }
+    .settings-trigger .small-icon { width: 23px; height: 23px; }
 
     .section { margin-top: 9px; }
 
@@ -350,6 +364,8 @@
       font: inherit;
     }
 
+    dialog:focus { outline: none; }
+
     dialog::backdrop {
       background: color-mix(in srgb, #41436A 72%, transparent);
       backdrop-filter: blur(2px);
@@ -555,6 +571,8 @@
 
     .suggestion-main:active { background: var(--surface-2); }
 
+    .suggestion:has(.suggestion-main:active) { background: var(--surface-2); }
+
     .suggestion-name {
       min-width: 0;
       overflow: hidden;
@@ -689,6 +707,86 @@
     }
 
     .back-button .small-icon { width: 21px; height: 21px; }
+
+    .settings-sheet .sheet-header h2 { color: #41436A; }
+
+    .settings-content {
+      margin-top: 18px;
+      color: #41436A;
+    }
+
+    .settings-content + .settings-content { margin-top: 26px; }
+
+    .settings-heading {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .settings-card {
+      overflow: hidden;
+      border-radius: 15px;
+      background: #fff;
+    }
+
+    .settings-action {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      width: 100%;
+      min-height: 72px;
+      padding: 11px 15px;
+      align-items: center;
+      border: 0;
+      background: transparent;
+      color: #41436A;
+      text-align: left;
+    }
+
+    .settings-action + .settings-action { box-shadow: inset 0 1px #984063; }
+
+    .settings-action-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 10px;
+      background: color-mix(in srgb, #984063 12%, #fff);
+      color: #984063;
+    }
+
+    .settings-action-icon .small-icon { width: 19px; height: 19px; }
+
+    .settings-action.danger { color: #F64668; }
+
+    .settings-action.danger .settings-action-icon {
+      background: color-mix(in srgb, #F64668 12%, #fff);
+      color: #F64668;
+    }
+
+    .settings-action.danger .settings-action-description { color: #984063; }
+
+    .settings-action-title {
+      display: block;
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .settings-action-description {
+      display: block;
+      margin-top: 2px;
+      color: #984063;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .settings-note {
+      margin: 10px 4px 0;
+      color: #41436A;
+      font-size: 13px;
+      line-height: 1.4;
+    }
 
     .list-options {
       margin-top: 12px;
@@ -884,20 +982,37 @@
 
     #deleteListDialog #deleteListText { color: #41436A; }
 
-    .dialog-button.primary { background: var(--accent); color: #fff; }
-    .error {
-      min-height: 22px;
-      margin: 8px 4px 0;
-      color: #984063;
-      font-size: 14px;
+    #importBackupDialog p { color: #41436A; }
+
+    #importBackupDialog #cancelImportBackup {
+      border: 1.5px solid #41436A;
+      background: transparent;
+      color: #41436A;
     }
 
-    .error:empty { display: none; }
+    #importBackupDialog #confirmImportBackup {
+      background: #F64668;
+      color: #fff;
+    }
 
+    #cleanupProductsDialog p { color: #41436A; }
+
+    #cleanupProductsDialog #cancelCleanupProducts {
+      border: 1.5px solid #41436A;
+      background: transparent;
+      color: #41436A;
+    }
+
+    #cleanupProductsDialog #confirmCleanupProducts {
+      background: #F64668;
+      color: #fff;
+    }
+
+    .dialog-button.primary { background: var(--accent); color: #fff; }
     .toast {
       position: fixed;
       z-index: 30;
-      inset: auto auto calc(98px + env(safe-area-inset-bottom)) 50%;
+      inset: calc(12px + env(safe-area-inset-top)) auto auto 50%;
       margin: 0;
       max-width: calc(100% - 40px);
       padding: 11px 16px;
@@ -911,7 +1026,7 @@
       opacity: 0;
       pointer-events: none;
       text-align: center;
-      transform: translate(-50%, 12px);
+      transform: translate(-50%, -12px);
       transition: opacity .18s, transform .18s;
     }
 
@@ -934,6 +1049,7 @@
   <main class="app">
     <header class="topbar">
       <button class="list-title" id="listTitle" type="button" aria-expanded="false"><span class="list-title-text" id="listTitleText">Einkauf</span></button>
+      <button class="settings-trigger" id="openSettings" type="button" aria-label="Einstellungen öffnen" hidden><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </header>
 
     <section class="section" id="openSection" aria-labelledby="openHeading">
@@ -958,7 +1074,7 @@
   <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen">+</button>
 
   <dialog class="sheet" id="addSheet" aria-labelledby="addTitle">
-    <form class="sheet-inner" id="addForm">
+    <form class="sheet-inner" id="addForm" novalidate>
       <div class="sheet-page search-page" id="searchPage">
         <div class="sheet-header">
           <button class="back-button" id="doneAdd" type="button" aria-label="Zurück zur Einkaufsliste"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
@@ -966,14 +1082,13 @@
           <span aria-hidden="true"></span>
         </div>
         <div class="search-wrap">
-          <input class="search-field" id="productName" name="productName" type="search" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="61" placeholder="Artikel suchen" aria-describedby="addError">
+          <input class="search-field" id="productName" name="productName" type="search" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="61" placeholder="Artikel suchen">
           <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
         </div>
         <div class="segments" role="group" aria-label="Sortierung">
           <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Häufig</button>
           <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
         </div>
-        <p class="error" id="addError" role="alert"></p>
         <div class="suggestions" id="suggestions"></div>
       </div>
 
@@ -1000,9 +1115,9 @@
   </dialog>
 
   <dialog class="dialog-card" id="listNameDialog" aria-labelledby="listNameTitle">
-    <form id="listNameForm">
+    <form id="listNameForm" novalidate>
       <h2 id="listNameTitle">Neue Liste</h2>
-      <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Listenname" required>
+      <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Listenname">
       <div class="dialog-actions">
         <button class="dialog-button" id="cancelListName" type="button">Abbrechen</button>
         <button class="dialog-button primary" type="submit">Sichern</button>
@@ -1010,12 +1125,69 @@
     </form>
   </dialog>
 
-  <dialog class="dialog-card" id="deleteListDialog" aria-labelledby="deleteListTitle">
+  <dialog class="dialog-card" id="deleteListDialog" aria-labelledby="deleteListTitle" tabindex="-1">
     <h2 id="deleteListTitle">Liste löschen?</h2>
     <p id="deleteListText"></p>
     <div class="dialog-actions">
       <button class="dialog-button" id="cancelDeleteList" type="button">Abbrechen</button>
       <button class="dialog-button danger" id="confirmDeleteList" type="button">Löschen</button>
+    </div>
+  </dialog>
+
+  <dialog class="sheet settings-sheet" id="settingsSheet" aria-labelledby="settingsTitle">
+    <div class="sheet-page">
+      <div class="sheet-header">
+        <button class="back-button" id="closeSettings" type="button" aria-label="Zurück zu den Listen"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <h2 id="settingsTitle">Einstellungen</h2>
+        <span aria-hidden="true"></span>
+      </div>
+      <section class="settings-content" aria-labelledby="backupHeading">
+        <h3 class="settings-heading" id="backupHeading">Datensicherung</h3>
+        <div class="settings-card">
+          <button class="settings-action" id="exportBackup" type="button">
+            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0 4 4m-4-4L8 7M5 21h14"/></svg></span>
+            <span><span class="settings-action-title">Backup exportieren</span><span class="settings-action-description">Alle Daten als JSON-Datei exportieren</span></span>
+          </button>
+          <button class="settings-action" id="importBackup" type="button">
+            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg></span>
+            <span><span class="settings-action-title">Backup importieren</span><span class="settings-action-description">Daten aus einer JSON-Datei wiederherstellen</span></span>
+          </button>
+        </div>
+        <p class="settings-note">Backups enthalten alle Listen, Artikel, Mengen und Kaufhäufigkeiten. Beim Import werden die aktuellen Daten vollständig ersetzt.</p>
+      </section>
+      <section class="settings-content" aria-labelledby="cleanupHeading">
+        <h3 class="settings-heading" id="cleanupHeading">Artikel bereinigen</h3>
+        <div class="settings-card">
+          <button class="settings-action danger" id="cleanupRareProducts" type="button">
+            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg></span>
+            <span><span class="settings-action-title">Selten gekaufte Artikel löschen</span><span class="settings-action-description">Artikel mit höchstens einem Kauf entfernen</span></span>
+          </button>
+          <button class="settings-action danger" id="cleanupOldProducts" type="button">
+            <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span><span class="settings-action-title">Lange ungenutzte Artikel löschen</span><span class="settings-action-description">Seit über einem Jahr nicht gekaufte Artikel entfernen</span></span>
+          </button>
+        </div>
+        <p class="settings-note">Die Bereinigung gilt für alle Listen und entfernt auch zugehörige Listeneinträge und Kaufhistorien.</p>
+      </section>
+      <input id="backupFile" type="file" accept="application/json,.json" hidden>
+    </div>
+  </dialog>
+
+  <dialog class="dialog-card" id="importBackupDialog" aria-labelledby="importBackupTitle" tabindex="-1">
+    <h2 id="importBackupTitle">Backup importieren?</h2>
+    <p>Alle vorhandenen Listen und Artikel werden durch die Daten aus dem Backup ersetzt.</p>
+    <div class="dialog-actions">
+      <button class="dialog-button" id="cancelImportBackup" type="button">Abbrechen</button>
+      <button class="dialog-button danger" id="confirmImportBackup" type="button">Wiederherstellen</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog-card" id="cleanupProductsDialog" aria-labelledby="cleanupProductsTitle" tabindex="-1">
+    <h2 id="cleanupProductsTitle">Artikel löschen?</h2>
+    <p id="cleanupProductsText"></p>
+    <div class="dialog-actions">
+      <button class="dialog-button" id="cancelCleanupProducts" type="button">Abbrechen</button>
+      <button class="dialog-button danger" id="confirmCleanupProducts" type="button">Löschen</button>
     </div>
   </dialog>
 
@@ -1026,14 +1198,23 @@
       "use strict";
 
       const DB_NAME = "einkaufslisten-app";
-      const DB_VERSION = 2;
+      const DB_VERSION = 4;
       const DEFAULT_LIST_NAME = "Einkauf";
       const MAX_LIST_NAME_LENGTH = 40;
       const MAX_PRODUCT_NAME_LENGTH = 60;
       const SWIPE_ACTION_WIDTH = 92;
+      const BACKUP_FORMAT = "einkauf-backup";
+      const BACKUP_VERSION = 1;
+      const MAX_BACKUP_BYTES = 10 * 1024 * 1024;
+      const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+      const BACKUP_STORE_NAMES = ["lists", "products", "items", "history", "settings"];
+      const QUANTITY_UNITS = new Set(["Stück", "g", "kg", "ml", "l"]);
       const QUANTITY_ICON_MARKUP = '<svg class="quantity-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="m2 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="M7 21h10M12 3v18M3 7h18"/></svg>';
       const collator = new Intl.Collator("de", { sensitivity: "base" });
-      const quantityFormatter = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 3 });
+      const quantityFormatter = new Intl.NumberFormat("de-DE", {
+        maximumFractionDigits: 3,
+        useGrouping: false
+      });
       const state = {
         db: null,
         list: null,
@@ -1044,6 +1225,8 @@
         quickMode: "frequent",
         inlineEditingListId: null,
         pendingListDelete: null,
+        pendingBackupImport: null,
+        pendingProductCleanup: null,
         showingLists: false,
         listLoadToken: 0,
         quantityProductName: null,
@@ -1055,6 +1238,7 @@
       const els = {
         listTitle: document.querySelector("#listTitle"),
         listTitleText: document.querySelector("#listTitleText"),
+        openSettings: document.querySelector("#openSettings"),
         openSection: document.querySelector("#openSection"),
         boughtSection: document.querySelector("#boughtSection"),
         listOverview: document.querySelector("#listOverview"),
@@ -1067,7 +1251,6 @@
         doneAdd: document.querySelector("#doneAdd"),
         productName: document.querySelector("#productName"),
         clearSearch: document.querySelector("#clearSearch"),
-        addError: document.querySelector("#addError"),
         frequentMode: document.querySelector("#frequentMode"),
         alphabeticalMode: document.querySelector("#alphabeticalMode"),
         suggestions: document.querySelector("#suggestions"),
@@ -1088,6 +1271,20 @@
         deleteListText: document.querySelector("#deleteListText"),
         cancelDeleteList: document.querySelector("#cancelDeleteList"),
         confirmDeleteList: document.querySelector("#confirmDeleteList"),
+        settingsSheet: document.querySelector("#settingsSheet"),
+        closeSettings: document.querySelector("#closeSettings"),
+        exportBackup: document.querySelector("#exportBackup"),
+        importBackup: document.querySelector("#importBackup"),
+        backupFile: document.querySelector("#backupFile"),
+        importBackupDialog: document.querySelector("#importBackupDialog"),
+        cancelImportBackup: document.querySelector("#cancelImportBackup"),
+        confirmImportBackup: document.querySelector("#confirmImportBackup"),
+        cleanupRareProducts: document.querySelector("#cleanupRareProducts"),
+        cleanupOldProducts: document.querySelector("#cleanupOldProducts"),
+        cleanupProductsDialog: document.querySelector("#cleanupProductsDialog"),
+        cleanupProductsText: document.querySelector("#cleanupProductsText"),
+        cancelCleanupProducts: document.querySelector("#cancelCleanupProducts"),
+        confirmCleanupProducts: document.querySelector("#confirmCleanupProducts"),
         toast: document.querySelector("#toast")
       };
       let toastHideTimer;
@@ -1104,7 +1301,7 @@
         const normalized = clean(value).replace(/\s+/g, "").replace(",", ".");
         if (!/^\d+(?:\.\d{1,3})?$/.test(normalized)) return null;
         const number = Number(normalized);
-        return Number.isFinite(number) && number > 0 && number <= 999999 ? String(number) : null;
+        return Number.isFinite(number) && number > 0 && number <= 999999 ? number : null;
       }
 
       function formatQuantity(value) {
@@ -1132,7 +1329,7 @@
         return new Promise((resolve, reject) => {
           const opening = indexedDB.open(DB_NAME, DB_VERSION);
           let settled = false;
-          opening.onupgradeneeded = () => {
+          opening.onupgradeneeded = (event) => {
             const db = opening.result;
             const upgradeTransaction = opening.transaction;
             const ensureStore = (name, options) => db.objectStoreNames.contains(name)
@@ -1146,6 +1343,37 @@
             if (!items.indexNames.contains("listId")) items.createIndex("listId", "listId");
             if (!history.indexNames.contains("listId")) history.createIndex("listId", "listId");
             if (!products.indexNames.contains("key")) products.createIndex("key", "key", { unique: true });
+            if (event.oldVersion < 3) {
+              const cursorRequest = items.openCursor();
+              cursorRequest.onsuccess = () => {
+                const cursor = cursorRequest.result;
+                if (!cursor) return;
+                const item = cursor.value;
+                if (item.quantityValue !== null && item.quantityValue !== undefined && item.quantityValue !== "") {
+                  const quantityValue = parseQuantity(item.quantityValue);
+                  cursor.update(quantityValue === null
+                    ? { ...item, quantityValue: null, quantityUnit: null }
+                    : { ...item, quantityValue });
+                }
+                cursor.continue();
+              };
+            }
+            if (event.oldVersion < 4) {
+              const migratedAt = Date.now();
+              const cursorRequest = history.openCursor();
+              cursorRequest.onsuccess = () => {
+                const cursor = cursorRequest.result;
+                if (!cursor) return;
+                const entry = cursor.value;
+                if (!Number.isSafeInteger(entry.lastPurchasedAt) || entry.lastPurchasedAt < 0) {
+                  cursor.update({
+                    ...entry,
+                    lastPurchasedAt: Number(entry.purchaseCount) > 0 ? migratedAt : null
+                  });
+                }
+                cursor.continue();
+              };
+            }
           };
           opening.onsuccess = () => {
             const db = opening.result;
@@ -1505,9 +1733,11 @@
           const willBeChecked = !currentItem.checked;
           const updatedItem = { ...currentItem, checked: willBeChecked };
           const existingHistory = state.history.find((entry) => entry.productId === currentItem.productId);
+          const purchaseCount = Math.max(0, Number(existingHistory?.purchaseCount || 0) + (willBeChecked ? 1 : -1));
           const updatedHistory = {
             ...(existingHistory || { id: id(), listId: state.list.id, productId: currentItem.productId }),
-            purchaseCount: Math.max(0, Number(existingHistory?.purchaseCount || 0) + (willBeChecked ? 1 : -1))
+            purchaseCount,
+            lastPurchasedAt: willBeChecked ? Date.now() : (purchaseCount > 0 ? existingHistory?.lastPurchasedAt ?? null : null)
           };
 
           try {
@@ -1563,6 +1793,304 @@
         }, 1800);
       }
 
+      function openSettingsSheet() {
+        if (!state.showingLists || els.settingsSheet.open) return;
+        els.settingsSheet.showModal();
+        els.closeSettings.focus({ preventScroll: true });
+      }
+
+      function closeSettingsSheet({ immediate = false, restoreFocus = true } = {}) {
+        if (!els.settingsSheet.open || els.settingsSheet.classList.contains("closing")) return;
+        if (immediate) {
+          els.settingsSheet.close();
+          if (restoreFocus) els.openSettings.focus({ preventScroll: true });
+          return;
+        }
+        els.settingsSheet.classList.add("closing");
+        setTimeout(() => {
+          els.settingsSheet.close();
+          els.settingsSheet.classList.remove("closing");
+          if (restoreFocus) els.openSettings.focus({ preventScroll: true });
+        }, 220);
+      }
+
+      async function exportBackup() {
+        return runExclusive("export-backup", async () => {
+          els.exportBackup.disabled = true;
+          try {
+            const values = await Promise.all(BACKUP_STORE_NAMES.map((name) => getAll(name)));
+            const data = Object.fromEntries(BACKUP_STORE_NAMES.map((name, index) => [name, values[index]]));
+            const backup = {
+              format: BACKUP_FORMAT,
+              version: BACKUP_VERSION,
+              createdAt: new Date().toISOString(),
+              data
+            };
+            const contents = JSON.stringify(backup, null, 2);
+            const filename = `einkauf-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            const blob = new Blob([contents], { type: "application/json" });
+            const file = typeof File === "function" ? new File([blob], filename, { type: blob.type }) : null;
+            let canShareFile = false;
+            try {
+              canShareFile = Boolean(file && navigator.share && navigator.canShare?.({ files: [file] }));
+            } catch (error) {
+              console.debug("Dateifreigabe nicht verfügbar", error);
+            }
+
+            if (canShareFile) {
+              try {
+                await navigator.share({ files: [file], title: "Einkauf Backup" });
+                showToast("Backup exportiert");
+                return;
+              } catch (error) {
+                if (error?.name === "AbortError") return;
+              }
+            }
+
+            const url = URL.createObjectURL(file || blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast("Backup exportiert");
+          } catch (error) {
+            console.error(error);
+            showToast("Backup konnte nicht exportiert werden");
+          } finally {
+            els.exportBackup.disabled = false;
+          }
+        });
+      }
+
+      function validateBackup(value) {
+        const invalid = () => { throw new TypeError("Ungültiges Backup"); };
+        const isObject = (entry) => entry !== null && typeof entry === "object" && !Array.isArray(entry);
+        const validId = (entry) => typeof entry === "string" && entry.length > 0 && entry.length <= 128 && clean(entry) === entry;
+        const validTime = (entry) => Number.isSafeInteger(entry) && entry >= 0;
+        const unique = (values) => values.length === new Set(values).size;
+
+        if (!isObject(value) || value.format !== BACKUP_FORMAT || value.version !== BACKUP_VERSION || !isObject(value.data)) invalid();
+        const { lists: rawLists, products: rawProducts, items: rawItems, history: rawHistory, settings: rawSettings } = value.data;
+        if (![rawLists, rawProducts, rawItems, rawHistory, rawSettings].every(Array.isArray)) invalid();
+        if (!rawLists.length || rawLists.length > 500 || rawProducts.length > 25000 || rawItems.length > 50000 || rawHistory.length > 50000 || rawSettings.length > 100) invalid();
+
+        const lists = rawLists.map((entry, index) => {
+          if (!isObject(entry) || !validId(entry.id)) invalid();
+          const name = clean(entry.name);
+          if (!name || name.length > MAX_LIST_NAME_LENGTH) invalid();
+          return { id: entry.id, name, sortOrder: index };
+        });
+        if (!unique(lists.map((entry) => entry.id)) || !unique(lists.map((entry) => comparable(entry.name)))) invalid();
+        const listIds = new Set(lists.map((entry) => entry.id));
+
+        const products = rawProducts.map((entry) => {
+          if (!isObject(entry) || !validId(entry.id) || !validTime(entry.createdAt)) invalid();
+          const name = clean(entry.name);
+          if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
+          return { id: entry.id, name, key: comparable(name), createdAt: entry.createdAt };
+        });
+        if (!unique(products.map((entry) => entry.id)) || !unique(products.map((entry) => entry.key))) invalid();
+        const productIds = new Set(products.map((entry) => entry.id));
+
+        const itemPairs = new Set();
+        const items = rawItems.map((entry) => {
+          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productIds.has(entry.productId) || typeof entry.checked !== "boolean" || !validTime(entry.createdAt)) invalid();
+          const pair = `${entry.listId}\u0000${entry.productId}`;
+          if (itemPairs.has(pair)) invalid();
+          itemPairs.add(pair);
+          const hasQuantity = entry.quantityValue !== null && entry.quantityValue !== undefined && entry.quantityValue !== "";
+          const hasUnit = entry.quantityUnit !== null && entry.quantityUnit !== undefined && entry.quantityUnit !== "";
+          if (hasQuantity !== hasUnit) invalid();
+          const quantityValue = hasQuantity ? parseQuantity(entry.quantityValue) : null;
+          if (hasQuantity && (!quantityValue || !QUANTITY_UNITS.has(entry.quantityUnit))) invalid();
+          return {
+            id: entry.id,
+            listId: entry.listId,
+            productId: entry.productId,
+            checked: entry.checked,
+            createdAt: entry.createdAt,
+            quantityValue,
+            quantityUnit: hasUnit ? entry.quantityUnit : null
+          };
+        });
+        if (!unique(items.map((entry) => entry.id))) invalid();
+
+        const historyPairs = new Set();
+        const importedAt = Date.now();
+        const history = rawHistory.map((entry) => {
+          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productIds.has(entry.productId) || !Number.isSafeInteger(entry.purchaseCount) || entry.purchaseCount < 0 || entry.purchaseCount > 1000000000) invalid();
+          const pair = `${entry.listId}\u0000${entry.productId}`;
+          if (historyPairs.has(pair)) invalid();
+          historyPairs.add(pair);
+          const lastPurchasedAt = entry.lastPurchasedAt === null || entry.lastPurchasedAt === undefined
+            ? (entry.purchaseCount > 0 ? importedAt : null)
+            : entry.lastPurchasedAt;
+          if (lastPurchasedAt !== null && !validTime(lastPurchasedAt)) invalid();
+          return { id: entry.id, listId: entry.listId, productId: entry.productId, purchaseCount: entry.purchaseCount, lastPurchasedAt };
+        });
+        if (!unique(history.map((entry) => entry.id)) || [...itemPairs].some((pair) => !historyPairs.has(pair))) invalid();
+
+        const requestedActiveList = rawSettings.find((entry) => isObject(entry) && entry.key === "lastOpenedListId")?.value;
+        const activeListId = listIds.has(requestedActiveList) ? requestedActiveList : lists[0].id;
+        return {
+          lists,
+          products,
+          items,
+          history,
+          settings: [{ key: "lastOpenedListId", value: activeListId }],
+          activeListId
+        };
+      }
+
+      async function selectBackupFile(event) {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file) return;
+        if (file.size > MAX_BACKUP_BYTES) {
+          showToast("Backup-Datei ist zu groß");
+          return;
+        }
+        try {
+          const backup = validateBackup(JSON.parse(await file.text()));
+          state.pendingBackupImport = backup;
+          els.importBackupDialog.showModal();
+          els.importBackupDialog.focus({ preventScroll: true });
+        } catch (error) {
+          console.error(error);
+          showToast("Backup ist ungültig oder nicht kompatibel");
+        }
+      }
+
+      async function restorePendingBackup() {
+        const backup = state.pendingBackupImport;
+        if (!backup) return;
+        return runExclusive("import-backup", async () => {
+          els.confirmImportBackup.disabled = true;
+          try {
+            await transact(BACKUP_STORE_NAMES, "readwrite", (transaction) => {
+              BACKUP_STORE_NAMES.forEach((name) => transaction.objectStore(name).clear());
+              backup.lists.forEach((entry) => transaction.objectStore("lists").put(entry));
+              backup.products.forEach((entry) => transaction.objectStore("products").put(entry));
+              backup.items.forEach((entry) => transaction.objectStore("items").put(entry));
+              backup.history.forEach((entry) => transaction.objectStore("history").put(entry));
+              backup.settings.forEach((entry) => transaction.objectStore("settings").put(entry));
+            });
+
+            const productNames = new Map(backup.products.map((product) => [product.id, product.name]));
+            state.products = backup.products;
+            state.lists = backup.lists;
+            state.list = backup.lists.find((list) => list.id === backup.activeListId) || backup.lists[0];
+            state.items = backup.items
+              .filter((item) => item.listId === state.list.id)
+              .map((item) => ({ ...item, productName: productNames.get(item.productId) }))
+              .sort((a, b) => a.createdAt - b.createdAt);
+            state.history = backup.history.filter((entry) => entry.listId === state.list.id);
+            state.inlineEditingListId = null;
+            state.pendingBackupImport = null;
+            els.importBackupDialog.close();
+            closeSettingsSheet({ immediate: true, restoreFocus: false });
+            renderItems();
+            showShoppingList();
+            showToast("Backup wiederhergestellt");
+          } catch (error) {
+            console.error(error);
+            showToast("Backup konnte nicht wiederhergestellt werden");
+          } finally {
+            els.confirmImportBackup.disabled = false;
+          }
+        });
+      }
+
+      async function findCleanupProductIds(mode, products = state.products, histories = null) {
+        const historyRecords = histories || await getAll("history");
+        const purchaseCounts = new Map();
+        const lastPurchases = new Map();
+        historyRecords.forEach((entry) => {
+          purchaseCounts.set(entry.productId, (purchaseCounts.get(entry.productId) || 0) + Number(entry.purchaseCount || 0));
+          if (Number.isSafeInteger(entry.lastPurchasedAt)) {
+            lastPurchases.set(entry.productId, Math.max(lastPurchases.get(entry.productId) || 0, entry.lastPurchasedAt));
+          }
+        });
+
+        if (mode === "rare") {
+          return products
+            .filter((product) => (purchaseCounts.get(product.id) || 0) <= 1)
+            .map((product) => product.id);
+        }
+
+        const cutoff = Date.now() - ONE_YEAR_MS;
+        return products
+          .filter((product) => (lastPurchases.get(product.id) || Number(product.createdAt) || Date.now()) < cutoff)
+          .map((product) => product.id);
+      }
+
+      async function askCleanupProducts(mode) {
+        try {
+          const productIds = await findCleanupProductIds(mode);
+          if (!productIds.length) {
+            showToast("Keine passenden Artikel gefunden");
+            return;
+          }
+          state.pendingProductCleanup = { mode, productIds };
+          const count = productIds.length;
+          els.cleanupProductsText.textContent = mode === "rare"
+            ? `${count} ${count === 1 ? "Artikel wurde" : "Artikel wurden"} höchstens einmal gekauft. Die Artikel werden aus allen Listen und Historien entfernt.`
+            : `${count} ${count === 1 ? "Artikel wurde" : "Artikel wurden"} seit über einem Jahr nicht gekauft. Die Artikel werden aus allen Listen und Historien entfernt.`;
+          els.cleanupProductsDialog.showModal();
+          els.cleanupProductsDialog.focus({ preventScroll: true });
+        } catch (error) {
+          console.error(error);
+          showToast("Artikel konnten nicht geprüft werden");
+        }
+      }
+
+      async function cleanupPendingProducts() {
+        const pending = state.pendingProductCleanup;
+        if (!pending) return;
+        return runExclusive("cleanup-products", async () => {
+          els.confirmCleanupProducts.disabled = true;
+          try {
+            const [products, items, histories] = await Promise.all([getAll("products"), getAll("items"), getAll("history")]);
+            const eligibleProductIds = new Set(await findCleanupProductIds(pending.mode, products, histories));
+            const productIds = new Set(pending.productIds.filter((productId) => eligibleProductIds.has(productId)));
+            if (!productIds.size) {
+              state.pendingProductCleanup = null;
+              els.cleanupProductsDialog.close();
+              showToast("Keine passenden Artikel mehr gefunden");
+              return;
+            }
+            await transact(["products", "items", "history"], "readwrite", (transaction) => {
+              const productStore = transaction.objectStore("products");
+              const itemStore = transaction.objectStore("items");
+              const historyStore = transaction.objectStore("history");
+              productIds.forEach((productId) => productStore.delete(productId));
+              items.forEach((item) => {
+                if (productIds.has(item.productId)) itemStore.delete(item.id);
+              });
+              histories.forEach((entry) => {
+                if (productIds.has(entry.productId)) historyStore.delete(entry.id);
+              });
+            });
+
+            state.products = state.products.filter((product) => !productIds.has(product.id));
+            state.items = state.items.filter((item) => !productIds.has(item.productId));
+            state.history = state.history.filter((entry) => !productIds.has(entry.productId));
+            state.pendingProductCleanup = null;
+            els.cleanupProductsDialog.close();
+            renderItems();
+            showToast(`${productIds.size} Artikel entfernt`);
+          } catch (error) {
+            console.error(error);
+            showToast("Artikel konnten nicht gelöscht werden");
+          } finally {
+            els.confirmCleanupProducts.disabled = false;
+          }
+        });
+      }
+
       function showListOverview() {
         state.showingLists = true;
         document.body.classList.add("list-overview-mode");
@@ -1575,6 +2103,7 @@
         els.openAdd.classList.add("list-mode");
         els.openAdd.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Neue Liste</span>';
         els.openAdd.setAttribute("aria-label", "Liste hinzufügen");
+        els.openSettings.hidden = false;
         renderListOptions();
       }
 
@@ -1590,6 +2119,7 @@
         els.openAdd.classList.remove("list-mode");
         els.openAdd.textContent = "+";
         els.openAdd.setAttribute("aria-label", "Artikel hinzufügen");
+        els.openSettings.hidden = true;
         els.openSection.classList.remove("view-enter");
         els.boughtSection.classList.remove("view-enter");
         void els.openSection.offsetWidth;
@@ -1678,6 +2208,7 @@
           return runExclusive(`rename-list:${list.id}`, async () => {
             const name = clean(input.value);
             if (!name) {
+              showToast("Bitte gib einen Listennamen ein");
               input.focus();
               return;
             }
@@ -1764,6 +2295,7 @@
         return runExclusive("create-list", async () => {
           const name = clean(els.listNameInput.value);
           if (!name) {
+            showToast("Bitte gib einen Listennamen ein");
             els.listNameInput.focus();
             return;
           }
@@ -1809,6 +2341,7 @@
         state.pendingListDelete = list;
         els.deleteListText.textContent = `„${list.name}“ wird dauerhaft gelöscht. Artikel und andere Listen bleiben unberührt.`;
         els.deleteListDialog.showModal();
+        els.deleteListDialog.focus({ preventScroll: true });
       }
 
       function deleteListData(transaction, listId) {
@@ -1840,16 +2373,28 @@
             const nextData = deletingActiveList && state.lists.length > 1
               ? await loadListData(nextActiveList.id)
               : { items: deletingActiveList ? [] : state.items, history: deletingActiveList ? [] : state.history };
+            const [allItems, allHistory] = await Promise.all([getAll("items"), getAll("history")]);
+            const remainingProductIds = new Set([
+              ...allItems.filter((item) => item.listId !== list.id).map((item) => item.productId),
+              ...allHistory.filter((entry) => entry.listId !== list.id).map((entry) => entry.productId)
+            ]);
+            const unusedProductIds = state.products
+              .filter((product) => !remainingProductIds.has(product.id))
+              .map((product) => product.id);
 
-            await transact(["lists", "items", "history", "settings"], "readwrite", (transaction) => {
+            await transact(["lists", "items", "history", "products", "settings"], "readwrite", (transaction) => {
               transaction.objectStore("lists").delete(list.id);
               deleteListData(transaction, list.id);
+              unusedProductIds.forEach((productId) => transaction.objectStore("products").delete(productId));
               nextLists.forEach((entry) => transaction.objectStore("lists").put(entry));
               transaction.objectStore("settings").put({ key: "lastOpenedListId", value: nextActiveList.id });
             });
-            await removeUnusedProducts();
 
             state.lists = nextLists;
+            if (unusedProductIds.length) {
+              const unused = new Set(unusedProductIds);
+              state.products = state.products.filter((product) => !unused.has(product.id));
+            }
             state.list = nextActiveList;
             state.items = nextData.items;
             state.history = nextData.history;
@@ -1869,7 +2414,6 @@
 
       function openAddSheet() {
         els.addForm.reset();
-        els.addError.textContent = "";
         resetQuantityPage();
         setQuickMode("frequent");
         els.addSheet.showModal();
@@ -1931,7 +2475,16 @@
         els.quantityPage.setAttribute("aria-hidden", "false");
         els.quantityPage.inert = false;
         els.searchPage.inert = true;
-        requestAnimationFrame(() => els.quantityValue.focus({ preventScroll: true }));
+        focusQuantityInput();
+      }
+
+      function focusQuantityInput() {
+        els.quantityValue.focus({ preventScroll: true });
+        requestAnimationFrame(() => {
+          if (els.addSheet.open && state.quantityProductName && document.activeElement !== els.quantityValue) {
+            els.quantityValue.focus({ preventScroll: true });
+          }
+        });
       }
 
       function closeQuantityPage({ focus = true } = {}) {
@@ -1941,7 +2494,6 @@
 
       function openQuantityEditor(item) {
         els.addForm.reset();
-        els.addError.textContent = "";
         resetQuantityPage();
         els.addSheet.showModal();
         openQuantityPage(item.productName, item);
@@ -2090,12 +2642,11 @@
         return runExclusive("add-product", async () => {
           const productName = clean(value);
           if (!productName) {
-            els.addError.textContent = "Bitte gib einen Artikelnamen ein";
+            showToast("Bitte gib einen Artikelnamen ein");
             els.productName.focus();
             return;
           }
           if (productName.length > MAX_PRODUCT_NAME_LENGTH) {
-            els.addError.textContent = "";
             showToast(`Artikelname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
             els.productName.focus();
             return;
@@ -2104,7 +2655,6 @@
           const productKey = comparable(productName);
           const openDuplicate = state.items.find((item) => !item.checked && comparable(item.productName) === productKey);
           if (openDuplicate) {
-            els.addError.textContent = "";
             renderSuggestions();
             els.productName.focus();
             return;
@@ -2127,7 +2677,11 @@
                 quantityUnit: quantity?.unit ?? null
               };
               const updatedHistory = existingHistory
-                ? { ...existingHistory, purchaseCount: Math.max(0, Number(existingHistory.purchaseCount || 0) - 1) }
+                ? {
+                    ...existingHistory,
+                    purchaseCount: Math.max(0, Number(existingHistory.purchaseCount || 0) - 1),
+                    lastPurchasedAt: Number(existingHistory.purchaseCount || 0) <= 1 ? null : existingHistory.lastPurchasedAt ?? null
+                  }
                 : null;
               await putProductItemAndHistory(newProduct ? product : null, reopenedItem, updatedHistory);
               if (newProduct) state.products.push(product);
@@ -2154,7 +2708,8 @@
               id: id(),
               listId: state.list.id,
               productId: product.id,
-              purchaseCount: 0
+              purchaseCount: 0,
+              lastPurchasedAt: null
             };
             await putProductItemAndHistory(newProduct ? product : null, item, historyItem);
             if (newProduct) state.products.push(product);
@@ -2172,7 +2727,6 @@
       function finishAddingProduct(productName) {
         renderItems();
         els.productName.value = "";
-        els.addError.textContent = "";
         renderSuggestions();
         els.productName.focus({ preventScroll: true });
         showToast(`${productName} hinzugefügt`);
@@ -2187,7 +2741,7 @@
         const quantityValue = parseQuantity(els.quantityValue.value);
         if (!quantityValue) {
           els.quantityValue.setAttribute("aria-invalid", "true");
-          showToast("Bitte gib eine gültige Menge größer als 0 ein");
+          showToast("Bitte gib eine gültige Menge ein");
           els.quantityValue.focus();
           return;
         }
@@ -2203,6 +2757,26 @@
       }
 
       els.openAdd.addEventListener("click", () => state.showingLists ? openListEditor() : openAddSheet());
+      els.openSettings.addEventListener("click", openSettingsSheet);
+      els.closeSettings.addEventListener("click", () => closeSettingsSheet());
+      els.exportBackup.addEventListener("click", exportBackup);
+      els.importBackup.addEventListener("click", () => {
+        els.backupFile.value = "";
+        els.backupFile.click();
+      });
+      els.backupFile.addEventListener("change", selectBackupFile);
+      els.cleanupRareProducts.addEventListener("click", () => askCleanupProducts("rare"));
+      els.cleanupOldProducts.addEventListener("click", () => askCleanupProducts("old"));
+      els.cancelImportBackup.addEventListener("click", () => {
+        state.pendingBackupImport = null;
+        els.importBackupDialog.close();
+      });
+      els.confirmImportBackup.addEventListener("click", restorePendingBackup);
+      els.cancelCleanupProducts.addEventListener("click", () => {
+        state.pendingProductCleanup = null;
+        els.cleanupProductsDialog.close();
+      });
+      els.confirmCleanupProducts.addEventListener("click", cleanupPendingProducts);
       els.listTitle.addEventListener("click", () => state.showingLists ? showShoppingList() : showListOverview());
       document.addEventListener("pointerdown", (event) => {
         const editingId = state.inlineEditingListId;
@@ -2224,7 +2798,6 @@
       els.doneAdd.addEventListener("click", closeAddSheet);
       els.clearSearch.addEventListener("click", () => {
         els.productName.value = "";
-        els.addError.textContent = "";
         renderSuggestions();
         els.productName.focus({ preventScroll: true });
       });
@@ -2240,6 +2813,11 @@
       els.quantityValue.addEventListener("input", () => {
         els.quantityValue.removeAttribute("aria-invalid");
       });
+      els.quantityValue.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" || event.isComposing) return;
+        event.preventDefault();
+        els.addForm.requestSubmit();
+      });
       els.quantityValue.addEventListener("blur", () => {
         const value = parseQuantity(els.quantityValue.value);
         if (value) els.quantityValue.value = formatQuantity(value);
@@ -2247,7 +2825,6 @@
       els.frequentMode.addEventListener("click", () => setQuickMode("frequent"));
       els.alphabeticalMode.addEventListener("click", () => setQuickMode("alphabetical"));
       els.productName.addEventListener("input", () => {
-        els.addError.textContent = "";
         scheduleSuggestions();
       });
       els.productName.addEventListener("keydown", (event) => {
@@ -2262,6 +2839,16 @@
       els.addSheet.addEventListener("cancel", (event) => {
         event.preventDefault();
         closeAddSheet();
+      });
+      els.settingsSheet.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        closeSettingsSheet();
+      });
+      els.importBackupDialog.addEventListener("cancel", () => {
+        state.pendingBackupImport = null;
+      });
+      els.cleanupProductsDialog.addEventListener("cancel", () => {
+        state.pendingProductCleanup = null;
       });
       els.deleteListDialog.addEventListener("cancel", () => {
         state.pendingListDelete = null;

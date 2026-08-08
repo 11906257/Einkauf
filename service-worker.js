@@ -1,9 +1,8 @@
 "use strict";
 
 const CACHE_PREFIX = "einkauf-app-";
-const CACHE_NAME = `${CACHE_PREFIX}v1.3.0`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.5.0`;
 const APP_SHELL = [
-  "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icons/favicon-32.png",
