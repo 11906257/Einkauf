@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = "einkauf-app-";
-const CACHE_NAME = `${CACHE_PREFIX}v1.5.1`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.5.4`;
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",

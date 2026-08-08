@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.5.1">
+  <meta name="application-version" content="1.5.4">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -623,7 +623,10 @@
     }
 
     .suggestions-empty {
-      padding: 28px 18px;
+      display: grid;
+      min-height: 62px;
+      padding: 8px 17px;
+      place-items: center;
       border-radius: 14px;
       background: var(--surface);
       color: var(--secondary);
@@ -1074,7 +1077,7 @@
   <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen">+</button>
 
   <dialog class="sheet" id="addSheet" aria-labelledby="addTitle">
-    <form class="sheet-inner" id="addForm" novalidate>
+    <form class="sheet-inner" id="addForm" autocomplete="off" novalidate>
       <div class="sheet-page search-page" id="searchPage">
         <div class="sheet-header">
           <button class="back-button" id="doneAdd" type="button" aria-label="Zurück zur Einkaufsliste"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
@@ -1082,7 +1085,7 @@
           <span aria-hidden="true"></span>
         </div>
         <div class="search-wrap">
-          <input class="search-field" id="productName" name="productName" type="search" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="61" placeholder="Artikel suchen">
+          <input class="search-field" id="productName" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="61" placeholder="Artikel suchen" aria-label="Artikel suchen">
           <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
         </div>
         <div class="segments" role="group" aria-label="Sortierung">
@@ -1115,7 +1118,7 @@
   </dialog>
 
   <dialog class="dialog-card" id="listNameDialog" aria-labelledby="listNameTitle">
-    <form id="listNameForm" novalidate>
+    <form id="listNameForm" autocomplete="off" novalidate>
       <h2 id="listNameTitle">Neue Liste</h2>
       <input class="search-field" id="listNameInput" type="text" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Listenname">
       <div class="dialog-actions">
@@ -2415,12 +2418,22 @@
         });
       }
 
+      function focusProductSearch() {
+        if (!els.addSheet.open || els.addForm.classList.contains("quantity-mode")) return;
+        els.productName.focus({ preventScroll: true });
+        requestAnimationFrame(() => {
+          if (els.addSheet.open && !els.addForm.classList.contains("quantity-mode") && document.activeElement !== els.productName) {
+            els.productName.focus({ preventScroll: true });
+          }
+        });
+      }
+
       function openAddSheet() {
         els.addForm.reset();
         resetQuantityPage();
         setQuickMode("frequent");
         els.addSheet.showModal();
-        els.productName.focus({ preventScroll: true });
+        focusProductSearch();
       }
 
       function closeAddSheet() {
@@ -2492,7 +2505,7 @@
 
       function closeQuantityPage({ focus = true } = {}) {
         resetQuantityPage();
-        if (focus) requestAnimationFrame(() => els.productName.focus({ preventScroll: true }));
+        if (focus) focusProductSearch();
       }
 
       function openQuantityEditor(item) {
@@ -2646,12 +2659,12 @@
           const productName = clean(value);
           if (!productName) {
             showToast("Bitte gib einen Artikelnamen ein");
-            els.productName.focus();
+            focusProductSearch();
             return;
           }
           if (productName.length > MAX_PRODUCT_NAME_LENGTH) {
             showToast(`Artikelname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
-            els.productName.focus();
+            focusProductSearch();
             return;
           }
 
@@ -2659,7 +2672,7 @@
           const openDuplicate = state.items.find((item) => !item.checked && comparable(item.productName) === productKey);
           if (openDuplicate) {
             renderSuggestions();
-            els.productName.focus();
+            focusProductSearch();
             return;
           }
 
@@ -2731,7 +2744,7 @@
         renderItems();
         els.productName.value = "";
         renderSuggestions();
-        els.productName.focus({ preventScroll: true });
+        focusProductSearch();
         showToast(`${productName} hinzugefügt`);
       }
 
@@ -2802,7 +2815,7 @@
       els.clearSearch.addEventListener("click", () => {
         els.productName.value = "";
         renderSuggestions();
-        els.productName.focus({ preventScroll: true });
+        focusProductSearch();
       });
       els.addForm.addEventListener("submit", submitAddForm);
       els.backFromQuantity.addEventListener("click", () => {
