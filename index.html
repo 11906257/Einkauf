@@ -2287,7 +2287,7 @@
 
             if (canShareFile) {
               try {
-                await navigator.share({ files: [file], title: "Einkauf Backup" });
+                await navigator.share({ files: [file] });
                 return;
               } catch (error) {
                 if (error?.name === "AbortError") return;
@@ -2905,7 +2905,7 @@
 
       function renderQuantityGroupOptions() {
         els.quantityGroupOptions.replaceChildren();
-        [...state.groups, { id: null, name: "Keine Gruppe" }].forEach((group) => {
+        [...state.groups, { id: null, name: "Sonstiges" }].forEach((group) => {
           const button = document.createElement("button");
           const active = group.id === state.quantityGroupId;
           button.type = "button";
@@ -3282,12 +3282,6 @@
         }
         if (!state.quantityProductName) {
           closeQuantityPage();
-          return;
-        }
-        const product = state.products.find((entry) => entry.key === comparable(state.quantityProductName));
-        const groupChanged = (product?.groupId || null) !== state.quantityGroupId;
-        if (!quantityValue && !groupChanged) {
-          focusQuantityInput();
           return;
         }
         if (state.quantityEditingItemId) {
