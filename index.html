@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#41436A">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.5.0">
+  <meta name="application-version" content="1.5.1">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -1236,6 +1236,7 @@
         operations: new Set()
       };
       const els = {
+        themeColor: document.querySelector('meta[name="theme-color"]'),
         listTitle: document.querySelector("#listTitle"),
         listTitleText: document.querySelector("#listTitleText"),
         openSettings: document.querySelector("#openSettings"),
@@ -2093,6 +2094,7 @@
 
       function showListOverview() {
         state.showingLists = true;
+        els.themeColor.content = "#FE9677";
         document.body.classList.add("list-overview-mode");
         els.openSection.hidden = true;
         els.boughtSection.hidden = true;
@@ -2109,6 +2111,7 @@
 
       function showShoppingList() {
         state.showingLists = false;
+        els.themeColor.content = "#41436A";
         document.body.classList.remove("list-overview-mode");
         els.openSection.hidden = false;
         els.boughtSection.hidden = false;
