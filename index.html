@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.8.0">
+  <meta name="application-version" content="1.10.0">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -117,6 +117,7 @@
 
     .list-title:active { opacity: .65; }
     .list-title.overview-mode::after { display: none; }
+    .list-title.overview-mode { font-size: 52px; }
 
     .settings-trigger {
       display: grid;
@@ -288,7 +289,7 @@
     }
 
     .item.bought .item-name {
-      color: color-mix(in srgb, #984063 52%, transparent);
+      color: color-mix(in srgb, #41436A 52%, transparent);
       text-decoration: line-through;
       text-decoration-thickness: 1.5px;
     }
@@ -591,6 +592,7 @@
 
     .suggestion-swipe-row {
       position: relative;
+      flex: 0 0 auto;
       overflow: hidden;
       background: var(--danger);
     }
@@ -600,6 +602,8 @@
     .suggestion-swipe-row:first-child { border-radius: 14px 14px 0 0; }
     .suggestion-swipe-row:last-child { border-radius: 0 0 14px 14px; }
     .suggestion-swipe-row:only-child { border-radius: 14px; }
+    .suggestions > .suggestion-swipe-row:has(+ .suggestion-category) { border-radius: 14px; }
+    .suggestions > .suggestion-swipe-row + .suggestion-category { margin-top: 16px; }
 
     .suggestion-main {
       display: flex;
@@ -652,7 +656,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 17px;
-      color: #984063;
+      color: #41436A;
     }
 
     .suggestion.add-new .suggestion-main { color: var(--text); font-weight: 400; }
@@ -1070,6 +1074,7 @@
       color: #41436A;
       caret-color: #984063;
       font: inherit;
+      font-size: 15px;
     }
 
     .list-options {
@@ -1140,12 +1145,11 @@
       padding: 0 8px 0 18px;
       color: #F3E6DF;
       font-size: 24px;
+      font-weight: 750;
       text-align: left;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
-    .list-select.active { font-weight: 400; }
 
     .inline-list-input {
       min-width: 0;
@@ -1157,7 +1161,13 @@
       background: transparent;
       color: #F3E6DF;
       font-size: 24px;
-      font-weight: 400;
+      font-weight: 750;
+    }
+
+    .list-title,
+    .list-select,
+    .inline-list-input {
+      font-family: ui-serif, "New York", Georgia, serif;
     }
 
     .list-action.save-list-name {
@@ -1348,12 +1358,12 @@
           <span aria-hidden="true"></span>
         </div>
         <div class="search-wrap">
-          <input class="search-field" id="productName" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Artikel suchen" aria-label="Artikel suchen">
+          <input class="search-field" id="productSearch" name="search" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Artikel suchen" aria-label="Artikel suchen">
           <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
         </div>
         <div class="segments" role="group" aria-label="Sortierung">
-          <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Häufig</button>
           <button class="segment" id="categoryMode" type="button" aria-pressed="false">Artikelgruppen</button>
+          <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Meistgekauft</button>
           <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
         </div>
         <div class="suggestions" id="suggestions"></div>
@@ -1368,7 +1378,7 @@
         <div class="quantity-controls">
           <label class="quantity-label" for="quantityValue">Menge</label>
           <div class="quantity-input-wrap">
-            <input class="quantity-input" id="quantityValue" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" maxlength="12" placeholder="1">
+            <input class="quantity-input" id="quantityValue" name="quantity-entry" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" maxlength="12" placeholder="1">
             <button class="quantity-clear" id="clearQuantity" type="button" aria-label="Menge löschen" hidden>×</button>
           </div>
           <div class="unit-options" id="unitOptions" role="group" aria-label="Einheit">
@@ -1448,7 +1458,7 @@
           </button>
         </div>
       </section>
-      <input id="backupFile" type="file" accept="application/json,.json" hidden>
+      <input id="backupFile" name="backup-import" type="file" accept="application/json,.json" autocomplete="off" hidden>
     </div>
     <div class="sheet-page settings-groups-page" id="settingsGroupsPage" aria-hidden="true" inert>
       <div class="sheet-header">
@@ -1458,8 +1468,8 @@
       </div>
       <section class="settings-content" aria-label="Artikelgruppen verwalten">
         <div class="group-manager" id="groupManager"></div>
-        <form class="group-add-form" id="groupAddForm">
-          <input class="group-add-input" id="groupName" type="text" maxlength="40" autocomplete="off" placeholder="Neue Artikelgruppe" aria-label="Neue Artikelgruppe">
+        <form class="group-add-form" id="groupAddForm" autocomplete="off">
+          <input class="group-add-input" id="groupInput" name="group-entry" type="text" maxlength="40" autocomplete="off" autocapitalize="sentences" placeholder="Neue Artikelgruppe" aria-label="Neue Artikelgruppe">
           <button class="group-add-button" type="submit" aria-label="Artikelgruppe hinzufügen">+</button>
         </form>
       </section>
@@ -1547,7 +1557,7 @@
         addSheet: document.querySelector("#addSheet"),
         addForm: document.querySelector("#addForm"),
         doneAdd: document.querySelector("#doneAdd"),
-        productName: document.querySelector("#productName"),
+        productName: document.querySelector("#productSearch"),
         clearSearch: document.querySelector("#clearSearch"),
         frequentMode: document.querySelector("#frequentMode"),
         alphabeticalMode: document.querySelector("#alphabeticalMode"),
@@ -1583,7 +1593,7 @@
         backupFile: document.querySelector("#backupFile"),
         groupManager: document.querySelector("#groupManager"),
         groupAddForm: document.querySelector("#groupAddForm"),
-        groupName: document.querySelector("#groupName"),
+        groupName: document.querySelector("#groupInput"),
         importBackupDialog: document.querySelector("#importBackupDialog"),
         cancelImportBackup: document.querySelector("#cancelImportBackup"),
         confirmImportBackup: document.querySelector("#confirmImportBackup"),
@@ -2703,6 +2713,9 @@
         const input = document.createElement("input");
         input.className = "inline-list-input";
         input.type = "text";
+        input.name = "list-edit";
+        input.autocomplete = "off";
+        input.autocapitalize = "sentences";
         input.value = list.name;
         input.maxLength = MAX_LIST_NAME_LENGTH + 1;
         input.setAttribute("aria-label", "Listenname");
