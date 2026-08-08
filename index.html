@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.0">
+  <meta name="application-version" content="1.10.1">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -38,6 +38,19 @@
       background: var(--bg);
       color: #F3E6DF;
       overscroll-behavior-y: none;
+    }
+
+    html.page-scroll-locked,
+    body.page-scroll-locked {
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body.page-scroll-locked {
+      position: fixed;
+      right: 0;
+      left: 0;
+      width: 100%;
     }
 
     body.list-overview-mode {
@@ -72,7 +85,7 @@
     .topbar {
       position: sticky;
       z-index: 5;
-      top: 0;
+      top: env(safe-area-inset-top);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1609,6 +1622,8 @@
       let toastCloseTimer;
       let scrollFadeFrame;
       let suggestionFrame;
+      const pageScrollLocks = new Set();
+      let lockedPageScrollY = 0;
 
       const id = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
       const clean = (value) => String(value ?? "").normalize("NFC").replace(/\s+/gu, " ").trim();
@@ -1624,6 +1639,37 @@
 
       function formatQuantity(value) {
         return quantityFormatter.format(Number(value));
+      }
+
+      function lockPageScroll(owner) {
+        if (pageScrollLocks.has(owner)) return;
+        if (!pageScrollLocks.size) {
+          lockedPageScrollY = window.scrollY;
+          document.documentElement.classList.add("page-scroll-locked");
+          document.body.classList.add("page-scroll-locked");
+          document.body.style.top = `-${lockedPageScrollY}px`;
+        }
+        pageScrollLocks.add(owner);
+      }
+
+      function unlockPageScroll(owner) {
+        if (!pageScrollLocks.delete(owner) || pageScrollLocks.size) return;
+        document.documentElement.classList.remove("page-scroll-locked");
+        document.body.classList.remove("page-scroll-locked");
+        document.body.style.removeProperty("top");
+        window.scrollTo(0, lockedPageScrollY);
+      }
+
+      function openLockedSheet(dialog) {
+        if (dialog.open) return false;
+        lockPageScroll(dialog);
+        try {
+          dialog.showModal();
+          return true;
+        } catch (error) {
+          unlockPageScroll(dialog);
+          throw error;
+        }
       }
 
       async function runExclusive(key, operation) {
@@ -1779,13 +1825,32 @@
           const key = comparable(productName);
           let product = productsByKey.get(key);
           if (!product) {
-            product = { id: id(), name: productName, key, groupId: null, createdAt: Number(record.createdAt) || Date.now() };
+            product = { id: id(), name: productName, key, groupId: null, defaultUnit: "Stück", createdAt: Number(record.createdAt) || Date.now() };
             products.push(product);
             productsById.set(product.id, product);
             productsByKey.set(key, product);
           }
           record.productId = product.id;
           changed = true;
+        });
+
+        const latestUnits = new Map();
+        items.forEach((item) => {
+          if (!item.productId || !QUANTITY_UNITS.has(item.quantityUnit)) return;
+          const createdAt = Number(item.createdAt) || 0;
+          const current = latestUnits.get(item.productId);
+          if (!current || createdAt >= current.createdAt) {
+            latestUnits.set(item.productId, { unit: item.quantityUnit, createdAt });
+          }
+        });
+        products.forEach((product, index) => {
+          const defaultUnit = QUANTITY_UNITS.has(product.defaultUnit)
+            ? product.defaultUnit
+            : latestUnits.get(product.id)?.unit || "Stück";
+          if (product.defaultUnit !== defaultUnit) {
+            products[index] = { ...product, defaultUnit };
+            changed = true;
+          }
         });
 
         const usedProductIds = new Set(records.map((record) => record.productId).filter(Boolean));
@@ -2262,7 +2327,7 @@
       function openSettingsSheet() {
         if (!state.showingLists || els.settingsSheet.open) return;
         closeGroupsPage();
-        els.settingsSheet.showModal();
+        if (!openLockedSheet(els.settingsSheet)) return;
         els.closeSettings.focus({ preventScroll: true });
       }
 
@@ -2384,7 +2449,9 @@
           if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
           const groupId = entry.groupId === null || entry.groupId === undefined ? null : entry.groupId;
           if (groupId !== null && (!validId(groupId) || !groupIds.has(groupId))) invalid();
-          return { id: entry.id, name, key: comparable(name), groupId, createdAt: entry.createdAt };
+          const defaultUnit = entry.defaultUnit === undefined ? "Stück" : entry.defaultUnit;
+          if (!QUANTITY_UNITS.has(defaultUnit)) invalid();
+          return { id: entry.id, name, key: comparable(name), groupId, defaultUnit, createdAt: entry.createdAt };
         });
         if (!unique(products.map((entry) => entry.id)) || !unique(products.map((entry) => entry.key))) invalid();
         const productIds = new Set(products.map((entry) => entry.id));
@@ -2953,7 +3020,7 @@
         resetQuantityPage();
         setQuickMode(state.quickMode, { persist: false });
         els.themeColor.content = "#FE9677";
-        els.addSheet.showModal();
+        if (!openLockedSheet(els.addSheet)) return;
         focusProductSearch();
       }
 
@@ -3039,7 +3106,7 @@
         els.quantityValue.value = item?.quantityValue ? formatQuantity(item.quantityValue) : "";
         syncQuantityClear();
         els.addWithQuantity.textContent = item ? "Speichern" : "Hinzufügen";
-        setQuantityUnit(item?.quantityUnit || "Stück");
+        setQuantityUnit(item?.quantityUnit || product?.defaultUnit || "Stück");
         renderQuantityGroupOptions();
         els.addSheet.classList.add("quantity-mode");
         els.addForm.classList.add("quantity-mode");
@@ -3064,7 +3131,7 @@
       function openQuantityEditor(item) {
         els.addForm.reset();
         resetQuantityPage();
-        els.addSheet.showModal();
+        if (!openLockedSheet(els.addSheet)) return;
         openQuantityPage(item.productName, item);
       }
 
@@ -3075,11 +3142,16 @@
             closeAddSheet();
             return;
           }
-          const updatedItem = { ...item, quantityValue, quantityUnit };
+          const updatedItem = {
+            ...item,
+            quantityValue,
+            quantityUnit: quantityValue ? quantityUnit : null
+          };
           const product = state.products.find((entry) => entry.id === item.productId);
-          const updatedProduct = product && product.groupId !== state.quantityGroupId
-            ? { ...product, groupId: state.quantityGroupId }
-            : null;
+          const rememberedUnit = quantityUnit || product?.defaultUnit || "Stück";
+          const updatedProduct = product && (
+            product.groupId !== state.quantityGroupId || product.defaultUnit !== rememberedUnit
+          ) ? { ...product, groupId: state.quantityGroupId, defaultUnit: rememberedUnit } : null;
           try {
             await putProductItemAndHistory(updatedProduct, updatedItem, null);
             state.items = state.items.map((entry) => entry.id === itemId ? updatedItem : entry);
@@ -3150,13 +3222,11 @@
           });
         }
 
-        if (!fragment.childNodes.length) {
+        if (!fragment.childNodes.length && (query || state.products.length)) {
           const empty = document.createElement("div");
           empty.className = "suggestions-empty";
           if (query) {
             empty.textContent = "Kein Treffer";
-          } else if (!state.products.length) {
-            empty.textContent = "Tippe oben einen Artikelnamen ein";
           } else {
             empty.textContent = "Alle bekannten Produkte stehen bereits auf der Liste";
           }
@@ -3288,15 +3358,24 @@
             let product = state.products.find((entry) => entry.key === productKey);
             const newProduct = !product;
             if (!product) {
-              product = { id: id(), name: productName, key: productKey, groupId: quantity?.groupId || null, createdAt: Date.now() };
+              product = {
+                id: id(),
+                name: productName,
+                key: productKey,
+                groupId: quantity?.groupId || null,
+                defaultUnit: QUANTITY_UNITS.has(quantity?.unit) ? quantity.unit : "Stück",
+                createdAt: Date.now()
+              };
             }
-            const groupedProduct = !newProduct && quantity && product.groupId !== (quantity.groupId || null)
-              ? { ...product, groupId: quantity.groupId || null }
-              : product;
-            product = groupedProduct;
-            const productToSave = newProduct || groupedProduct !== state.products.find((entry) => entry.id === product.id)
-              ? product
-              : null;
+            let productToSave = newProduct ? product : null;
+            if (!newProduct && quantity) {
+              const groupId = quantity.groupId || null;
+              const defaultUnit = QUANTITY_UNITS.has(quantity.unit) ? quantity.unit : product.defaultUnit || "Stück";
+              if (product.groupId !== groupId || product.defaultUnit !== defaultUnit) {
+                product = { ...product, groupId, defaultUnit };
+                productToSave = product;
+              }
+            }
             const boughtItem = state.items.find((item) => item.checked && comparable(item.productName) === productKey);
             const existingHistory = state.history.find((entry) => entry.productId === product.id);
             if (boughtItem) {
@@ -3305,7 +3384,7 @@
                 checked: false,
                 createdAt: Date.now(),
                 quantityValue: quantity?.value ?? null,
-                quantityUnit: quantity?.unit ?? null
+                quantityUnit: quantity?.value ? quantity.unit : null
               };
               const updatedHistory = existingHistory
                 ? {
@@ -3334,7 +3413,7 @@
               checked: false,
               createdAt: Date.now(),
               quantityValue: quantity?.value ?? null,
-              quantityUnit: quantity?.unit ?? null
+              quantityUnit: quantity?.value ? quantity.unit : null
             };
             const historyItem = existingHistory ? null : {
               id: id(),
@@ -3386,13 +3465,13 @@
           saveItemQuantity(
             state.quantityEditingItemId,
             quantityValue,
-            quantityValue ? state.quantityUnit : null
+            state.quantityUnit
           );
           return;
         }
         addProduct(state.quantityProductName, {
           value: quantityValue,
-          unit: quantityValue ? state.quantityUnit : null,
+          unit: state.quantityUnit,
           groupId: state.quantityGroupId
         });
       }
@@ -3495,13 +3574,18 @@
         if (event.target === els.addSheet) closeAddSheet();
       });
       els.addSheet.addEventListener("cancel", (event) => {
+        if (event.target !== els.addSheet) return;
         event.preventDefault();
         closeAddSheet();
       });
       els.settingsSheet.addEventListener("cancel", (event) => {
+        if (event.target !== els.settingsSheet) return;
         event.preventDefault();
         closeSettingsSheet();
       });
+      els.addSheet.addEventListener("close", () => unlockPageScroll(els.addSheet));
+      els.settingsSheet.addEventListener("close", () => unlockPageScroll(els.settingsSheet));
+      els.backupFile.addEventListener("cancel", (event) => event.stopPropagation());
       els.importBackupDialog.addEventListener("cancel", () => {
         state.pendingBackupImport = null;
       });
