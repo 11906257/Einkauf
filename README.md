@@ -12,7 +12,7 @@
 - Artikel globalen Artikelgruppen zuordnen und gruppiert anzeigen
 - Reihenfolge der Artikelgruppen in den Einstellungen festlegen
 - Artikel abhaken und wieder auf die offene Liste setzen
-- Artikel und Listen mit einer Wischbewegung entfernen
+- Listeneinträge entfernen oder Artikel per Wischbewegung aus allen Listen löschen
 - Listen direkt umbenennen
 - Alle Daten als JSON-Backup exportieren und importieren
 - Selten oder lange nicht gekaufte Artikel gezielt bereinigen

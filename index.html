@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.6.0">
+  <meta name="application-version" content="1.8.0">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -170,7 +170,7 @@
     .swipe-row {
       position: relative;
       overflow: hidden;
-      background: var(--danger);
+      background: #8E8E93;
     }
 
     .swipe-row + .swipe-row .item { border-top: 1px solid #984063; }
@@ -198,7 +198,7 @@
       background: var(--surface);
     }
 
-    .delete-reveal {
+    .swipe-reveal {
       position: absolute;
       inset: 0 0 0 auto;
       display: grid;
@@ -305,7 +305,7 @@
       border: 0;
       border-radius: 50%;
       background: #F3E6DF;
-      color: var(--danger);
+      color: #5F606B;
       font-size: 14px;
       font-weight: 600;
     }
@@ -573,6 +573,8 @@
     }
 
     .suggestion {
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       width: 100%;
@@ -581,12 +583,23 @@
       overflow: hidden;
       border-radius: 0;
       background: #F3E6DF;
+      touch-action: pan-y;
+      transition: transform .16s ease;
     }
 
-    .suggestion + .suggestion { border-top: 1px solid #984063; }
-    .suggestion:first-child { border-radius: 14px 14px 0 0; }
-    .suggestion:last-child { border-radius: 0 0 14px 14px; }
-    .suggestion:only-child { border-radius: 14px; }
+    .suggestion.dragging { transition: none; }
+
+    .suggestion-swipe-row {
+      position: relative;
+      overflow: hidden;
+      background: var(--danger);
+    }
+
+    .suggestion-swipe-row > .swipe-reveal { z-index: 0; }
+    .suggestion-swipe-row + .suggestion-swipe-row .suggestion { border-top: 1px solid #984063; }
+    .suggestion-swipe-row:first-child { border-radius: 14px 14px 0 0; }
+    .suggestion-swipe-row:last-child { border-radius: 0 0 14px 14px; }
+    .suggestion-swipe-row:only-child { border-radius: 14px; }
 
     .suggestion-main {
       display: flex;
@@ -1003,7 +1016,7 @@
       background: #F64668;
     }
 
-    .group-swipe-row > .delete-reveal { z-index: 0; }
+    .group-swipe-row > .swipe-reveal { z-index: 0; }
 
     .group-swipe-row + .group-swipe-row .group-manager-row { border-top: 1px solid #41436A; }
 
@@ -1383,6 +1396,15 @@
     </div>
   </dialog>
 
+  <dialog class="dialog-card" id="deleteProductDialog" aria-labelledby="deleteProductTitle" tabindex="-1">
+    <h2 id="deleteProductTitle">Artikel überall löschen?</h2>
+    <p id="deleteProductText"></p>
+    <div class="dialog-actions">
+      <button class="dialog-button cancel" id="cancelDeleteProduct" type="button">Abbrechen</button>
+      <button class="dialog-button danger" id="confirmDeleteProduct" type="button">Löschen</button>
+    </div>
+  </dialog>
+
   <dialog class="sheet settings-sheet" id="settingsSheet" aria-labelledby="settingsTitle">
     <div class="sheet-inner settings-inner" id="settingsInner">
     <div class="sheet-page settings-main-page" id="settingsMainPage" aria-hidden="false">
@@ -1418,11 +1440,11 @@
         <div class="settings-card">
           <button class="settings-action danger" id="cleanupRareProducts" type="button">
             <span class="settings-action-icon"><span class="cleanup-count-icon" aria-hidden="true">1x</span></span>
-            <span><span class="settings-action-title">Selten gekaufte Artikel löschen</span><span class="settings-action-description">Artikel mit höchstens einem Kauf entfernen</span></span>
+            <span><span class="settings-action-title">Selten gekaufte Artikel löschen</span><span class="settings-action-description">Artikel mit höchstens einem Kauf löschen</span></span>
           </button>
           <button class="settings-action danger" id="cleanupOldProducts" type="button">
             <span class="settings-action-icon"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></span>
-            <span><span class="settings-action-title">Lange ungenutzte Artikel löschen</span><span class="settings-action-description">Seit über einem Jahr nicht gekaufte Artikel entfernen</span></span>
+            <span><span class="settings-action-title">Lange ungenutzte Artikel löschen</span><span class="settings-action-description">Seit über einem Jahr nicht gekaufte Artikel löschen</span></span>
           </button>
         </div>
       </section>
@@ -1498,6 +1520,7 @@
         quickMode: "frequent",
         inlineEditingListId: null,
         pendingListDelete: null,
+        pendingProductDelete: null,
         pendingBackupImport: null,
         pendingProductCleanup: null,
         showingLists: false,
@@ -1544,6 +1567,10 @@
         deleteListText: document.querySelector("#deleteListText"),
         cancelDeleteList: document.querySelector("#cancelDeleteList"),
         confirmDeleteList: document.querySelector("#confirmDeleteList"),
+        deleteProductDialog: document.querySelector("#deleteProductDialog"),
+        deleteProductText: document.querySelector("#deleteProductText"),
+        cancelDeleteProduct: document.querySelector("#cancelDeleteProduct"),
+        confirmDeleteProduct: document.querySelector("#confirmDeleteProduct"),
         settingsSheet: document.querySelector("#settingsSheet"),
         settingsInner: document.querySelector("#settingsInner"),
         settingsMainPage: document.querySelector("#settingsMainPage"),
@@ -1943,7 +1970,7 @@
           shell.className = "swipe-row";
           const reveal = document.createElement("button");
           reveal.type = "button";
-          reveal.className = "delete-reveal";
+          reveal.className = "swipe-reveal";
           reveal.textContent = "Entfernen";
           reveal.setAttribute("aria-label", `${item.productName} entfernen`);
           const row = document.createElement("div");
@@ -2134,9 +2161,9 @@
           shell.className = "group-swipe-row";
           const reveal = document.createElement("button");
           reveal.type = "button";
-          reveal.className = "delete-reveal";
-          reveal.textContent = "Entfernen";
-          reveal.setAttribute("aria-label", `${group.name} entfernen`);
+          reveal.className = "swipe-reveal";
+          reveal.textContent = "Löschen";
+          reveal.setAttribute("aria-label", `${group.name} löschen`);
           const row = document.createElement("div");
           row.className = "group-manager-row";
           const name = document.createElement("span");
@@ -2520,7 +2547,7 @@
         return runExclusive("cleanup-products", async () => {
           els.confirmCleanupProducts.disabled = true;
           try {
-            const [products, items, histories] = await Promise.all([getAll("products"), getAll("items"), getAll("history")]);
+            const [products, histories] = await Promise.all([getAll("products"), getAll("history")]);
             const eligibleProductIds = new Set(await findCleanupProductIds(pending.mode, products, histories));
             const productIds = new Set(pending.productIds.filter((productId) => eligibleProductIds.has(productId)));
             if (!productIds.size) {
@@ -2528,18 +2555,7 @@
               els.cleanupProductsDialog.close();
               return;
             }
-            await transact(["products", "items", "history"], "readwrite", (transaction) => {
-              const productStore = transaction.objectStore("products");
-              const itemStore = transaction.objectStore("items");
-              const historyStore = transaction.objectStore("history");
-              productIds.forEach((productId) => productStore.delete(productId));
-              items.forEach((item) => {
-                if (productIds.has(item.productId)) itemStore.delete(item.id);
-              });
-              histories.forEach((entry) => {
-                if (productIds.has(entry.productId)) historyStore.delete(entry.id);
-              });
-            });
+            await deleteProductsEverywhere(productIds);
 
             state.products = state.products.filter((product) => !productIds.has(product.id));
             state.items = state.items.filter((item) => !productIds.has(item.productId));
@@ -2611,9 +2627,9 @@
           row.className = "list-option";
           const reveal = document.createElement("button");
           reveal.type = "button";
-          reveal.className = "delete-reveal";
-          reveal.textContent = "Entfernen";
-          reveal.setAttribute("aria-label", `${list.name} entfernen`);
+          reveal.className = "swipe-reveal";
+          reveal.textContent = "Löschen";
+          reveal.setAttribute("aria-label", `${list.name} löschen`);
           const select = document.createElement("button");
           select.type = "button";
           select.className = `list-select${list.id === state.list.id ? " active" : ""}`;
@@ -2852,6 +2868,58 @@
         });
       }
 
+      function askDeleteProduct(productId) {
+        const product = state.products.find((entry) => entry.id === productId);
+        if (!product) return;
+        state.pendingProductDelete = product;
+        els.deleteProductText.replaceChildren(
+          document.createTextNode(`„${product.name}“ wird dauerhaft gelöscht.`),
+          document.createElement("br"),
+          document.createTextNode("Der Artikel verschwindet aus allen Listen und Kaufhistorien.")
+        );
+        els.deleteProductDialog.showModal();
+        els.deleteProductDialog.focus({ preventScroll: true });
+      }
+
+      function deleteProductsEverywhere(productIds) {
+        return transact(["products", "items", "history"], "readwrite", (transaction) => {
+          const products = transaction.objectStore("products");
+          productIds.forEach((productId) => products.delete(productId));
+          ["items", "history"].forEach((storeName) => {
+            const cursorRequest = transaction.objectStore(storeName).openCursor();
+            cursorRequest.onsuccess = () => {
+              const cursor = cursorRequest.result;
+              if (!cursor) return;
+              if (productIds.has(cursor.value.productId)) cursor.delete();
+              cursor.continue();
+            };
+          });
+        });
+      }
+
+      async function deletePendingProduct() {
+        const product = state.pendingProductDelete;
+        if (!product) return;
+        return runExclusive(`delete-product:${product.id}`, async () => {
+          els.confirmDeleteProduct.disabled = true;
+          try {
+            const productIds = new Set([product.id]);
+            await deleteProductsEverywhere(productIds);
+            state.products = state.products.filter((entry) => !productIds.has(entry.id));
+            state.items = state.items.filter((entry) => !productIds.has(entry.productId));
+            state.history = state.history.filter((entry) => !productIds.has(entry.productId));
+            state.pendingProductDelete = null;
+            els.deleteProductDialog.close();
+            renderItems();
+            renderSuggestions();
+          } catch (error) {
+            console.error(error);
+          } finally {
+            els.confirmDeleteProduct.disabled = false;
+          }
+        });
+      }
+
       function focusPageInput(input, isCurrentPage) {
         const applyFocus = () => {
           if (isCurrentPage()) input.focus({ preventScroll: true });
@@ -3065,7 +3133,7 @@
         } else {
           matches.forEach((entry) => {
             const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
-            fragment.append(createSuggestion(entry.productName, { isOnList }));
+            fragment.append(createSuggestion(entry.productName, { isOnList, productId: entry.productId }));
           });
         }
 
@@ -3101,7 +3169,7 @@
           rows.className = "suggestion-category-items";
           groupMatches.forEach((entry) => {
             const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
-            rows.append(createSuggestion(entry.productName, { isOnList }));
+            rows.append(createSuggestion(entry.productName, { isOnList, productId: entry.productId }));
           });
           section.append(heading, rows);
           fragment.append(section);
@@ -3116,7 +3184,9 @@
         });
       }
 
-      function createSuggestion(productName, { isOnList = false, isNew = false } = {}) {
+      function createSuggestion(productName, { isOnList = false, isNew = false, productId = null } = {}) {
+        const shell = document.createElement("div");
+        shell.className = "suggestion-swipe-row";
         const row = document.createElement("div");
         row.className = `suggestion${isOnList ? " already-listed" : ""}${isNew ? " add-new" : ""}`;
         const main = document.createElement("button");
@@ -3129,21 +3199,36 @@
         row.append(main);
 
         if (isOnList) {
-          main.disabled = true;
+          main.setAttribute("aria-disabled", "true");
           const status = document.createElement("span");
           status.className = "suggestion-status";
           status.textContent = "Auf der Liste";
           main.append(status);
-          return row;
+        } else {
+          main.addEventListener("click", () => {
+            if (row.dataset.suppressClick === "true" || row.style.transform) return;
+            addProduct(productName);
+          });
+          const quantityButton = makeQuantityButton(
+            `Menge für ${productName} hinzufügen`,
+            () => openQuantityPage(productName)
+          );
+          row.append(quantityButton);
         }
 
-        main.addEventListener("click", () => addProduct(productName));
-        const quantityButton = makeQuantityButton(
-          `Menge für ${productName} hinzufügen`,
-          () => openQuantityPage(productName)
-        );
-        row.append(quantityButton);
-        return row;
+        if (!productId) {
+          shell.append(row);
+          return shell;
+        }
+
+        const reveal = document.createElement("button");
+        reveal.type = "button";
+        reveal.className = "swipe-reveal";
+        reveal.textContent = "Löschen";
+        reveal.setAttribute("aria-label", `${productName} überall löschen`);
+        shell.append(reveal, row);
+        bindSwipeGesture(row, reveal, () => askDeleteProduct(productId), ".quantity-button");
+        return shell;
       }
 
       function updateScrollFade() {
@@ -3340,6 +3425,12 @@
         renderListOptions();
       });
       els.confirmDeleteList.addEventListener("click", deletePendingList);
+      els.cancelDeleteProduct.addEventListener("click", () => {
+        state.pendingProductDelete = null;
+        els.deleteProductDialog.close();
+        renderSuggestions();
+      });
+      els.confirmDeleteProduct.addEventListener("click", deletePendingProduct);
       els.clearBought.addEventListener("click", clearBoughtItems);
       els.doneAdd.addEventListener("click", closeAddSheet);
       els.clearSearch.addEventListener("click", () => {
@@ -3407,6 +3498,10 @@
       els.deleteListDialog.addEventListener("cancel", () => {
         state.pendingListDelete = null;
         renderListOptions();
+      });
+      els.deleteProductDialog.addEventListener("cancel", () => {
+        state.pendingProductDelete = null;
+        renderSuggestions();
       });
 
       async function start() {
