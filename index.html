@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.3">
+  <meta name="application-version" content="1.10.4">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -38,6 +38,12 @@
       background: var(--bg);
       color: #F3E6DF;
       overscroll-behavior-y: none;
+    }
+
+    html.add-sheet-open,
+    body.add-sheet-open,
+    body.list-overview-mode.add-sheet-open {
+      background: var(--active-sheet-bg);
     }
 
     html.page-scroll-locked,
@@ -3040,9 +3046,22 @@
         els.addForm.reset();
         resetQuantityPage();
         setQuickMode(state.quickMode, { persist: false });
-        els.themeColor.content = "#FE9677";
         if (!openLockedSheet(els.addSheet)) return;
+        els.themeColor.content = "#FE9677";
+        setAddSheetBackground("#FE9677");
         focusProductSearch();
+      }
+
+      function setAddSheetBackground(color) {
+        document.documentElement.style.setProperty("--active-sheet-bg", color);
+        document.documentElement.classList.add("add-sheet-open");
+        document.body.classList.add("add-sheet-open");
+      }
+
+      function clearAddSheetBackground() {
+        document.documentElement.classList.remove("add-sheet-open");
+        document.body.classList.remove("add-sheet-open");
+        document.documentElement.style.removeProperty("--active-sheet-bg");
       }
 
       function closeAddSheet() {
@@ -3053,6 +3072,7 @@
           els.addSheet.close();
           els.addSheet.classList.remove("closing");
           resetQuantityPage();
+          clearAddSheetBackground();
           els.themeColor.content = state.showingLists ? "#F3E6DF" : "#41436A";
           els.openAdd.focus({ preventScroll: true });
         }, 220);
@@ -3123,6 +3143,7 @@
         const product = state.products.find((entry) => entry.key === comparable(normalizedName));
         state.quantityGroupId = product?.groupId || null;
         els.themeColor.content = "#984063";
+        setAddSheetBackground("#984063");
         els.quantityTitle.textContent = normalizedName;
         els.quantityValue.value = item?.quantityValue ? formatQuantity(item.quantityValue) : "";
         syncQuantityClear();
@@ -3146,6 +3167,7 @@
       function closeQuantityPage({ focus = true } = {}) {
         resetQuantityPage();
         els.themeColor.content = "#FE9677";
+        setAddSheetBackground("#FE9677");
         if (focus) focusProductSearch();
       }
 
@@ -3153,6 +3175,7 @@
         els.addForm.reset();
         resetQuantityPage();
         if (!openLockedSheet(els.addSheet)) return;
+        setAddSheetBackground("#FE9677");
         openQuantityPage(item.productName, item);
       }
 
@@ -3604,7 +3627,10 @@
         event.preventDefault();
         closeSettingsSheet();
       });
-      els.addSheet.addEventListener("close", () => unlockPageScroll(els.addSheet));
+      els.addSheet.addEventListener("close", () => {
+        unlockPageScroll(els.addSheet);
+        clearAddSheetBackground();
+      });
       els.settingsSheet.addEventListener("close", () => unlockPageScroll(els.settingsSheet));
       els.backupFile.addEventListener("cancel", (event) => event.stopPropagation());
       els.importBackupDialog.addEventListener("cancel", () => {
