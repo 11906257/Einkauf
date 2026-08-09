@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.4">
+  <meta name="application-version" content="1.10.6">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -21,8 +21,44 @@
       --secondary: #984063;
       --accent: #FE9677;
       --accent-pressed: #984063;
+      --text-on-accent: #3F4166;
+      --muted: #666776;
       --danger: #F64668;
+      --separator-size: 1px;
+      --item-separator: #984063;
+      --manager-separator: #41436A;
       --shadow: 0 12px 36px color-mix(in srgb, #41436A 28%, transparent);
+      --font-small: 12px;
+      --font-secondary: 14px;
+      --font-body: 17px;
+      --font-heading: 20px;
+      --font-list: 24px;
+      --font-page-title: 34px;
+      --font-overview-title: 52px;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-content: 10px;
+      --space-category: 20px;
+      --space-section: 30px;
+      --page-gutter: 18px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --topbar-height: 82px;
+      --app-bottom-space: 112px;
+      --sheet-header-height: 52px;
+      --field-height: 58px;
+      --touch-size: 44px;
+      --touch-size-small: 44px;
+      --icon-button-size: 44px;
+      --item-row-height: 62px;
+      --suggestion-row-height: 54px;
+      --category-header-height: 32px;
+      --settings-row-height: 72px;
+      --list-row-height: 82px;
+      --floating-button-size: 62px;
+      --floating-button-offset: 22px;
+      --dialog-button-height: 46px;
+      --control-gap: 12px;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -71,21 +107,38 @@
 
     button, input { font: inherit; }
     button { color: inherit; cursor: pointer; }
-    button:disabled { cursor: default; }
+    button:disabled { cursor: default; opacity: .45; }
 
-    :focus,
-    :focus-visible { outline: none; }
+    :focus { outline: none; }
 
-    input:focus,
-    input:focus-visible {
-      box-shadow: none !important;
+    :focus-visible { outline: none; box-shadow: none; }
+
+    .app-error {
+      margin-top: var(--space-content);
+      padding: var(--space-category);
+      border-radius: 15px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .app-error h2 { margin: 0 0 var(--space-sm); font-size: var(--font-heading); }
+    .app-error p { margin: 0; line-height: 1.45; }
+    .app-error button {
+      min-height: var(--touch-size);
+      margin-top: var(--space-category);
+      padding: 0 var(--space-category);
+      border: 0;
+      border-radius: 12px;
+      background: #41436A;
+      color: #F3E6DF;
+      font-weight: 650;
     }
 
     .app {
       width: min(100%, 520px);
       min-height: 100vh;
       margin: 0 auto;
-      padding: calc(82px + env(safe-area-inset-top)) 18px calc(112px + env(safe-area-inset-bottom));
+      padding: calc(var(--topbar-height) + var(--safe-top)) var(--page-gutter) calc(var(--app-bottom-space) + var(--safe-bottom));
     }
 
     .topbar {
@@ -95,10 +148,10 @@
       left: 50%;
       display: flex;
       width: min(100%, 520px);
-      min-height: calc(82px + env(safe-area-inset-top));
+      min-height: calc(var(--topbar-height) + var(--safe-top));
       align-items: center;
       justify-content: space-between;
-      padding: calc(8px + env(safe-area-inset-top)) 18px 0;
+      padding: calc(var(--space-sm) + var(--safe-top)) var(--page-gutter) 0;
       background: var(--bg);
       transform: translateX(-50%);
     }
@@ -121,12 +174,12 @@
     .list-title {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-sm);
       max-width: 100%;
-      padding: 8px 2px;
+      padding: var(--space-sm) 2px;
       border: 0;
       background: transparent;
-      font-size: 34px;
+      font-size: var(--font-page-title);
       font-weight: 750;
       letter-spacing: -.9px;
       text-align: left;
@@ -152,12 +205,12 @@
 
     .list-title:active { opacity: .65; }
     .list-title.overview-mode::after { display: none; }
-    .list-title.overview-mode { font-size: 52px; }
+    .list-title.overview-mode { font-size: var(--font-overview-title); }
 
     .settings-trigger {
       display: grid;
-      width: 44px;
-      height: 44px;
+      width: var(--touch-size);
+      height: var(--touch-size);
       flex: 0 0 auto;
       padding: 0;
       place-items: center;
@@ -169,22 +222,22 @@
     .settings-trigger[hidden] { display: none; }
     .settings-trigger .small-icon { width: 23px; height: 23px; }
 
-    .section { margin-top: 9px; }
+    .section { margin-top: var(--space-content); }
 
-    #boughtSection { margin-top: 29px; }
+    #boughtSection { margin-top: var(--space-section); }
 
     .section-bar {
       display: flex;
-      height: 39px;
+      min-height: var(--touch-size);
       align-items: center;
       justify-content: space-between;
-      padding: 0 0 7px;
+      padding: 0 0 var(--space-sm);
     }
 
     .section-heading {
       margin: 0;
       color: #F3E6DF;
-      font-size: 13px;
+      font-size: var(--font-small);
       font-weight: 650;
       letter-spacing: .45px;
       text-transform: uppercase;
@@ -198,39 +251,42 @@
     }
 
     .card.grouped-card {
-      overflow: visible;
-      border-radius: 0;
-      background: transparent;
+      overflow: hidden;
+      border-radius: 15px;
+      background: var(--surface);
     }
 
     .swipe-row {
       position: relative;
       overflow: hidden;
-      background: #8E8E93;
+      background: var(--muted);
     }
 
-    .swipe-row + .swipe-row .item { border-top: 1px solid #984063; }
+    .swipe-row + .swipe-row,
+    .suggestion-swipe-row + .suggestion-swipe-row {
+      border-top: var(--separator-size) solid var(--item-separator);
+    }
+
+    .group-swipe-row + .group-swipe-row {
+      border-top: var(--separator-size) solid var(--manager-separator);
+    }
 
     .product-group-heading {
-      display: inline-flex;
-      min-height: 24px;
-      margin: 0 0 6px;
-      padding: 4px 10px;
+      display: flex;
+      min-height: var(--category-header-height);
+      padding: var(--space-sm) 16px;
       align-items: center;
-      border-radius: 999px;
       background: #984063;
       color: #F3E6DF;
-      font-size: 12px;
+      font-size: var(--font-small);
       font-weight: 700;
-      letter-spacing: .45px;
+      letter-spacing: .5px;
+      line-height: 1.2;
       text-transform: uppercase;
     }
 
-    .product-group + .product-group { margin-top: 16px; }
-
     .product-group-items {
-      overflow: hidden;
-      border-radius: 15px;
+      overflow: visible;
       background: var(--surface);
     }
 
@@ -239,20 +295,26 @@
       inset: 0 0 0 auto;
       display: grid;
       width: 92px;
+      margin: 0;
+      padding: 0;
       place-items: center;
+      appearance: none;
+      -webkit-appearance: none;
       color: #F3E6DF;
-      font-size: 14px;
+      font-size: var(--font-secondary);
       font-weight: 650;
       border: 0;
       background: transparent;
     }
 
+    .swipe-reveal:focus-visible { z-index: 5; }
+
     .item {
       position: relative;
       display: flex;
       align-items: center;
-      min-height: 62px;
-      padding: 8px 16px 8px 12px;
+      min-height: var(--item-row-height);
+      padding: var(--space-sm) 16px var(--space-sm) 12px;
       background: var(--surface);
       touch-action: pan-y;
       transition: transform .16s ease;
@@ -261,28 +323,38 @@
     .item.dragging { transition: none; }
     .check-button {
       display: grid;
-      width: 28px;
-      height: 28px;
+      position: relative;
+      width: var(--touch-size);
+      height: var(--touch-size);
       flex: 0 0 auto;
-      margin-right: 13px;
+      margin: -8px calc(var(--control-gap) - 8px) -8px -8px;
       padding: 0;
       place-items: center;
-      border: 2px solid #41436A;
-      border-radius: 50%;
+      border: 0;
       background: transparent;
       color: transparent;
-      font-size: 17px;
+      font-size: var(--font-body);
       font-weight: 800;
       line-height: 1;
+    }
+
+    .check-button::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border: 2px solid #984063;
+      border-radius: 50%;
+      background: transparent;
     }
 
     .check-button:active { transform: scale(.88); }
 
     .check-button.checked {
-      border-color: #984063;
-      background: #984063;
       color: #F3E6DF;
     }
+
+    .check-button.checked::before { border-color: #984063; background: #984063; }
 
     .item-copy {
       min-width: 0;
@@ -302,7 +374,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: 18px;
+      font-size: var(--font-body);
       line-height: 1.3;
       color: #41436A;
     }
@@ -311,8 +383,8 @@
       display: block;
       margin-top: 2px;
       overflow: hidden;
-      color: color-mix(in srgb, #984063 72%, transparent);
-      font-size: 14px;
+      color: #7D3552;
+      font-size: var(--font-secondary);
       line-height: 1.25;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -320,29 +392,29 @@
 
     .quantity-button.item-quantity-button {
       flex: 0 0 auto;
-      margin: 0 -8px 0 10px;
+      margin: 0 calc(-1 * var(--space-sm)) 0 var(--space-content);
     }
 
     .item.bought .item-name {
-      color: color-mix(in srgb, #41436A 52%, transparent);
+      color: color-mix(in srgb, #41436A 82%, transparent);
       text-decoration: line-through;
       text-decoration-thickness: 1.5px;
     }
 
-    .item.bought .item-quantity { color: color-mix(in srgb, #984063 52%, transparent); }
+    .item.bought .item-quantity { color: color-mix(in srgb, #7D3552 82%, transparent); }
 
     .clear-button {
       display: grid;
-      width: 32px;
-      height: 32px;
-      min-height: 32px;
+      width: var(--touch-size);
+      height: var(--touch-size);
+      min-height: var(--touch-size);
       padding: 0;
       place-items: center;
       border: 0;
       border-radius: 50%;
       background: #F3E6DF;
       color: #5F606B;
-      font-size: 14px;
+      font-size: var(--font-secondary);
       font-weight: 600;
     }
 
@@ -361,13 +433,13 @@
     .empty {
       display: grid;
       width: 100%;
-      min-height: 62px;
-      padding: 8px 17px;
+      min-height: var(--item-row-height);
+      padding: var(--space-sm) 16px;
       place-items: center;
       border: 0;
       background: transparent;
       color: var(--secondary);
-      font-size: 15px;
+      font-size: var(--font-secondary);
       line-height: 1.4;
       text-align: center;
     }
@@ -377,30 +449,33 @@
 
     .bought-placeholder {
       display: grid;
-      min-height: 62px;
-      padding: 8px 17px;
+      min-height: var(--item-row-height);
+      padding: var(--space-sm) 16px;
       place-items: center;
       color: var(--secondary);
-      font-size: 15px;
+      font-size: var(--font-secondary);
       text-align: center;
     }
 
     .add-button {
       position: fixed;
       z-index: 8;
-      right: max(22px, calc((100vw - 520px) / 2 + 22px));
-      bottom: calc(22px + env(safe-area-inset-bottom));
-      display: grid;
-      width: 62px;
-      height: 62px;
-      padding: 0 0 5px;
-      place-items: center;
+      right: max(var(--floating-button-offset), calc((100vw - 520px) / 2 + var(--floating-button-offset)));
+      bottom: calc(var(--floating-button-offset) + var(--safe-bottom));
+      display: flex;
+      width: var(--floating-button-size);
+      height: var(--floating-button-size);
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      appearance: none;
+      -webkit-appearance: none;
       border: 0;
       border-radius: 50%;
       background: var(--accent);
       box-shadow: 0 10px 26px color-mix(in srgb, #984063 36%, transparent);
-      color: #41436A;
-      font-size: 40px;
+      color: var(--text-on-accent);
+      font-size: var(--font-page-title);
       font-weight: 300;
       line-height: 1;
     }
@@ -433,9 +508,10 @@
       top: 0;
       bottom: 0;
       width: min(100%, 520px);
-      height: auto;
-      min-height: 100%;
-      max-height: none;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      max-height: 100dvh;
       max-width: none;
       margin: 0 auto;
       padding: 0;
@@ -452,7 +528,7 @@
     .sheet-inner {
       position: relative;
       height: 100%;
-      min-height: 100%;
+      min-height: 0;
       overflow: hidden;
       padding: 0;
     }
@@ -462,11 +538,12 @@
       inset: 0;
       display: flex;
       flex-direction: column;
-      padding: calc(8px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+      padding: calc(var(--space-sm) + var(--safe-top)) var(--page-gutter) calc(var(--page-gutter) + var(--safe-bottom));
       transition: opacity .22s ease, transform .24s cubic-bezier(.2, .75, .25, 1);
     }
 
     .search-page {
+      padding-bottom: 0;
       background: #FE9677;
       transform: translateX(0);
     }
@@ -494,14 +571,14 @@
       display: grid;
       grid-template-columns: 64px 1fr 64px;
       align-items: center;
-      min-height: 52px;
+      min-height: var(--sheet-header-height);
     }
 
     .sheet-header h2 {
       margin: 0;
       overflow: hidden;
       color: #F3E6DF;
-      font-size: 18px;
+      font-size: var(--font-heading);
       text-align: center;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -509,19 +586,26 @@
 
     .search-field {
       width: 100%;
-      height: 58px;
+      height: var(--field-height);
       padding: 0 50px 0 16px;
       border: 0;
       border-radius: 14px;
       background: #F3E6DF;
-      color: #984063;
+      color: #41436A;
       caret-color: #984063;
-      font-size: 20px;
+    }
+
+    .search-field,
+    .quantity-input {
+      font-family: inherit;
+      font-size: var(--font-body);
+      font-weight: 400;
+      line-height: 1.2;
     }
 
     .search-wrap {
       position: relative;
-      margin-top: 10px;
+      margin-top: var(--space-content);
     }
 
     .search-field::-webkit-search-cancel-button { display: none; }
@@ -530,16 +614,16 @@
       position: absolute;
       z-index: 1;
       top: 50%;
-      right: 8px;
+      right: 4px;
       display: grid;
-      width: 36px;
-      height: 36px;
-      padding: 0 0 3px;
+      width: var(--touch-size);
+      height: var(--touch-size);
+      padding: 0;
       place-items: center;
       border: 0;
       background: transparent;
       color: var(--secondary);
-      font-size: 25px;
+      font-size: var(--font-heading);
       font-weight: 500;
       line-height: 1;
       transform: translateY(-50%);
@@ -549,10 +633,10 @@
 
     .segments {
       display: flex;
-      height: 40px;
-      flex: 0 0 40px;
-      gap: 3px;
-      margin-top: 10px;
+      height: var(--icon-button-size);
+      flex: 0 0 var(--icon-button-size);
+      gap: var(--space-xs);
+      margin-top: var(--space-content);
       padding: 2px;
       overflow: hidden;
       border: 0;
@@ -574,15 +658,15 @@
       appearance: none;
       -webkit-appearance: none;
       background: transparent;
-      color: #41436A;
-      font-size: 14px;
+      color: var(--text-on-accent);
+      font-size: var(--font-secondary);
       font-weight: 600;
       line-height: 1;
     }
 
     .segment.active {
       background: #41436A;
-      color: #FE9677;
+      color: #F3E6DF;
       box-shadow: none;
     }
 
@@ -594,23 +678,24 @@
       gap: 0;
       overflow-x: hidden;
       overflow-y: auto;
-      margin-top: 10px;
+      margin-top: var(--space-content);
       -webkit-overflow-scrolling: touch;
+    }
+
+    .suggestions:has(> .suggestion-category) {
+      background: transparent;
+    }
+
+    .suggestions:has(.suggestion, .suggestion-category)::after {
+      content: "";
+      min-height: calc(var(--page-gutter) + var(--safe-bottom));
+      flex: 1 0 calc(var(--page-gutter) + var(--safe-bottom));
+      background: transparent;
     }
 
     .suggestions.fade-top {
       -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
       mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
-    }
-
-    .suggestions.fade-bottom {
-      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 18px), transparent 100%);
-      mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 18px), transparent 100%);
-    }
-
-    .suggestions.fade-both {
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
     }
 
     .suggestion {
@@ -619,7 +704,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       width: 100%;
-      min-height: 54px;
+      min-height: var(--suggestion-row-height);
       align-items: center;
       overflow: hidden;
       border-radius: 0;
@@ -632,62 +717,84 @@
 
     .suggestion-swipe-row {
       position: relative;
+      display: block;
       flex: 0 0 auto;
+      min-height: var(--suggestion-row-height);
       overflow: hidden;
       background: var(--danger);
     }
 
+    .suggestion-swipe-row > .suggestion { min-height: inherit; }
+
     .suggestion-swipe-row > .swipe-reveal { z-index: 0; }
-    .suggestion-swipe-row + .suggestion-swipe-row .suggestion { border-top: 1px solid #984063; }
     .suggestion-swipe-row:first-child { border-radius: 14px 14px 0 0; }
-    .suggestion-swipe-row:last-child { border-radius: 0 0 14px 14px; }
-    .suggestion-swipe-row:only-child { border-radius: 14px; }
-    .suggestions > .suggestion-swipe-row:has(+ .suggestion-category) { border-radius: 14px; }
-    .suggestions > .suggestion-swipe-row + .suggestion-category { margin-top: 16px; }
+    .suggestion-swipe-row:last-of-type { border-radius: 0 0 14px 14px; }
+    .suggestion-swipe-row.standalone { border-radius: 14px; }
+    .suggestions:has(> .suggestion-category) > .suggestion-swipe-row,
+    .suggestion-category .suggestion-swipe-row { border-radius: 0; }
+
+    .suggestions > .suggestion-category:first-child .suggestion-category-heading,
+    .suggestions > .suggestion-swipe-row:first-child {
+      border-radius: 14px 14px 0 0;
+    }
+
+    .suggestions > .suggestion-category:first-child {
+      overflow: hidden;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .suggestions > .suggestion-category:last-of-type {
+      overflow: hidden;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .suggestions > .suggestion-category:only-of-type {
+      border-radius: 14px;
+    }
+
+    .suggestions > .suggestion-category:last-of-type .suggestion-swipe-row:last-child {
+      border-radius: 0 0 14px 14px;
+    }
+
+    .suggestions > .suggestion:first-child { border-radius: 14px 14px 0 0; }
+    .suggestions > .suggestion:last-child { border-radius: 0 0 14px 14px; }
+    .suggestions > .suggestion:only-child { border-radius: 14px; }
 
     .suggestion-main {
       display: flex;
       min-width: 0;
-      min-height: 54px;
+      min-height: var(--suggestion-row-height);
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      padding: 10px 14px;
+      gap: var(--space-content);
+      padding: var(--space-content) 14px;
       border: 0;
       background: transparent;
       text-align: left;
     }
 
-    .suggestion-main:active {
-      background: #984063;
-      color: #F3E6DF;
+    .suggestion-category {
+      flex: 0 0 auto;
+      background: #F3E6DF;
     }
 
-    .suggestion:has(.suggestion-main:active) { background: #984063; }
-
-    .suggestion-main:active .suggestion-name,
-    .suggestion-main:active .suggestion-status { color: #F3E6DF; }
-
-    .suggestion-category + .suggestion-category { margin-top: 16px; }
-
     .suggestion-category-heading {
-      display: inline-flex;
-      min-height: 24px;
-      margin-bottom: 6px;
-      padding: 4px 10px;
+      display: flex;
+      min-height: var(--category-header-height);
+      padding: var(--space-sm) 16px;
       align-items: center;
-      border-radius: 999px;
       background: #984063;
       color: #F3E6DF;
-      font-size: 12px;
+      font-size: var(--font-small);
       font-weight: 700;
       letter-spacing: .45px;
+      line-height: 1.2;
       text-transform: uppercase;
     }
 
     .suggestion-category-items {
-      overflow: hidden;
-      border-radius: 14px;
+      overflow: visible;
+      background: #F3E6DF;
     }
 
     .suggestion-name {
@@ -695,7 +802,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: 17px;
+      font-size: var(--font-body);
       color: #41436A;
     }
 
@@ -708,18 +815,22 @@
 
     .quantity-button {
       display: grid;
-      width: 40px;
-      height: 40px;
-      margin-right: 8px;
+      width: var(--icon-button-size);
+      height: var(--icon-button-size);
+      margin-right: var(--space-sm);
       padding: 0;
       place-items: center;
-      border: 0;
+      border: 1px solid #984063;
       border-radius: 11px;
-      background: #984063;
-      color: #F3E6DF;
-      font-size: 12px;
+      background: transparent;
+      color: #984063;
+      font-size: var(--font-small);
       font-weight: 750;
       letter-spacing: -.3px;
+    }
+
+    .quantity-button:active {
+      background: color-mix(in srgb, #984063 10%, transparent);
     }
 
     .quantity-icon {
@@ -735,19 +846,19 @@
     .suggestion-status {
       flex: 0 0 auto;
       color: #984063;
-      font-size: 13px;
+      font-size: var(--font-small);
       font-weight: 600;
     }
 
     .suggestions-empty {
       display: grid;
-      min-height: 62px;
-      padding: 8px 17px;
+      min-height: var(--item-row-height);
+      padding: var(--space-sm) 16px;
       place-items: center;
       border-radius: 14px;
       background: #F3E6DF;
       color: var(--secondary);
-      font-size: 15px;
+      font-size: var(--font-secondary);
       line-height: 1.4;
       text-align: center;
     }
@@ -755,14 +866,14 @@
     .quantity-controls {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
+      gap: var(--space-content);
+      margin-top: var(--space-content);
     }
 
     .quantity-label {
       margin: 0 0 0 2px;
       color: #F3E6DF;
-      font-size: 13px;
+      font-size: var(--font-small);
       font-weight: 650;
       letter-spacing: .35px;
       line-height: 1;
@@ -775,14 +886,13 @@
 
     .quantity-input {
       width: 100%;
-      height: 58px;
+      height: var(--field-height);
       padding: 0 50px 0 16px;
       border: 0;
       border-radius: 14px;
       background: #F3E6DF;
       color: #984063;
       caret-color: #984063;
-      font-size: 20px;
       font-variant-numeric: tabular-nums;
     }
 
@@ -790,16 +900,16 @@
       position: absolute;
       z-index: 1;
       top: 50%;
-      right: 8px;
+      right: 4px;
       display: grid;
-      width: 36px;
-      height: 36px;
-      padding: 0 0 3px;
+      width: var(--touch-size);
+      height: var(--touch-size);
+      padding: 0;
       place-items: center;
       border: 0;
       background: transparent;
       color: #984063;
-      font-size: 25px;
+      font-size: var(--font-heading);
       font-weight: 500;
       line-height: 1;
       transform: translateY(-50%);
@@ -810,31 +920,33 @@
     .unit-options {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: var(--space-sm);
       margin-top: 0;
     }
 
     .quantity-group-control {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
+      gap: var(--space-content);
+      margin-top: 6px;
+      padding-top: 16px;
+      border-top: 1px solid #F3E6DF;
     }
 
     .group-options {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: var(--space-sm);
     }
 
     .group-chip {
-      min-height: 38px;
+      min-height: var(--touch-size-small);
       padding: 0 15px;
       border: 1.5px solid #F3E6DF;
       border-radius: 999px;
       background: transparent;
       color: #F3E6DF;
-      font-size: 14px;
+      font-size: var(--font-secondary);
       font-weight: 650;
     }
 
@@ -844,13 +956,13 @@
     }
 
     .unit-chip {
-      min-height: 38px;
+      min-height: var(--touch-size-small);
       padding: 0 15px;
       border: 1.5px solid #F3E6DF;
       border-radius: 999px;
       background: transparent;
       color: #F3E6DF;
-      font-size: 14px;
+      font-size: var(--font-secondary);
       font-weight: 650;
     }
 
@@ -860,12 +972,12 @@
     }
 
     .quantity-add {
-      min-height: 44px;
+      min-height: var(--touch-size);
       padding: 0;
       border: 0;
       background: transparent;
       color: var(--accent);
-      font-size: 14px;
+      font-size: var(--font-secondary);
       font-weight: 650;
       justify-self: end;
       text-align: right;
@@ -875,7 +987,7 @@
 
     .back-button {
       display: inline-flex;
-      min-height: 44px;
+      min-height: var(--touch-size);
       padding: 0;
       align-items: center;
       border: 0;
@@ -889,10 +1001,10 @@
     .quantity-page .back-button { color: #F3E6DF; }
 
     .search-page .sheet-header h2,
-    .search-page .back-button { color: #41436A; }
+    .search-page .back-button { color: var(--text-on-accent); }
 
     .search-page .search-field::placeholder {
-      color: #8E8E93;
+      color: var(--muted);
       opacity: 1;
     }
 
@@ -942,15 +1054,15 @@
     }
 
     .settings-content {
-      margin-top: 10px;
+      margin-top: var(--space-content);
       color: #41436A;
     }
 
-    .settings-content + .settings-content { margin-top: 20px; }
+    .settings-content + .settings-content { margin-top: var(--space-category); }
 
     .settings-heading {
-      margin: 0 0 10px;
-      font-size: 13px;
+      margin: 0 0 var(--space-content);
+      font-size: var(--font-small);
       font-weight: 650;
       letter-spacing: .45px;
       text-transform: uppercase;
@@ -958,15 +1070,15 @@
 
     .settings-card {
       display: grid;
-      gap: 10px;
+      gap: var(--space-content);
     }
 
     .settings-action {
       display: grid;
       grid-template-columns: 42px minmax(0, 1fr);
       width: 100%;
-      min-height: 72px;
-      padding: 11px 15px;
+      min-height: var(--settings-row-height);
+      padding: var(--space-content) 16px;
       align-items: center;
       border: 0;
       border-radius: 14px;
@@ -974,6 +1086,8 @@
       color: #41436A;
       text-align: left;
     }
+
+    .settings-action:disabled { opacity: 1; }
 
     .settings-action-icon {
       display: grid;
@@ -987,7 +1101,7 @@
     .settings-action-icon .small-icon { width: 19px; height: 19px; }
 
     .cleanup-count-icon {
-      font-size: 15px;
+      font-size: var(--font-secondary);
       font-weight: 600;
       letter-spacing: 0;
       line-height: 1;
@@ -995,19 +1109,19 @@
 
     .settings-action.danger {
       background: color-mix(in srgb, #41436A 7%, #F3E6DF);
-      color: #F64668;
+      color: var(--danger);
     }
 
     .settings-action.danger .settings-action-icon {
       background: transparent;
-      color: #F64668;
+      color: var(--danger);
     }
 
     .settings-action.danger .settings-action-description { color: #41436A; }
 
     .settings-action-title {
       display: block;
-      font-size: 16px;
+      font-size: var(--font-body);
       font-weight: 650;
     }
 
@@ -1015,7 +1129,7 @@
       display: block;
       margin-top: 2px;
       color: #41436A;
-      font-size: 13px;
+      font-size: var(--font-small);
       line-height: 1.3;
     }
 
@@ -1023,7 +1137,7 @@
       display: grid;
       gap: 0;
       overflow: hidden;
-      border: 1px solid #41436A;
+      border: 2px solid #41436A;
       border-radius: 14px;
       background: #F3E6DF;
     }
@@ -1032,7 +1146,7 @@
       padding: 16px;
       background: transparent;
       color: #41436A;
-      font-size: 14px;
+      font-size: var(--font-secondary);
       text-align: center;
     }
 
@@ -1040,11 +1154,11 @@
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) repeat(2, 38px);
-      min-height: 54px;
-      padding: 8px 10px 8px 15px;
+      grid-template-columns: minmax(0, 1fr) repeat(3, var(--touch-size-small));
+      min-height: var(--suggestion-row-height);
+      padding: var(--space-sm) var(--space-content) var(--space-sm) 16px;
       align-items: center;
-      gap: 4px;
+      gap: var(--space-xs);
       border-radius: 0;
       background: #F3E6DF;
       color: #41436A;
@@ -1054,71 +1168,122 @@
 
     .group-manager-row.dragging { transition: none; }
 
+    .group-manager-row.editing {
+      grid-template-columns: minmax(0, 1fr) var(--touch-size-small);
+    }
+
     .group-swipe-row {
       position: relative;
       overflow: hidden;
-      background: #F64668;
+      background: var(--danger);
     }
 
     .group-swipe-row > .swipe-reveal { z-index: 0; }
 
-    .group-swipe-row + .group-swipe-row .group-manager-row { border-top: 1px solid #41436A; }
 
     .group-manager-name {
       overflow: hidden;
-      font-size: 15px;
+      font-size: var(--font-body);
       font-weight: 650;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .group-manager-button,
-    .group-add-button {
+    .group-manager-button {
       display: grid;
-      width: 38px;
-      height: 38px;
+      width: var(--touch-size-small);
+      height: var(--touch-size-small);
       padding: 0;
       place-items: center;
       border: 0;
       border-radius: 10px;
       background: #F3E6DF;
       color: #41436A;
-      font-size: 18px;
+      font-size: var(--font-heading);
       font-weight: 650;
     }
 
     .group-manager-button:disabled { opacity: .3; }
 
-    .group-add-button {
-      width: 44px;
-      height: 44px;
-      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
-      font-size: 18px;
-      line-height: 1;
+    .group-edit-button {
+      background: transparent;
     }
 
-    .group-add-form {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 44px;
-      gap: 8px;
-      margin-top: 8px;
+    .group-edit-button .small-icon {
+      width: 18px;
+      height: 18px;
     }
 
-    .group-add-input {
+    .inline-group-input {
       min-width: 0;
-      height: 44px;
-      padding: 0 14px;
+      width: 100%;
+      height: var(--touch-size-small);
+      padding: 0;
       border: 0;
-      border-radius: 12px;
-      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
+      border-radius: 0;
+      background: transparent;
       color: #41436A;
       caret-color: #984063;
       font: inherit;
-      font-size: 15px;
+      font-size: var(--font-body);
+      font-weight: 650;
+    }
+
+    .inline-group-input::selection {
+      background: #41436A;
+      color: #F3E6DF;
+    }
+
+    .group-save-button {
+      border-radius: 10px;
+      background: #41436A;
+      color: #F3E6DF;
+    }
+
+    .group-save-button .small-icon {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.7;
+    }
+
+    .group-add-tile {
+      display: flex;
+      width: 100%;
+      height: var(--suggestion-row-height);
+      margin-top: var(--space-sm);
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      border-radius: 14px;
+      background: #41436A;
+      color: #F3E6DF;
+      font-size: var(--font-page-title);
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .plus-icon {
+      display: block;
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .add-button .plus-icon,
+    .list-add-tile .plus-icon {
+      width: 30px;
+      height: 30px;
     }
 
     .list-options {
-      margin-top: 12px;
+      margin-top: var(--space-content);
     }
 
     .list-option {
@@ -1126,7 +1291,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      min-height: 82px;
+      min-height: var(--list-row-height);
       background: #41436A;
       color: #F3E6DF;
       touch-action: pan-y;
@@ -1136,14 +1301,14 @@
     .list-option-shell {
       position: relative;
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: var(--space-content);
       border-radius: 20px;
       background: var(--danger);
       box-shadow: 0 5px 20px color-mix(in srgb, #41436A 18%, transparent);
     }
 
     .list-overview {
-      padding-top: 18px;
+      padding-top: var(--space-category);
       color: #41436A;
       animation: overviewIn .2s ease-out;
     }
@@ -1153,16 +1318,19 @@
     .list-overview[hidden] { display: none; }
 
     .list-add-tile {
-      display: grid;
+      display: flex;
       width: 100%;
-      height: 82px;
-      padding: 0 0 5px;
-      place-items: center;
+      height: var(--list-row-height);
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      appearance: none;
+      -webkit-appearance: none;
       border: 2px solid #41436A;
       border-radius: 20px;
       background: transparent;
       color: #41436A;
-      font-size: 42px;
+      font-size: var(--font-page-title);
       font-weight: 300;
       line-height: 1;
     }
@@ -1180,11 +1348,11 @@
 
     .list-select {
       min-width: 0;
-      height: 82px;
+      height: var(--list-row-height);
       overflow: hidden;
       padding: 0 8px 0 18px;
       color: #F3E6DF;
-      font-size: 24px;
+      font-size: var(--font-list);
       font-weight: 750;
       text-align: left;
       text-overflow: ellipsis;
@@ -1193,14 +1361,14 @@
 
     .inline-list-input {
       min-width: 0;
-      height: 82px;
+      height: var(--list-row-height);
       margin: 0;
       padding: 0 18px;
       border: 0;
       border-radius: 0;
       background: transparent;
       color: #F3E6DF;
-      font-size: 24px;
+      font-size: var(--font-list);
       font-weight: 750;
     }
 
@@ -1212,9 +1380,9 @@
 
     .list-action.save-list-name {
       display: inline-flex;
-      width: 40px;
-      height: 40px;
-      margin-right: 12px;
+      width: var(--icon-button-size);
+      height: var(--icon-button-size);
+      margin-right: var(--control-gap);
       padding: 0;
       align-items: center;
       justify-content: center;
@@ -1226,7 +1394,7 @@
 
     .list-action {
       display: grid;
-      width: 40px;
+      width: var(--icon-button-size);
       height: 48px;
       place-items: center;
       color: var(--secondary);
@@ -1234,14 +1402,14 @@
 
     .list-row-actions {
       display: flex;
-      gap: 8px;
-      margin-right: 12px;
+      gap: var(--space-sm);
+      margin-right: var(--control-gap);
     }
 
     .list-icon-action {
       display: grid;
-      width: 40px;
-      height: 40px;
+      width: var(--icon-button-size);
+      height: var(--icon-button-size);
       padding: 0;
       place-items: center;
       border: 0;
@@ -1292,18 +1460,18 @@
       transform: translate(-50%, -50%);
     }
 
-    .dialog-card h2 { margin: 0 0 8px; font-size: 20px; text-align: center; }
-    .dialog-card p { margin: 0 0 17px; color: #41436A; line-height: 1.4; text-align: center; }
+    .dialog-card h2 { margin: 0 0 var(--space-sm); font-size: var(--font-heading); text-align: center; }
+    .dialog-card p { margin: 0; color: #41436A; line-height: 1.4; text-align: center; }
 
     .dialog-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 15px;
+      gap: var(--space-content);
+      margin-top: var(--space-category);
     }
 
     .dialog-button {
-      min-height: 46px;
+      min-height: var(--dialog-button-height);
       border: 0;
       border-radius: 12px;
       background: transparent;
@@ -1316,19 +1484,19 @@
     }
 
     .dialog-button.danger {
-      background: #F64668;
+      background: var(--danger);
       color: #F3E6DF;
     }
     .toast {
       position: fixed;
       z-index: 30;
-      inset: calc(12px + env(safe-area-inset-top)) auto auto 50%;
+      inset: calc(var(--control-gap) + var(--safe-top)) auto auto 50%;
       margin: 0;
-      max-width: calc(100% - 40px);
+      max-width: calc(100% - var(--space-category) - var(--space-category));
       padding: 11px 16px;
       border: 0;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: var(--font-secondary);
       font-weight: 600;
       line-height: 1.35;
       opacity: 0;
@@ -1368,6 +1536,12 @@
       <button class="settings-trigger" id="openSettings" type="button" aria-label="Einstellungen öffnen" hidden><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </header>
 
+    <section class="app-error" id="appError" role="alert" hidden>
+      <h2>Lokale Daten nicht verfügbar</h2>
+      <p id="appErrorMessage"></p>
+      <button id="reloadApp" type="button">App neu laden</button>
+    </section>
+
     <section class="section" id="openSection" aria-labelledby="openHeading">
       <div class="section-bar"><h2 class="section-heading" id="openHeading">Offen</h2></div>
       <div class="card" id="openItems" aria-live="polite"></div>
@@ -1387,7 +1561,7 @@
     </section>
   </main>
 
-  <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen">+</button>
+  <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen"><svg class="plus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
 
   <dialog class="sheet" id="addSheet" aria-labelledby="addTitle">
     <form class="sheet-inner" id="addForm" autocomplete="off" novalidate>
@@ -1398,7 +1572,7 @@
           <span aria-hidden="true"></span>
         </div>
         <div class="search-wrap">
-          <input class="search-field" id="productSearch" name="search" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="41" placeholder="Artikel suchen" aria-label="Artikel suchen">
+          <input class="search-field" id="productSearch" name="search" type="search" role="searchbox" inputmode="search" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" maxlength="40" placeholder="Artikel suchen" aria-label="Artikel suchen">
           <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
         </div>
         <div class="segments" role="group" aria-label="Sortierung">
@@ -1406,7 +1580,7 @@
           <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Meistgekauft</button>
           <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
         </div>
-        <div class="suggestions" id="suggestions"></div>
+        <div class="suggestions" id="suggestions" aria-live="polite" aria-busy="false"></div>
       </div>
 
       <div class="sheet-page quantity-page" id="quantityPage" aria-hidden="true" inert>
@@ -1508,10 +1682,7 @@
       </div>
       <section class="settings-content" aria-label="Artikelgruppen verwalten">
         <div class="group-manager" id="groupManager"></div>
-        <form class="group-add-form" id="groupAddForm" autocomplete="off">
-          <input class="group-add-input" id="groupInput" name="group-entry" type="text" maxlength="40" autocomplete="off" autocapitalize="sentences" placeholder="Neue Artikelgruppe" aria-label="Neue Artikelgruppe">
-          <button class="group-add-button" type="submit" aria-label="Artikelgruppe hinzufügen">+</button>
-        </form>
+        <button class="group-add-tile" id="groupAddTile" type="button" aria-label="Artikelgruppe hinzufügen"><svg class="plus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
       </section>
     </div>
     </div>
@@ -1535,7 +1706,7 @@
     </div>
   </dialog>
 
-  <div class="toast" id="toast" role="status" aria-live="polite" popover="manual"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" popover="manual"></div>
 
   <script>
     (() => {
@@ -1567,8 +1738,10 @@
         history: [],
         products: [],
         groups: [],
+        fatalError: false,
         quickMode: "frequent",
         inlineEditingListId: null,
+        inlineEditingGroupId: null,
         pendingListDelete: null,
         pendingProductDelete: null,
         pendingBackupImport: null,
@@ -1584,6 +1757,9 @@
       };
       const els = {
         themeColor: document.querySelector('meta[name="theme-color"]'),
+        appError: document.querySelector("#appError"),
+        appErrorMessage: document.querySelector("#appErrorMessage"),
+        reloadApp: document.querySelector("#reloadApp"),
         listTitle: document.querySelector("#listTitle"),
         listTitleText: document.querySelector("#listTitleText"),
         openSettings: document.querySelector("#openSettings"),
@@ -1632,8 +1808,7 @@
         importBackup: document.querySelector("#importBackup"),
         backupFile: document.querySelector("#backupFile"),
         groupManager: document.querySelector("#groupManager"),
-        groupAddForm: document.querySelector("#groupAddForm"),
-        groupName: document.querySelector("#groupInput"),
+        groupAddTile: document.querySelector("#groupAddTile"),
         importBackupDialog: document.querySelector("#importBackupDialog"),
         cancelImportBackup: document.querySelector("#cancelImportBackup"),
         confirmImportBackup: document.querySelector("#confirmImportBackup"),
@@ -1649,6 +1824,11 @@
       let toastCloseTimer;
       let scrollFadeFrame;
       let suggestionFrame;
+      let settingsWriteQueue = Promise.resolve();
+      let externalRefreshTimer;
+      const dataChannel = typeof BroadcastChannel === "function"
+        ? new BroadcastChannel(`${DB_NAME}-changes`)
+        : null;
       const pageScrollLocks = new Set();
       let lockedPageScrollY = 0;
 
@@ -1656,6 +1836,10 @@
       const clean = (value) => String(value ?? "").normalize("NFC").replace(/\s+/gu, " ").trim();
       const comparable = (value) => clean(value).toLocaleLowerCase("de-DE");
       const byName = (a, b) => collator.compare(a.productName, b.productName);
+      const byCreated = (a, b) =>
+        (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0)
+        || collator.compare(a.productName || "", b.productName || "")
+        || String(a.id).localeCompare(String(b.id));
 
       function parseQuantity(value) {
         const normalized = clean(value).replace(/\s+/g, "").replace(",", ".");
@@ -1716,8 +1900,31 @@
         });
       }
 
+      function showFatalError(message) {
+        state.fatalError = true;
+        document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
+        els.appErrorMessage.textContent = message;
+        els.appError.hidden = false;
+        els.openSection.hidden = true;
+        els.boughtSection.hidden = true;
+        els.listOverview.hidden = true;
+        els.openAdd.hidden = true;
+        els.openSettings.hidden = true;
+        els.listTitle.disabled = true;
+        requestAnimationFrame(() => els.reloadApp.focus({ preventScroll: true }));
+      }
+
+      function requireDatabase() {
+        if (!state.db) throw new DOMException("Die lokale Datenbank ist nicht geöffnet.", "InvalidStateError");
+        return state.db;
+      }
+
       function openDatabase() {
         return new Promise((resolve, reject) => {
+          if (!("indexedDB" in globalThis)) {
+            reject(new DOMException("IndexedDB wird von diesem Browser nicht unterstützt.", "NotSupportedError"));
+            return;
+          }
           const opening = indexedDB.open(DB_NAME, DB_VERSION);
           let settled = false;
           opening.onupgradeneeded = (event) => {
@@ -1777,7 +1984,7 @@
             db.onversionchange = () => {
               db.close();
               state.db = null;
-              els.openAdd.disabled = true;
+              showFatalError("Die App wurde in einem anderen Tab aktualisiert. Lade sie neu, um sicher weiterzuarbeiten.");
             };
             resolve(db);
           };
@@ -1795,21 +2002,41 @@
       }
 
       function store(name, mode = "readonly") {
-        return state.db.transaction(name, mode).objectStore(name);
+        return requireDatabase().transaction(name, mode).objectStore(name);
       }
 
       function transact(storeNames, mode, operation) {
         return new Promise((resolve, reject) => {
-          const transaction = state.db.transaction(storeNames, mode);
+          const changedStoreNames = Array.isArray(storeNames) ? storeNames : [storeNames];
+          let transaction;
+          try {
+            transaction = requireDatabase().transaction(storeNames, mode);
+          } catch (error) {
+            reject(error);
+            return;
+          }
           let result;
-          transaction.oncomplete = () => resolve(result);
-          transaction.onerror = () => reject(transaction.error);
-          transaction.onabort = () => reject(transaction.error || new DOMException("Transaktion abgebrochen", "AbortError"));
+          let settled = false;
+          const rejectOnce = (error) => {
+            if (settled) return;
+            settled = true;
+            reject(error);
+          };
+          transaction.oncomplete = () => {
+            if (settled) return;
+            settled = true;
+            if (mode === "readwrite" && changedStoreNames.some((name) => name !== "settings")) {
+              dataChannel?.postMessage({ stores: changedStoreNames });
+            }
+            resolve(result);
+          };
+          transaction.onerror = () => rejectOnce(transaction.error || new DOMException("Transaktion fehlgeschlagen", "UnknownError"));
+          transaction.onabort = () => rejectOnce(transaction.error || new DOMException("Transaktion abgebrochen", "AbortError"));
           try {
             result = operation(transaction);
           } catch (error) {
-            transaction.abort();
-            reject(error);
+            try { transaction.abort(); } catch {}
+            rejectOnce(error);
           }
         });
       }
@@ -1880,25 +2107,16 @@
           }
         });
 
-        const usedProductIds = new Set(records.map((record) => record.productId).filter(Boolean));
-        const unusedProductIds = new Set(products
-          .filter((product) => !usedProductIds.has(product.id))
-          .map((product) => product.id));
-        if (unusedProductIds.size) changed = true;
-
         if (!changed) return products;
         await transact(["products", "items", "history"], "readwrite", (transaction) => {
           const productStore = transaction.objectStore("products");
           const itemStore = transaction.objectStore("items");
           const historyStore = transaction.objectStore("history");
-          products.forEach((product) => {
-            if (unusedProductIds.has(product.id)) productStore.delete(product.id);
-            else productStore.put(product);
-          });
+          products.forEach((product) => productStore.put(product));
           items.forEach(({ productName: _productName, ...item }) => item.productId && itemStore.put(item));
           history.forEach(({ productName: _productName, ...entry }) => entry.productId && historyStore.put(entry));
         });
-        return products.filter((product) => !unusedProductIds.has(product.id));
+        return products;
       }
 
       function deleteRecords(storeName, ids) {
@@ -1973,11 +2191,56 @@
         }
         activeList = state.lists.find((list) => list.id === lastOpened?.value) || activeList;
         state.list = activeList;
-        await put("settings", { key: "lastOpenedListId", value: activeList.id });
+        await persistSetting("lastOpenedListId", activeList.id);
         const data = await loadListData(activeList.id);
         state.items = data.items;
         state.history = data.history;
       }
+
+      async function refreshFromDatabase() {
+        if (!state.db || state.fatalError) return;
+        const [products, groups, lists, lastOpened] = await Promise.all([
+          getAll("products"),
+          getAll("groups"),
+          getAll("lists"),
+          request(store("settings").get("lastOpenedListId"))
+        ]);
+        if (!lists.length) return;
+        groups.sort((a, b) =>
+          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
+        );
+        lists.sort((a, b) =>
+          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
+        );
+        const activeList = lists.find((list) => list.id === state.list?.id)
+          || lists.find((list) => list.id === lastOpened?.value)
+          || lists[0];
+        state.products = products;
+        state.groups = groups;
+        state.lists = lists;
+        state.list = activeList;
+        const data = await loadListData(activeList.id);
+        state.items = data.items;
+        state.history = data.history;
+        renderItems();
+        if (state.showingLists) renderListOptions();
+        if (!els.settingsGroupsPage.inert) renderGroupManager();
+        if (els.addSheet.open && els.addForm.classList.contains("quantity-mode")) renderQuantityGroupOptions();
+        if (els.addSheet.open && !els.addForm.classList.contains("quantity-mode")) renderSuggestions();
+      }
+
+      function scheduleExternalRefresh() {
+        clearTimeout(externalRefreshTimer);
+        externalRefreshTimer = setTimeout(() => {
+          if (state.operations.size) {
+            scheduleExternalRefresh();
+            return;
+          }
+          refreshFromDatabase().catch(console.error);
+        }, 60);
+      }
+
+      if (dataChannel) dataChannel.onmessage = scheduleExternalRefresh;
 
       async function loadListData(listId) {
         const [items, history] = await Promise.all([getItemsForList(listId), getHistoryForList(listId)]);
@@ -1985,7 +2248,7 @@
         return {
           items: items
             .map((item) => ({ ...item, productName: productNames.get(item.productId) || "Unbekannter Artikel" }))
-            .sort((a, b) => (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0)),
+            .sort(byCreated),
           history
         };
       }
@@ -2031,7 +2294,7 @@
         return [...items].sort((a, b) => {
           const aOrder = groupOrder.get(productGroups.get(a.productId)) ?? fallbackOrder;
           const bOrder = groupOrder.get(productGroups.get(b.productId)) ?? fallbackOrder;
-          return aOrder - bOrder;
+          return aOrder - bOrder || byCreated(a, b);
         });
       }
 
@@ -2061,7 +2324,7 @@
           rows.className = "product-group-items";
           section.append(heading, rows);
           container.append(section);
-          renderRows(rows, groupItems);
+          renderRows(rows, [...groupItems].sort(byCreated));
         });
       }
 
@@ -2185,6 +2448,15 @@
         row.addEventListener("pointerup", finish);
         row.addEventListener("pointercancel", reset);
         row.addEventListener("contextmenu", (event) => event.preventDefault());
+        reveal.addEventListener("focus", () => {
+          row.style.transform = `translateX(-${SWIPE_ACTION_WIDTH}px)`;
+          opened = true;
+        });
+        reveal.addEventListener("blur", () => {
+          requestAnimationFrame(() => {
+            if (!row.contains(document.activeElement) && !reveal.contains(document.activeElement)) reset();
+          });
+        });
         reveal.addEventListener("click", onDelete);
       }
 
@@ -2249,6 +2521,13 @@
         }, 1500);
       }
 
+      function persistSetting(key, value) {
+        settingsWriteQueue = settingsWriteQueue
+          .catch(() => {})
+          .then(() => put("settings", { key, value }));
+        return settingsWriteQueue;
+      }
+
       function renderGroupManager() {
         els.groupManager.replaceChildren();
         if (!state.groups.length) {
@@ -2261,6 +2540,7 @@
         state.groups.forEach((group, index) => {
           const shell = document.createElement("div");
           shell.className = "group-swipe-row";
+          shell.dataset.groupId = group.id;
           const reveal = document.createElement("button");
           reveal.type = "button";
           reveal.className = "swipe-reveal";
@@ -2285,70 +2565,164 @@
           down.setAttribute("aria-label", `${group.name} nach unten`);
           down.disabled = index === state.groups.length - 1;
           down.addEventListener("click", () => moveGroup(group.id, 1).catch(console.error));
-          row.append(name, up, down);
+          const edit = document.createElement("button");
+          edit.type = "button";
+          edit.className = "group-manager-button group-edit-button";
+          edit.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+          edit.setAttribute("aria-label", `${group.name} umbenennen`);
+          edit.addEventListener("click", () => startInlineGroupRename(group));
+          row.append(name, up, down, edit);
           shell.append(reveal, row);
-          bindSwipeGesture(row, reveal, () => deleteGroup(group.id).catch(console.error), ".group-manager-button");
+          bindSwipeGesture(row, reveal, () => deleteGroup(group.id).catch(console.error), ".group-manager-button, input");
           els.groupManager.append(shell);
         });
       }
 
-      async function addGroup(name) {
-        const normalizedName = clean(name);
-        if (!normalizedName) {
-          showToast("Bitte gib einen Artikelgruppennamen ein");
-          return;
-        }
-        if (normalizedName.length > MAX_PRODUCT_NAME_LENGTH) {
-          showToast(`Artikelgruppenname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
-          return;
-        }
-        const key = comparable(normalizedName);
-        if (state.groups.some((group) => comparable(group.name) === key)) {
-          showToast("Artikelgruppe bereits vorhanden");
-          return;
-        }
-        const group = { id: id(), name: normalizedName, key, sortOrder: state.groups.length };
-        await put("groups", group);
-        state.groups.push(group);
-        els.groupName.value = "";
-        renderGroupManager();
-        renderQuantityGroupOptions();
+      function nextDefaultGroupName() {
+        const baseName = "Artikelgruppe";
+        const names = new Set(state.groups.map((group) => comparable(group.name)));
+        if (!names.has(comparable(baseName))) return baseName;
+        let suffix = 1;
+        while (names.has(comparable(`${baseName} ${suffix}`))) suffix += 1;
+        return `${baseName} ${suffix}`;
       }
 
-      async function moveGroup(groupId, direction) {
-        const index = state.groups.findIndex((group) => group.id === groupId);
-        const targetIndex = index + direction;
-        if (index < 0 || targetIndex < 0 || targetIndex >= state.groups.length) return;
-        const reorderedGroups = [...state.groups];
-        [reorderedGroups[index], reorderedGroups[targetIndex]] = [reorderedGroups[targetIndex], reorderedGroups[index]];
-        const updatedGroups = reorderedGroups.map((group, sortOrder) => ({ ...group, sortOrder }));
-        await transact(["groups"], "readwrite", (transaction) => {
-          const groupStore = transaction.objectStore("groups");
-          updatedGroups.forEach((group) => groupStore.put(group));
+      function createGroupAndEdit() {
+        return runExclusive("create-group", async () => {
+          const name = nextDefaultGroupName();
+          const group = { id: id(), name, key: comparable(name), sortOrder: state.groups.length };
+          try {
+            await put("groups", group);
+            state.groups.push(group);
+            startInlineGroupRename(group);
+          } catch (error) {
+            console.error(error);
+          }
         });
-        state.groups = updatedGroups;
-        renderGroupManager();
-        renderItems();
       }
 
-      async function deleteGroup(groupId) {
-        const affectedProducts = state.products.filter((product) => product.groupId === groupId);
-        const remainingGroups = state.groups
-          .filter((group) => group.id !== groupId)
-          .map((group, sortOrder) => ({ ...group, sortOrder }));
-        await transact(["groups", "products"], "readwrite", (transaction) => {
-          const groupStore = transaction.objectStore("groups");
-          groupStore.delete(groupId);
-          remainingGroups.forEach((group) => groupStore.put(group));
-          const productStore = transaction.objectStore("products");
-          affectedProducts.forEach((product) => productStore.put({ ...product, groupId: null }));
-        });
-        state.groups = remainingGroups;
-        state.products = state.products.map((product) => product.groupId === groupId ? { ...product, groupId: null } : product);
-        if (state.quantityGroupId === groupId) state.quantityGroupId = null;
+      function cancelInlineGroupRename() {
+        if (!state.inlineEditingGroupId) return;
+        state.inlineEditingGroupId = null;
         renderGroupManager();
-        renderQuantityGroupOptions();
-        renderItems();
+      }
+
+      function startInlineGroupRename(group) {
+        state.inlineEditingGroupId = null;
+        renderGroupManager();
+        const shell = [...els.groupManager.querySelectorAll(".group-swipe-row")]
+          .find((entry) => entry.dataset.groupId === group.id);
+        if (!shell) return;
+        const row = shell.querySelector(".group-manager-row");
+        row.classList.add("editing");
+        state.inlineEditingGroupId = group.id;
+
+        const input = document.createElement("input");
+        input.className = "inline-group-input";
+        input.type = "text";
+        input.name = "group-edit";
+        input.autocomplete = "off";
+        input.autocapitalize = "sentences";
+        input.value = group.name;
+        input.maxLength = MAX_PRODUCT_NAME_LENGTH;
+        input.setAttribute("aria-label", "Artikelgruppenname");
+
+        const save = document.createElement("button");
+        save.type = "button";
+        save.className = "group-manager-button group-save-button";
+        save.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
+        save.setAttribute("aria-label", "Artikelgruppenname sichern");
+        row.replaceChildren(input, save);
+
+        const persist = async () => runExclusive(`rename-group:${group.id}`, async () => {
+          const name = clean(input.value);
+          if (!name) {
+            showToast("Bitte gib einen Artikelgruppennamen ein");
+            input.focus();
+            return;
+          }
+          if (name.length > MAX_PRODUCT_NAME_LENGTH) {
+            showToast(`Artikelgruppenname: maximal ${MAX_PRODUCT_NAME_LENGTH} Zeichen`);
+            input.focus();
+            return;
+          }
+          const duplicate = state.groups.some((entry) => entry.id !== group.id && comparable(entry.name) === comparable(name));
+          if (duplicate) {
+            showToast("Artikelgruppe bereits vorhanden");
+            input.select();
+            return;
+          }
+          if (name === group.name) {
+            cancelInlineGroupRename();
+            return;
+          }
+          save.disabled = true;
+          try {
+            const updatedGroup = { ...group, name, key: comparable(name) };
+            await put("groups", updatedGroup);
+            Object.assign(group, updatedGroup);
+            state.inlineEditingGroupId = null;
+            renderGroupManager();
+            renderQuantityGroupOptions();
+            renderItems();
+          } catch (error) {
+            console.error(error);
+            save.disabled = false;
+          }
+        });
+
+        save.addEventListener("click", persist);
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            persist();
+          } else if (event.key === "Escape") {
+            cancelInlineGroupRename();
+          }
+        });
+        input.focus({ preventScroll: true });
+        input.select();
+      }
+
+      function moveGroup(groupId, direction) {
+        return runExclusive("move-group", async () => {
+          const index = state.groups.findIndex((group) => group.id === groupId);
+          const targetIndex = index + direction;
+          if (index < 0 || targetIndex < 0 || targetIndex >= state.groups.length) return;
+          const reorderedGroups = [...state.groups];
+          [reorderedGroups[index], reorderedGroups[targetIndex]] = [reorderedGroups[targetIndex], reorderedGroups[index]];
+          const updatedGroups = reorderedGroups.map((group, sortOrder) => ({ ...group, sortOrder }));
+          await transact(["groups"], "readwrite", (transaction) => {
+            const groupStore = transaction.objectStore("groups");
+            updatedGroups.forEach((group) => groupStore.put(group));
+          });
+          state.groups = updatedGroups;
+          renderGroupManager();
+          renderItems();
+        });
+      }
+
+      function deleteGroup(groupId) {
+        return runExclusive(`delete-group:${groupId}`, async () => {
+          const affectedProducts = state.products.filter((product) => product.groupId === groupId);
+          const remainingGroups = state.groups
+            .filter((group) => group.id !== groupId)
+            .map((group, sortOrder) => ({ ...group, sortOrder }));
+          await transact(["groups", "products"], "readwrite", (transaction) => {
+            const groupStore = transaction.objectStore("groups");
+            groupStore.delete(groupId);
+            remainingGroups.forEach((group) => groupStore.put(group));
+            const productStore = transaction.objectStore("products");
+            affectedProducts.forEach((product) => productStore.put({ ...product, groupId: null }));
+          });
+          state.groups = remainingGroups;
+          if (state.inlineEditingGroupId === groupId) state.inlineEditingGroupId = null;
+          state.products = state.products.map((product) => product.groupId === groupId ? { ...product, groupId: null } : product);
+          if (state.quantityGroupId === groupId) state.quantityGroupId = null;
+          renderGroupManager();
+          renderQuantityGroupOptions();
+          renderItems();
+        });
       }
 
       function openSettingsSheet() {
@@ -2365,10 +2739,11 @@
         els.settingsMainPage.setAttribute("aria-hidden", "true");
         els.settingsGroupsPage.inert = false;
         els.settingsGroupsPage.setAttribute("aria-hidden", "false");
-        focusPageInput(els.groupName, () => els.settingsInner.classList.contains("groups-mode"));
+        els.closeGroups.focus({ preventScroll: true });
       }
 
       function closeGroupsPage({ restoreFocus = false } = {}) {
+        state.inlineEditingGroupId = null;
         els.settingsInner.classList.remove("groups-mode");
         els.settingsMainPage.inert = false;
         els.settingsMainPage.setAttribute("aria-hidden", "false");
@@ -2447,8 +2822,10 @@
         const unique = (values) => values.length === new Set(values).size;
 
         if (!isObject(value) || value.format !== BACKUP_FORMAT || value.version !== BACKUP_VERSION || !isObject(value.data)) invalid();
-        const { lists: rawLists, products: rawProducts, items: rawItems, history: rawHistory, settings: rawSettings } = value.data;
+        const { lists: rawLists, items: rawItems, history: rawHistory } = value.data;
         const rawGroups = value.data.groups ?? [];
+        const rawProducts = value.data.products ?? [];
+        const rawSettings = value.data.settings ?? [];
         if (![rawLists, rawGroups, rawProducts, rawItems, rawHistory, rawSettings].every(Array.isArray)) invalid();
         if (!rawLists.length || rawLists.length > 500 || rawGroups.length > 500 || rawProducts.length > 25000 || rawItems.length > 50000 || rawHistory.length > 50000 || rawSettings.length > 100) invalid();
 
@@ -2470,23 +2847,46 @@
         if (!unique(groups.map((entry) => entry.id)) || !unique(groups.map((entry) => entry.key))) invalid();
         const groupIds = new Set(groups.map((entry) => entry.id));
 
+        const importedAt = Date.now();
         const products = rawProducts.map((entry) => {
-          if (!isObject(entry) || !validId(entry.id) || !validTime(entry.createdAt)) invalid();
+          if (!isObject(entry) || !validId(entry.id) || (entry.createdAt !== undefined && !validTime(entry.createdAt))) invalid();
           const name = clean(entry.name);
           if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
           const groupId = entry.groupId === null || entry.groupId === undefined ? null : entry.groupId;
           if (groupId !== null && (!validId(groupId) || !groupIds.has(groupId))) invalid();
           const defaultUnit = entry.defaultUnit === undefined ? "Stück" : entry.defaultUnit;
           if (!QUANTITY_UNITS.has(defaultUnit)) invalid();
-          return { id: entry.id, name, key: comparable(name), groupId, defaultUnit, createdAt: entry.createdAt };
+          return { id: entry.id, name, key: comparable(name), groupId, defaultUnit, createdAt: entry.createdAt ?? importedAt };
         });
         if (!unique(products.map((entry) => entry.id)) || !unique(products.map((entry) => entry.key))) invalid();
+
+        // Backups vor dem globalen Produktpool enthielten Produktnamen direkt
+        // in Listen- und Historieneinträgen. Diese Namen werden einmalig in
+        // reguläre Produkte überführt, bevor Beziehungen validiert werden.
+        const productsByKey = new Map(products.map((entry) => [entry.key, entry]));
+        for (const entry of [...rawItems, ...rawHistory]) {
+          if (!isObject(entry) || typeof entry.productName !== "string") continue;
+          const name = clean(entry.productName);
+          const key = comparable(name);
+          if (!name || name.length > MAX_PRODUCT_NAME_LENGTH || productsByKey.has(key)) continue;
+          const defaultUnit = QUANTITY_UNITS.has(entry.quantityUnit) ? entry.quantityUnit : "Stück";
+          const product = { id: id(), name, key, groupId: null, defaultUnit, createdAt: validTime(entry.createdAt) ? entry.createdAt : importedAt };
+          products.push(product);
+          productsByKey.set(key, product);
+        }
+        if (products.length > 25000 || !unique(products.map((entry) => entry.id))) invalid();
         const productIds = new Set(products.map((entry) => entry.id));
+        const resolveProductId = (entry) => {
+          if (productIds.has(entry.productId)) return entry.productId;
+          if (typeof entry.productName !== "string") return null;
+          return productsByKey.get(comparable(clean(entry.productName)))?.id ?? null;
+        };
 
         const itemPairs = new Set();
         const items = rawItems.map((entry) => {
-          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productIds.has(entry.productId) || typeof entry.checked !== "boolean" || !validTime(entry.createdAt)) invalid();
-          const pair = `${entry.listId}\u0000${entry.productId}`;
+          const productId = isObject(entry) ? resolveProductId(entry) : null;
+          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productId || typeof entry.checked !== "boolean" || !validTime(entry.createdAt)) invalid();
+          const pair = `${entry.listId}\u0000${productId}`;
           if (itemPairs.has(pair)) invalid();
           itemPairs.add(pair);
           const hasQuantity = entry.quantityValue !== null && entry.quantityValue !== undefined && entry.quantityValue !== "";
@@ -2497,7 +2897,7 @@
           return {
             id: entry.id,
             listId: entry.listId,
-            productId: entry.productId,
+            productId,
             checked: entry.checked,
             createdAt: entry.createdAt,
             quantityValue,
@@ -2507,17 +2907,17 @@
         if (!unique(items.map((entry) => entry.id))) invalid();
 
         const historyPairs = new Set();
-        const importedAt = Date.now();
         const history = rawHistory.map((entry) => {
-          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productIds.has(entry.productId) || !Number.isSafeInteger(entry.purchaseCount) || entry.purchaseCount < 0 || entry.purchaseCount > 1000000000) invalid();
-          const pair = `${entry.listId}\u0000${entry.productId}`;
+          const productId = isObject(entry) ? resolveProductId(entry) : null;
+          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productId || !Number.isSafeInteger(entry.purchaseCount) || entry.purchaseCount < 0 || entry.purchaseCount > 1000000000) invalid();
+          const pair = `${entry.listId}\u0000${productId}`;
           if (historyPairs.has(pair)) invalid();
           historyPairs.add(pair);
           const lastPurchasedAt = entry.lastPurchasedAt === null || entry.lastPurchasedAt === undefined
             ? (entry.purchaseCount > 0 ? importedAt : null)
             : entry.lastPurchasedAt;
           if (lastPurchasedAt !== null && !validTime(lastPurchasedAt)) invalid();
-          return { id: entry.id, listId: entry.listId, productId: entry.productId, purchaseCount: entry.purchaseCount, lastPurchasedAt };
+          return { id: entry.id, listId: entry.listId, productId, purchaseCount: entry.purchaseCount, lastPurchasedAt };
         });
         if (!unique(history.map((entry) => entry.id)) || [...itemPairs].some((pair) => !historyPairs.has(pair))) invalid();
 
@@ -2553,8 +2953,9 @@
         try {
           const backup = validateBackup(JSON.parse(await file.text()));
           state.pendingBackupImport = backup;
-          els.importBackupDialog.showModal();
-          els.importBackupDialog.focus({ preventScroll: true });
+          if (openLockedSheet(els.importBackupDialog)) {
+            els.cancelImportBackup.focus({ preventScroll: true });
+          }
         } catch (error) {
           console.error(error);
           showToast("Backup ist ungültig oder nicht kompatibel");
@@ -2638,8 +3039,9 @@
           els.cleanupProductsText.textContent = mode === "rare"
             ? `${count} ${count === 1 ? "Artikel wurde" : "Artikel wurden"} höchstens einmal gekauft. Die Artikel werden aus allen Listen und Historien entfernt.`
             : `${count} ${count === 1 ? "Artikel wurde" : "Artikel wurden"} seit über einem Jahr nicht gekauft. Die Artikel werden aus allen Listen und Historien entfernt.`;
-          els.cleanupProductsDialog.showModal();
-          els.cleanupProductsDialog.focus({ preventScroll: true });
+          if (openLockedSheet(els.cleanupProductsDialog)) {
+            els.cancelCleanupProducts.focus({ preventScroll: true });
+          }
         } catch (error) {
           console.error(error);
         }
@@ -2757,7 +3159,7 @@
         const addTile = document.createElement("button");
         addTile.type = "button";
         addTile.className = "list-add-tile";
-        addTile.textContent = "+";
+        addTile.innerHTML = '<svg class="plus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
         addTile.setAttribute("aria-label", "Liste hinzufügen");
         addTile.addEventListener("click", createListAndEdit);
         fragment.append(addTile);
@@ -2775,15 +3177,12 @@
       function createListAndEdit() {
         return runExclusive("create-list", async () => {
           const list = { id: id(), name: nextDefaultListName(), sortOrder: state.lists.length };
-          state.lists.push(list);
-          startInlineRename(list);
           try {
             await put("lists", list);
+            state.lists.push(list);
+            startInlineRename(list);
           } catch (error) {
             console.error(error);
-            state.lists = state.lists.filter((entry) => entry.id !== list.id);
-            if (state.inlineEditingListId === list.id) state.inlineEditingListId = null;
-            renderListOptions();
           }
         });
       }
@@ -2811,7 +3210,7 @@
         input.autocomplete = "off";
         input.autocapitalize = "sentences";
         input.value = list.name;
-        input.maxLength = MAX_LIST_NAME_LENGTH + 1;
+        input.maxLength = MAX_LIST_NAME_LENGTH;
         input.setAttribute("aria-label", "Listenname");
         const saveAction = document.createElement("button");
         saveAction.type = "button";
@@ -2884,7 +3283,7 @@
         try {
           const data = await loadListData(list.id);
           if (loadToken !== state.listLoadToken) return;
-          await put("settings", { key: "lastOpenedListId", value: list.id });
+          await persistSetting("lastOpenedListId", list.id);
           if (loadToken !== state.listLoadToken) return;
           state.list = list;
           state.items = data.items;
@@ -2904,8 +3303,9 @@
           document.createElement("br"),
           document.createTextNode("Artikel und andere Listen bleiben unberührt.")
         );
-        els.deleteListDialog.showModal();
-        els.deleteListDialog.focus({ preventScroll: true });
+        if (openLockedSheet(els.deleteListDialog)) {
+          els.cancelDeleteList.focus({ preventScroll: true });
+        }
       }
 
       function deleteListData(transaction, listId) {
@@ -2937,28 +3337,14 @@
             const nextData = deletingActiveList && state.lists.length > 1
               ? await loadListData(nextActiveList.id)
               : { items: deletingActiveList ? [] : state.items, history: deletingActiveList ? [] : state.history };
-            const [allItems, allHistory] = await Promise.all([getAll("items"), getAll("history")]);
-            const remainingProductIds = new Set([
-              ...allItems.filter((item) => item.listId !== list.id).map((item) => item.productId),
-              ...allHistory.filter((entry) => entry.listId !== list.id).map((entry) => entry.productId)
-            ]);
-            const unusedProductIds = state.products
-              .filter((product) => !remainingProductIds.has(product.id))
-              .map((product) => product.id);
-
-            await transact(["lists", "items", "history", "products", "settings"], "readwrite", (transaction) => {
+            await transact(["lists", "items", "history", "settings"], "readwrite", (transaction) => {
               transaction.objectStore("lists").delete(list.id);
               deleteListData(transaction, list.id);
-              unusedProductIds.forEach((productId) => transaction.objectStore("products").delete(productId));
               nextLists.forEach((entry) => transaction.objectStore("lists").put(entry));
               transaction.objectStore("settings").put({ key: "lastOpenedListId", value: nextActiveList.id });
             });
 
             state.lists = nextLists;
-            if (unusedProductIds.length) {
-              const unused = new Set(unusedProductIds);
-              state.products = state.products.filter((product) => !unused.has(product.id));
-            }
             state.list = nextActiveList;
             state.items = nextData.items;
             state.history = nextData.history;
@@ -2984,8 +3370,9 @@
           document.createElement("br"),
           document.createTextNode("Der Artikel verschwindet aus allen Listen und Kaufhistorien.")
         );
-        els.deleteProductDialog.showModal();
-        els.deleteProductDialog.focus({ preventScroll: true });
+        if (openLockedSheet(els.deleteProductDialog)) {
+          els.cancelDeleteProduct.focus({ preventScroll: true });
+        }
       }
 
       function deleteProductsEverywhere(productIds) {
@@ -3204,7 +3591,7 @@
             }
             renderItems();
             closeAddSheet();
-            if (quantityValue) showToast("Menge gespeichert");
+            if (quantityValue) showToast(`${item.productName} gespeichert`);
           } catch (error) {
             console.error(error);
           }
@@ -3219,7 +3606,7 @@
             button.classList.toggle("active", active);
             button.setAttribute("aria-pressed", String(active));
           });
-        if (persist) put("settings", { key: "quickMode", value: mode }).catch(console.error);
+        if (persist) persistSetting("quickMode", mode).catch(console.error);
         renderSuggestions();
       }
 
@@ -3229,6 +3616,7 @@
           suggestionFrame = 0;
         }
         if (!state.list) return;
+        els.suggestions.setAttribute("aria-busy", "true");
         const query = comparable(els.productName.value);
         els.clearSearch.hidden = els.productName.value.length === 0;
         const openItems = state.items.filter((item) => !item.checked);
@@ -3276,7 +3664,14 @@
           }
           fragment.append(empty);
         }
+        if (
+          fragment.childElementCount === 1
+          && fragment.firstElementChild.classList.contains("suggestion-swipe-row")
+        ) {
+          fragment.firstElementChild.classList.add("standalone");
+        }
         els.suggestions.append(fragment);
+        els.suggestions.setAttribute("aria-busy", "false");
         scheduleScrollFade();
       }
 
@@ -3343,10 +3738,7 @@
           row.append(quantityButton);
         }
 
-        if (!productId) {
-          shell.append(row);
-          return shell;
-        }
+        if (!productId) return row;
 
         const reveal = document.createElement("button");
         reveal.type = "button";
@@ -3361,11 +3753,8 @@
       function updateScrollFade() {
         const element = els.suggestions;
         const hasTop = element.scrollTop > 3;
-        const hasBottom = element.scrollTop + element.clientHeight < element.scrollHeight - 3;
-        element.classList.remove("fade-top", "fade-bottom", "fade-both");
-        if (hasTop && hasBottom) element.classList.add("fade-both");
-        else if (hasTop) element.classList.add("fade-top");
-        else if (hasBottom) element.classList.add("fade-bottom");
+        element.classList.remove("fade-bottom", "fade-both");
+        element.classList.toggle("fade-top", hasTop);
       }
 
       function scheduleScrollFade() {
@@ -3521,6 +3910,7 @@
       }
 
       els.openAdd.addEventListener("click", openAddSheet);
+      els.reloadApp.addEventListener("click", () => location.reload());
       els.openSettings.addEventListener("click", openSettingsSheet);
       els.closeSettings.addEventListener("click", () => closeSettingsSheet());
       els.openGroups.addEventListener("click", openGroupsPage);
@@ -3530,10 +3920,7 @@
         els.backupFile.value = "";
         els.backupFile.click();
       });
-      els.groupAddForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        addGroup(els.groupName.value).catch(console.error);
-      });
+      els.groupAddTile.addEventListener("click", createGroupAndEdit);
       els.backupFile.addEventListener("change", selectBackupFile);
       els.cleanupRareProducts.addEventListener("click", () => askCleanupProducts("rare"));
       els.cleanupOldProducts.addEventListener("click", () => askCleanupProducts("old"));
@@ -3550,9 +3937,24 @@
       els.listTitle.addEventListener("click", () => state.showingLists ? showShoppingList() : showListOverview());
       document.addEventListener("pointerdown", (event) => {
         const editingId = state.inlineEditingListId;
-        if (!editingId || event.target.closest(".rename-list") || event.target.closest(`[data-list-id="${editingId}"]`)) return;
+        if (
+          !editingId
+          || event.target.closest(".rename-list, .list-add-tile")
+          || event.target.closest("[data-list-id]")?.dataset.listId === editingId
+        ) return;
         setTimeout(() => {
           if (state.inlineEditingListId === editingId) cancelInlineRename();
+        }, 0);
+      });
+      document.addEventListener("pointerdown", (event) => {
+        const editingId = state.inlineEditingGroupId;
+        if (
+          !editingId
+          || event.target.closest(".group-edit-button, .group-add-tile")
+          || event.target.closest("[data-group-id]")?.dataset.groupId === editingId
+        ) return;
+        setTimeout(() => {
+          if (state.inlineEditingGroupId === editingId) cancelInlineGroupRename();
         }, 0);
       });
       els.cancelDeleteList.addEventListener("click", () => {
@@ -3632,6 +4034,12 @@
         clearAddSheetBackground();
       });
       els.settingsSheet.addEventListener("close", () => unlockPageScroll(els.settingsSheet));
+      [
+        els.importBackupDialog,
+        els.cleanupProductsDialog,
+        els.deleteListDialog,
+        els.deleteProductDialog
+      ].forEach((dialog) => dialog.addEventListener("close", () => unlockPageScroll(dialog)));
       els.backupFile.addEventListener("cancel", (event) => event.stopPropagation());
       els.importBackupDialog.addEventListener("cancel", () => {
         state.pendingBackupImport = null;
@@ -3662,8 +4070,11 @@
           renderItems();
         } catch (error) {
           console.error(error);
-          els.openItems.textContent = "Die lokale Speicherung konnte nicht geöffnet werden";
-          els.openAdd.disabled = true;
+          showFatalError(
+            error?.name === "QuotaExceededError"
+              ? "Der lokale Speicher ist voll. Gib im Browser Speicherplatz frei und lade die App erneut."
+              : "Die lokale Datenbank konnte nicht geöffnet werden. Deine bestehenden Daten wurden nicht verändert. Lade die App erneut oder prüfe die Browser-Einstellungen für Websitedaten."
+          );
         }
       }
 

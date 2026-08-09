@@ -1,35 +1,17 @@
 # Einkauf
 
-**Einkauf** ist eine schnelle und übersichtliche Progressive Web App für Einkaufslisten. Sie funktioniert direkt im Browser und kann auf Smartphone oder Tablet wie eine App zum Home-Bildschirm hinzugefügt werden.
+**Einkauf** ist eine installierbare Einkaufslisten-App für Smartphone, Tablet und Desktop. Sie funktioniert auch ohne Internetverbindung.
 
 ## Funktionen
 
-- Mehrere voneinander unabhängige Einkaufslisten erstellen und verwalten
-- Artikel schnell über die persönliche Produktauswahl hinzufügen
-- Vorschläge nach Kaufhäufigkeit, Artikelgruppen oder alphabetisch sortieren
-- Optionale Mengen in Stück, Gramm, Kilogramm, Milliliter oder Liter angeben
-- Mengen offener Artikel nachträglich ändern
-- Artikel globalen Artikelgruppen zuordnen und gruppiert anzeigen
-- Reihenfolge der Artikelgruppen in den Einstellungen festlegen
-- Artikel abhaken und wieder auf die offene Liste setzen
-- Listeneinträge entfernen oder Artikel per Wischbewegung aus allen Listen löschen
-- Listen direkt umbenennen
-- Alle Daten als JSON-Backup exportieren und importieren
-- Selten oder lange nicht gekaufte Artikel gezielt bereinigen
-- Auch ohne Internetverbindung verwenden
-
-Alle Listen greifen auf einen gemeinsamen Produktkatalog zu. Wie häufig ein Produkt verwendet wurde, wird für jede Liste separat gespeichert und verbessert dort die Sortierung der Vorschläge.
+- Mehrere Einkaufslisten verwalten
+- Artikel mit Mengen, Einheiten und Artikelgruppen organisieren
+- Einkäufe abhaken und häufig verwendete Artikel schneller wiederfinden
+- Listen, Artikel und Gruppen bearbeiten und sortieren
+- Daten als JSON-Backup exportieren und wieder importieren
 
 ## Datenschutz
 
-Die App stellt **keine externen Verbindungen** her und überträgt keine persönlichen Daten. Listen, Produkte und Kaufhäufigkeiten werden ausschließlich lokal in der Browser-Datenbank des verwendeten Geräts gespeichert.
+Die App benötigt kein Konto, verwendet kein Tracking und stellt keine externen Verbindungen her. Alle Daten werden ausschließlich lokal in der Browser-Datenbank des Geräts gespeichert.
 
-Dadurch bleiben die Daten privat, werden aber nicht automatisch zwischen Geräten synchronisiert. Werden die Website-Daten des Browsers gelöscht, werden auch die gespeicherten Einkaufslisten entfernt.
-
-Über die Einstellungen kann jederzeit eine lokale Backup-Datei erstellt werden. Sie enthält alle Listen, Artikel, Artikelgruppen, Mengen und Kaufhäufigkeiten und kann später auf demselben oder einem anderen Gerät importiert werden.
-
-## Progressive Web App
-
-Die App kann über GitHub Pages bereitgestellt werden. Nach dem ersten Aufruf steht sie auch offline zur Verfügung und lässt sich auf unterstützten Geräten zum Home-Bildschirm hinzufügen.
-
-Beim ersten Start wird automatisch eine leere Liste **„Einkauf“** angelegt. Die App enthält keine Beispiel- oder Dummy-Produkte.
+Werden die Website-Daten des Browsers gelöscht, gehen auch die Einkaufslisten verloren. Deshalb empfiehlt sich regelmäßig ein Backup über die Einstellungen.
