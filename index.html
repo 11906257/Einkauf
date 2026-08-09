@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.7">
+  <meta name="application-version" content="1.10.8">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -1732,7 +1732,7 @@
       const MAX_PRODUCT_NAME_LENGTH = 40;
       const SWIPE_ACTION_WIDTH = 92;
       const BACKUP_FORMAT = "einkauf-backup";
-      const BACKUP_VERSION = 1;
+      const BACKUP_VERSION = 2;
       const MAX_BACKUP_BYTES = 10 * 1024 * 1024;
       const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
       const BACKUP_STORE_NAMES = ["lists", "groups", "products", "items", "history", "settings"];
@@ -1967,7 +1967,7 @@
           }
           const opening = indexedDB.open(DB_NAME, DB_VERSION);
           let settled = false;
-          opening.onupgradeneeded = (event) => {
+          opening.onupgradeneeded = () => {
             const db = opening.result;
             const upgradeTransaction = opening.transaction;
             const ensureStore = (name, options) => db.objectStoreNames.contains(name)
@@ -1982,37 +1982,6 @@
             if (!items.indexNames.contains("listId")) items.createIndex("listId", "listId");
             if (!history.indexNames.contains("listId")) history.createIndex("listId", "listId");
             if (!products.indexNames.contains("key")) products.createIndex("key", "key", { unique: true });
-            if (event.oldVersion < 3) {
-              const cursorRequest = items.openCursor();
-              cursorRequest.onsuccess = () => {
-                const cursor = cursorRequest.result;
-                if (!cursor) return;
-                const item = cursor.value;
-                if (item.quantityValue !== null && item.quantityValue !== undefined && item.quantityValue !== "") {
-                  const quantityValue = parseQuantity(item.quantityValue);
-                  cursor.update(quantityValue === null
-                    ? { ...item, quantityValue: null, quantityUnit: null }
-                    : { ...item, quantityValue });
-                }
-                cursor.continue();
-              };
-            }
-            if (event.oldVersion < 4) {
-              const migratedAt = Date.now();
-              const cursorRequest = history.openCursor();
-              cursorRequest.onsuccess = () => {
-                const cursor = cursorRequest.result;
-                if (!cursor) return;
-                const entry = cursor.value;
-                if (!Number.isSafeInteger(entry.lastPurchasedAt) || entry.lastPurchasedAt < 0) {
-                  cursor.update({
-                    ...entry,
-                    lastPurchasedAt: Number(entry.purchaseCount) > 0 ? migratedAt : null
-                  });
-                }
-                cursor.continue();
-              };
-            }
           };
           opening.onsuccess = () => {
             const db = opening.result;
@@ -2101,64 +2070,6 @@
         return request(objectStore.index("listId").getAll(listId));
       }
 
-      async function migrateProductPool() {
-        const [products, items, history] = await Promise.all([
-          getAll("products"),
-          getAll("items"),
-          getAll("history")
-        ]);
-        const productsById = new Map(products.map((product) => [product.id, product]));
-        const productsByKey = new Map(products.map((product) => [product.key, product]));
-        const records = [...history, ...items];
-        let changed = false;
-
-        records.forEach((record) => {
-          if (record.productId && productsById.has(record.productId)) return;
-          const productName = clean(record.productName);
-          if (!productName) return;
-          const key = comparable(productName);
-          let product = productsByKey.get(key);
-          if (!product) {
-            product = { id: id(), name: productName, key, groupId: null, defaultUnit: "Stück", createdAt: Number(record.createdAt) || Date.now() };
-            products.push(product);
-            productsById.set(product.id, product);
-            productsByKey.set(key, product);
-          }
-          record.productId = product.id;
-          changed = true;
-        });
-
-        const latestUnits = new Map();
-        items.forEach((item) => {
-          if (!item.productId || !QUANTITY_UNITS.has(item.quantityUnit)) return;
-          const createdAt = Number(item.createdAt) || 0;
-          const current = latestUnits.get(item.productId);
-          if (!current || createdAt >= current.createdAt) {
-            latestUnits.set(item.productId, { unit: item.quantityUnit, createdAt });
-          }
-        });
-        products.forEach((product, index) => {
-          const defaultUnit = QUANTITY_UNITS.has(product.defaultUnit)
-            ? product.defaultUnit
-            : latestUnits.get(product.id)?.unit || "Stück";
-          if (product.defaultUnit !== defaultUnit) {
-            products[index] = { ...product, defaultUnit };
-            changed = true;
-          }
-        });
-
-        if (!changed) return products;
-        await transact(["products", "items", "history"], "readwrite", (transaction) => {
-          const productStore = transaction.objectStore("products");
-          const itemStore = transaction.objectStore("items");
-          const historyStore = transaction.objectStore("history");
-          products.forEach((product) => productStore.put(product));
-          items.forEach(({ productName: _productName, ...item }) => item.productId && itemStore.put(item));
-          history.forEach(({ productName: _productName, ...entry }) => entry.productId && historyStore.put(entry));
-        });
-        return products;
-      }
-
       function deleteRecords(storeName, ids) {
         if (!ids.length) return Promise.resolve();
         return transact([storeName], "readwrite", (transaction) => {
@@ -2207,7 +2118,7 @@
 
       async function initialiseData() {
         [state.products, state.groups] = await Promise.all([
-          migrateProductPool(),
+          getAll("products"),
           getAll("groups")
         ]);
         state.groups.sort((a, b) =>
@@ -2824,6 +2735,15 @@
           try {
             const values = await Promise.all(BACKUP_STORE_NAMES.map((name) => getAll(name)));
             const data = Object.fromEntries(BACKUP_STORE_NAMES.map((name, index) => [name, values[index]]));
+            data.products = data.products.map((product) => ({
+              ...product,
+              groupId: product.groupId ?? null
+            }));
+            data.items = data.items.map((item) => ({
+              ...item,
+              quantityValue: item.quantityValue ?? null,
+              quantityUnit: item.quantityUnit ?? null
+            }));
             const backup = {
               format: BACKUP_FORMAT,
               version: BACKUP_VERSION,
@@ -2872,10 +2792,14 @@
         const unique = (values) => values.length === new Set(values).size;
 
         if (!isObject(value) || value.format !== BACKUP_FORMAT || value.version !== BACKUP_VERSION || !isObject(value.data)) invalid();
-        const { lists: rawLists, items: rawItems, history: rawHistory } = value.data;
-        const rawGroups = value.data.groups ?? [];
-        const rawProducts = value.data.products ?? [];
-        const rawSettings = value.data.settings ?? [];
+        const {
+          lists: rawLists,
+          groups: rawGroups,
+          products: rawProducts,
+          items: rawItems,
+          history: rawHistory,
+          settings: rawSettings
+        } = value.data;
         if (![rawLists, rawGroups, rawProducts, rawItems, rawHistory, rawSettings].every(Array.isArray)) invalid();
         if (!rawLists.length || rawLists.length > 500 || rawGroups.length > 500 || rawProducts.length > 25000 || rawItems.length > 50000 || rawHistory.length > 50000 || rawSettings.length > 100) invalid();
 
@@ -2897,77 +2821,48 @@
         if (!unique(groups.map((entry) => entry.id)) || !unique(groups.map((entry) => entry.key))) invalid();
         const groupIds = new Set(groups.map((entry) => entry.id));
 
-        const importedAt = Date.now();
         const products = rawProducts.map((entry) => {
-          if (!isObject(entry) || !validId(entry.id) || (entry.createdAt !== undefined && !validTime(entry.createdAt))) invalid();
+          if (!isObject(entry) || !validId(entry.id) || !validTime(entry.createdAt)) invalid();
           const name = clean(entry.name);
           if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
-          const groupId = entry.groupId === null || entry.groupId === undefined ? null : entry.groupId;
+          const groupId = entry.groupId;
           if (groupId !== null && (!validId(groupId) || !groupIds.has(groupId))) invalid();
-          const defaultUnit = entry.defaultUnit === undefined ? "Stück" : entry.defaultUnit;
-          if (!QUANTITY_UNITS.has(defaultUnit)) invalid();
-          return { id: entry.id, name, key: comparable(name), groupId, defaultUnit, createdAt: entry.createdAt ?? importedAt };
+          if (!QUANTITY_UNITS.has(entry.defaultUnit) || entry.key !== comparable(name)) invalid();
+          return { id: entry.id, name, key: entry.key, groupId, defaultUnit: entry.defaultUnit, createdAt: entry.createdAt };
         });
         if (!unique(products.map((entry) => entry.id)) || !unique(products.map((entry) => entry.key))) invalid();
-
-        // Backups vor dem globalen Produktpool enthielten Produktnamen direkt
-        // in Listen- und Historieneinträgen. Diese Namen werden einmalig in
-        // reguläre Produkte überführt, bevor Beziehungen validiert werden.
-        const productsByKey = new Map(products.map((entry) => [entry.key, entry]));
-        for (const entry of [...rawItems, ...rawHistory]) {
-          if (!isObject(entry) || typeof entry.productName !== "string") continue;
-          const name = clean(entry.productName);
-          const key = comparable(name);
-          if (!name || name.length > MAX_PRODUCT_NAME_LENGTH || productsByKey.has(key)) continue;
-          const defaultUnit = QUANTITY_UNITS.has(entry.quantityUnit) ? entry.quantityUnit : "Stück";
-          const product = { id: id(), name, key, groupId: null, defaultUnit, createdAt: validTime(entry.createdAt) ? entry.createdAt : importedAt };
-          products.push(product);
-          productsByKey.set(key, product);
-        }
-        if (products.length > 25000 || !unique(products.map((entry) => entry.id))) invalid();
         const productIds = new Set(products.map((entry) => entry.id));
-        const resolveProductId = (entry) => {
-          if (productIds.has(entry.productId)) return entry.productId;
-          if (typeof entry.productName !== "string") return null;
-          return productsByKey.get(comparable(clean(entry.productName)))?.id ?? null;
-        };
 
         const itemPairs = new Set();
         const items = rawItems.map((entry) => {
-          const productId = isObject(entry) ? resolveProductId(entry) : null;
-          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productId || typeof entry.checked !== "boolean" || !validTime(entry.createdAt)) invalid();
-          const pair = `${entry.listId}\u0000${productId}`;
+          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productIds.has(entry.productId) || typeof entry.checked !== "boolean" || !validTime(entry.createdAt)) invalid();
+          const pair = `${entry.listId}\u0000${entry.productId}`;
           if (itemPairs.has(pair)) invalid();
           itemPairs.add(pair);
-          const hasQuantity = entry.quantityValue !== null && entry.quantityValue !== undefined && entry.quantityValue !== "";
-          const hasUnit = entry.quantityUnit !== null && entry.quantityUnit !== undefined && entry.quantityUnit !== "";
+          const hasQuantity = entry.quantityValue !== null;
+          const hasUnit = entry.quantityUnit !== null;
           if (hasQuantity !== hasUnit) invalid();
-          const quantityValue = hasQuantity ? parseQuantity(entry.quantityValue) : null;
-          if (hasQuantity && (!quantityValue || !QUANTITY_UNITS.has(entry.quantityUnit))) invalid();
+          if (hasQuantity && (typeof entry.quantityValue !== "number" || !Number.isFinite(entry.quantityValue) || entry.quantityValue <= 0 || !QUANTITY_UNITS.has(entry.quantityUnit))) invalid();
           return {
             id: entry.id,
             listId: entry.listId,
-            productId,
+            productId: entry.productId,
             checked: entry.checked,
             createdAt: entry.createdAt,
-            quantityValue,
-            quantityUnit: hasUnit ? entry.quantityUnit : null
+            quantityValue: entry.quantityValue,
+            quantityUnit: entry.quantityUnit
           };
         });
         if (!unique(items.map((entry) => entry.id))) invalid();
 
         const historyPairs = new Set();
         const history = rawHistory.map((entry) => {
-          const productId = isObject(entry) ? resolveProductId(entry) : null;
-          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productId || !Number.isSafeInteger(entry.purchaseCount) || entry.purchaseCount < 0 || entry.purchaseCount > 1000000000) invalid();
-          const pair = `${entry.listId}\u0000${productId}`;
+          if (!isObject(entry) || !validId(entry.id) || !listIds.has(entry.listId) || !productIds.has(entry.productId) || !Number.isSafeInteger(entry.purchaseCount) || entry.purchaseCount < 0 || entry.purchaseCount > 1000000000) invalid();
+          const pair = `${entry.listId}\u0000${entry.productId}`;
           if (historyPairs.has(pair)) invalid();
           historyPairs.add(pair);
-          const lastPurchasedAt = entry.lastPurchasedAt === null || entry.lastPurchasedAt === undefined
-            ? (entry.purchaseCount > 0 ? importedAt : null)
-            : entry.lastPurchasedAt;
-          if (lastPurchasedAt !== null && !validTime(lastPurchasedAt)) invalid();
-          return { id: entry.id, listId: entry.listId, productId, purchaseCount: entry.purchaseCount, lastPurchasedAt };
+          if (entry.lastPurchasedAt !== null && !validTime(entry.lastPurchasedAt)) invalid();
+          return { id: entry.id, listId: entry.listId, productId: entry.productId, purchaseCount: entry.purchaseCount, lastPurchasedAt: entry.lastPurchasedAt };
         });
         if (!unique(history.map((entry) => entry.id)) || [...itemPairs].some((pair) => !historyPairs.has(pair))) invalid();
 
