@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.8">
+  <meta name="application-version" content="1.10.9">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -83,8 +83,10 @@
     }
 
     html.confirmation-open,
-    body.confirmation-open {
-      background: color-mix(in srgb, #41436A 72%, #FE9677);
+    body.confirmation-open,
+    body.list-overview-mode.confirmation-open {
+      min-height: 100dvh;
+      background: #765A6E;
     }
 
     html.page-scroll-locked,
@@ -1311,6 +1313,8 @@
       transition: transform .16s ease, opacity .15s;
     }
 
+    .list-option.dragging { transition: none; }
+
     .list-option-shell {
       position: relative;
       overflow: hidden;
@@ -1642,6 +1646,15 @@
     </div>
   </dialog>
 
+  <dialog class="dialog-card" id="deleteGroupDialog" aria-labelledby="deleteGroupTitle" tabindex="-1">
+    <h2 id="deleteGroupTitle">Artikelgruppe löschen?</h2>
+    <p id="deleteGroupText"></p>
+    <div class="dialog-actions">
+      <button class="dialog-button cancel" id="cancelDeleteGroup" type="button">Abbrechen</button>
+      <button class="dialog-button danger" id="confirmDeleteGroup" type="button">Löschen</button>
+    </div>
+  </dialog>
+
   <dialog class="sheet settings-sheet" id="settingsSheet" aria-labelledby="settingsTitle">
     <div class="sheet-inner settings-inner" id="settingsInner">
     <div class="sheet-page settings-main-page" id="settingsMainPage" aria-hidden="false">
@@ -1737,7 +1750,7 @@
       const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
       const BACKUP_STORE_NAMES = ["lists", "groups", "products", "items", "history", "settings"];
       const QUANTITY_UNITS = new Set(["Stück", "g", "kg", "ml", "l"]);
-      const QUANTITY_ICON_MARKUP = '<svg class="quantity-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="m2 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="M7 21h10M12 3v18M3 7h18"/></svg>';
+      const QUANTITY_ICON_MARKUP = '<svg class="quantity-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h6M14 7h6M4 17h10M18 17h2"/><circle cx="12" cy="7" r="2"/><circle cx="16" cy="17" r="2"/></svg>';
       const collator = new Intl.Collator("de", { sensitivity: "base" });
       const quantityFormatter = new Intl.NumberFormat("de-DE", {
         maximumFractionDigits: 3,
@@ -1757,6 +1770,7 @@
         inlineEditingGroupId: null,
         pendingListDelete: null,
         pendingProductDelete: null,
+        pendingGroupDelete: null,
         pendingBackupImport: null,
         pendingProductCleanup: null,
         showingLists: false,
@@ -1810,6 +1824,10 @@
         deleteProductText: document.querySelector("#deleteProductText"),
         cancelDeleteProduct: document.querySelector("#cancelDeleteProduct"),
         confirmDeleteProduct: document.querySelector("#confirmDeleteProduct"),
+        deleteGroupDialog: document.querySelector("#deleteGroupDialog"),
+        deleteGroupText: document.querySelector("#deleteGroupText"),
+        cancelDeleteGroup: document.querySelector("#cancelDeleteGroup"),
+        confirmDeleteGroup: document.querySelector("#confirmDeleteGroup"),
         settingsSheet: document.querySelector("#settingsSheet"),
         settingsInner: document.querySelector("#settingsInner"),
         settingsMainPage: document.querySelector("#settingsMainPage"),
@@ -2530,7 +2548,7 @@
           edit.addEventListener("click", () => startInlineGroupRename(group));
           row.append(name, up, down, edit);
           shell.append(reveal, row);
-          bindSwipeGesture(row, reveal, () => deleteGroup(group.id).catch(console.error), "input");
+          bindSwipeGesture(row, reveal, () => askDeleteGroup(group), "input");
           els.groupManager.append(shell);
         });
       }
@@ -2684,6 +2702,33 @@
           renderQuantityGroupOptions();
           renderItems();
         });
+      }
+
+      function askDeleteGroup(group) {
+        state.pendingGroupDelete = group;
+        els.deleteGroupText.replaceChildren(
+          document.createTextNode(`„${group.name}“ wird dauerhaft gelöscht.`),
+          document.createElement("br"),
+          document.createTextNode("Die Gruppe wird von allen zugeordneten Artikeln entfernt. Die Artikel selbst bleiben erhalten.")
+        );
+        if (openLockedSheet(els.deleteGroupDialog)) {
+          els.cancelDeleteGroup.focus({ preventScroll: true });
+        }
+      }
+
+      async function deletePendingGroup() {
+        const group = state.pendingGroupDelete;
+        if (!group) return;
+        els.confirmDeleteGroup.disabled = true;
+        try {
+          await deleteGroup(group.id);
+          state.pendingGroupDelete = null;
+          els.deleteGroupDialog.close();
+        } catch (error) {
+          console.error(error);
+        } finally {
+          els.confirmDeleteGroup.disabled = false;
+        }
       }
 
       function openSettingsSheet() {
@@ -3918,6 +3963,12 @@
         renderSuggestions();
       });
       els.confirmDeleteProduct.addEventListener("click", deletePendingProduct);
+      els.cancelDeleteGroup.addEventListener("click", () => {
+        state.pendingGroupDelete = null;
+        els.deleteGroupDialog.close();
+        renderGroupManager();
+      });
+      els.confirmDeleteGroup.addEventListener("click", deletePendingGroup);
       els.clearBought.addEventListener("click", clearBoughtItems);
       els.doneAdd.addEventListener("click", closeAddSheet);
       els.clearSearch.addEventListener("click", () => {
@@ -3987,7 +4038,8 @@
         els.importBackupDialog,
         els.cleanupProductsDialog,
         els.deleteListDialog,
-        els.deleteProductDialog
+        els.deleteProductDialog,
+        els.deleteGroupDialog
       ].forEach((dialog) => dialog.addEventListener("close", () => {
         unlockPageScroll(dialog);
         syncConfirmationBackground();
@@ -4006,6 +4058,10 @@
       els.deleteProductDialog.addEventListener("cancel", () => {
         state.pendingProductDelete = null;
         renderSuggestions();
+      });
+      els.deleteGroupDialog.addEventListener("cancel", () => {
+        state.pendingGroupDelete = null;
+        renderGroupManager();
       });
 
       function syncPageScrollFade() {
