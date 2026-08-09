@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.6">
+  <meta name="application-version" content="1.10.7">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -80,6 +80,11 @@
     body.add-sheet-open,
     body.list-overview-mode.add-sheet-open {
       background: var(--active-sheet-bg);
+    }
+
+    html.confirmation-open,
+    body.confirmation-open {
+      background: color-mix(in srgb, #41436A 72%, #FE9677);
     }
 
     html.page-scroll-locked,
@@ -729,7 +734,12 @@
     .suggestion-swipe-row > .swipe-reveal { z-index: 0; }
     .suggestion-swipe-row:first-child { border-radius: 14px 14px 0 0; }
     .suggestion-swipe-row:last-of-type { border-radius: 0 0 14px 14px; }
-    .suggestion-swipe-row.standalone { border-radius: 14px; }
+    .suggestion-swipe-row.standalone,
+    .suggestions > .suggestion-swipe-row:only-child,
+    .suggestions > .suggestion-swipe-row:first-child:last-of-type { border-radius: 14px; }
+    .suggestion-swipe-row.standalone > .suggestion,
+    .suggestions > .suggestion-swipe-row:only-child > .suggestion,
+    .suggestions > .suggestion-swipe-row:first-child:last-of-type > .suggestion { border-radius: inherit; }
     .suggestions:has(> .suggestion-category) > .suggestion-swipe-row,
     .suggestion-category .suggestion-swipe-row { border-radius: 0; }
 
@@ -1203,7 +1213,10 @@
       font-weight: 650;
     }
 
-    .group-manager-button:disabled { opacity: .3; }
+    .group-manager-button:disabled {
+      opacity: .3;
+      pointer-events: none;
+    }
 
     .group-edit-button {
       background: transparent;
@@ -1576,8 +1589,8 @@
           <button class="search-clear" id="clearSearch" type="button" aria-label="Suche löschen" hidden>×</button>
         </div>
         <div class="segments" role="group" aria-label="Sortierung">
-          <button class="segment" id="categoryMode" type="button" aria-pressed="false">Artikelgruppen</button>
-          <button class="segment active" id="frequentMode" type="button" aria-pressed="true">Meistgekauft</button>
+          <button class="segment active" id="categoryMode" type="button" aria-pressed="true">Artikelgruppen</button>
+          <button class="segment" id="frequentMode" type="button" aria-pressed="false">Meistgekauft</button>
           <button class="segment" id="alphabeticalMode" type="button" aria-pressed="false">A–Z</button>
         </div>
         <div class="suggestions" id="suggestions" aria-live="polite" aria-busy="false"></div>
@@ -1739,7 +1752,7 @@
         products: [],
         groups: [],
         fatalError: false,
-        quickMode: "frequent",
+        quickMode: "category",
         inlineEditingListId: null,
         inlineEditingGroupId: null,
         pendingListDelete: null,
@@ -1875,12 +1888,39 @@
         if (dialog.open) return false;
         lockPageScroll(dialog);
         try {
+          if (dialog.classList.contains("dialog-card")) {
+            dialog.dataset.previousThemeColor = els.themeColor.content;
+            els.themeColor.content = "#765A6E";
+            document.documentElement.classList.add("confirmation-open");
+            document.body.classList.add("confirmation-open");
+          }
           dialog.showModal();
           return true;
         } catch (error) {
+          if (dialog.dataset.previousThemeColor) {
+            els.themeColor.content = dialog.dataset.previousThemeColor;
+            delete dialog.dataset.previousThemeColor;
+          }
+          document.documentElement.classList.remove("confirmation-open");
+          document.body.classList.remove("confirmation-open");
           unlockPageScroll(dialog);
           throw error;
         }
+      }
+
+      function syncConfirmationBackground() {
+        const hasOpenConfirmation = [...document.querySelectorAll("dialog.dialog-card")]
+          .some((dialog) => dialog.open);
+        if (!hasOpenConfirmation) {
+          const closedDialog = [...document.querySelectorAll("dialog.dialog-card")]
+            .find((dialog) => dialog.dataset.previousThemeColor);
+          if (closedDialog) {
+            els.themeColor.content = closedDialog.dataset.previousThemeColor;
+            delete closedDialog.dataset.previousThemeColor;
+          }
+        }
+        document.documentElement.classList.toggle("confirmation-open", hasOpenConfirmation);
+        document.body.classList.toggle("confirmation-open", hasOpenConfirmation);
       }
 
       async function runExclusive(key, operation) {
@@ -2373,7 +2413,7 @@
             });
           }
           shell.append(reveal, row);
-          bindSwipeGesture(row, reveal, () => deleteItem(item), ".check-button, .item-quantity-button");
+          bindSwipeGesture(row, reveal, () => deleteItem(item), "input");
           fragment.append(shell);
         });
         container.append(fragment);
@@ -2407,6 +2447,12 @@
           active = true;
           captured = false;
         });
+
+        row.addEventListener("click", (event) => {
+          if (row.dataset.suppressClick !== "true") return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }, true);
 
         row.addEventListener("pointermove", (event) => {
           if (!active || event.pointerId !== pointerId) return;
@@ -2573,7 +2619,7 @@
           edit.addEventListener("click", () => startInlineGroupRename(group));
           row.append(name, up, down, edit);
           shell.append(reveal, row);
-          bindSwipeGesture(row, reveal, () => deleteGroup(group.id).catch(console.error), ".group-manager-button, input");
+          bindSwipeGesture(row, reveal, () => deleteGroup(group.id).catch(console.error), "input");
           els.groupManager.append(shell);
         });
       }
@@ -2588,15 +2634,19 @@
       }
 
       function createGroupAndEdit() {
+        if (state.operations.has("create-group")) return;
+        const name = nextDefaultGroupName();
+        const group = { id: id(), name, key: comparable(name), sortOrder: state.groups.length };
+        state.groups.push(group);
+        startInlineGroupRename(group);
         return runExclusive("create-group", async () => {
-          const name = nextDefaultGroupName();
-          const group = { id: id(), name, key: comparable(name), sortOrder: state.groups.length };
           try {
             await put("groups", group);
-            state.groups.push(group);
-            startInlineGroupRename(group);
           } catch (error) {
             console.error(error);
+            state.groups = state.groups.filter((entry) => entry.id !== group.id);
+            if (state.inlineEditingGroupId === group.id) state.inlineEditingGroupId = null;
+            renderGroupManager();
           }
         });
       }
@@ -2926,7 +2976,7 @@
         const requestedQuickMode = rawSettings.find((entry) => isObject(entry) && entry.key === "quickMode")?.value;
         const quickMode = ["frequent", "category", "alphabetical"].includes(requestedQuickMode)
           ? requestedQuickMode
-          : "frequent";
+          : "category";
         return {
           lists,
           groups,
@@ -3153,7 +3203,7 @@
           actions.append(rename);
           row.append(select, actions);
           shell.append(reveal, row);
-          bindSwipeGesture(row, reveal, () => askDeleteList(list), ".list-action, input");
+          bindSwipeGesture(row, reveal, () => askDeleteList(list), "input");
           fragment.append(shell);
         });
         const addTile = document.createElement("button");
@@ -3175,14 +3225,18 @@
       }
 
       function createListAndEdit() {
+        if (state.operations.has("create-list")) return;
+        const list = { id: id(), name: nextDefaultListName(), sortOrder: state.lists.length };
+        state.lists.push(list);
+        startInlineRename(list);
         return runExclusive("create-list", async () => {
-          const list = { id: id(), name: nextDefaultListName(), sortOrder: state.lists.length };
           try {
             await put("lists", list);
-            state.lists.push(list);
-            startInlineRename(list);
           } catch (error) {
             console.error(error);
+            state.lists = state.lists.filter((entry) => entry.id !== list.id);
+            if (state.inlineEditingListId === list.id) state.inlineEditingListId = null;
+            renderListOptions();
           }
         });
       }
@@ -4039,7 +4093,10 @@
         els.cleanupProductsDialog,
         els.deleteListDialog,
         els.deleteProductDialog
-      ].forEach((dialog) => dialog.addEventListener("close", () => unlockPageScroll(dialog)));
+      ].forEach((dialog) => dialog.addEventListener("close", () => {
+        unlockPageScroll(dialog);
+        syncConfirmationBackground();
+      }));
       els.backupFile.addEventListener("cancel", (event) => event.stopPropagation());
       els.importBackupDialog.addEventListener("cancel", () => {
         state.pendingBackupImport = null;
