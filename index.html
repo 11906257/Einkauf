@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.10">
+  <meta name="application-version" content="1.10.11">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -517,6 +517,11 @@
       background: #F3E6DF;
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
+    }
+
+    .settings-sheet,
+    .settings-sheet .sheet-inner {
+      background: #F3E6DF;
     }
 
     .sheet {
@@ -1515,7 +1520,7 @@
       margin: 0;
       padding: var(--safe-top) var(--page-gutter) var(--safe-bottom);
       border: 0;
-      background: transparent;
+      background: color-mix(in srgb, #41436A 72%, transparent);
       color: var(--text);
       display: flex;
       align-items: flex-start;
@@ -1523,6 +1528,8 @@
       overflow: hidden;
       appearance: none;
       -webkit-appearance: none;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
     }
 
     /* Native dialogs are hidden until opened; when open they own the full viewport. */
@@ -1530,9 +1537,9 @@
     .dialog-card[open] { display: flex; }
 
     .dialog-card::backdrop {
-      background: color-mix(in srgb, #41436A 72%, transparent);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
 
     .dialog-card-content {
@@ -3828,8 +3835,9 @@
         } else {
           main.addEventListener("click", () => {
             if (row.dataset.suppressClick === "true" || row.style.transform) return;
-            addProduct(productName);
+            addProduct(productName, null, { focusSearch: false });
           });
+          main.addEventListener("pointerdown", (event) => event.preventDefault());
           const quantityButton = makeQuantityButton(
             `Menge für ${productName} hinzufügen`,
             () => openQuantityPage(productName)
@@ -3863,7 +3871,7 @@
         });
       }
 
-      async function addProduct(value, quantity = null) {
+      async function addProduct(value, quantity = null, { focusSearch = true } = {}) {
         return runExclusive("add-product", async () => {
           const productName = clean(value);
           if (!productName) {
@@ -3959,18 +3967,18 @@
             state.items.push(item);
             if (historyItem) state.history.push(historyItem);
             if (quantity) closeQuantityPage({ focus: false });
-            finishAddingProduct(productName, Boolean(quantity));
+            finishAddingProduct(productName, Boolean(quantity), { focusSearch });
           } catch (error) {
             console.error(error);
           }
         });
       }
 
-      function finishAddingProduct(productName, notify = false) {
+      function finishAddingProduct(productName, notify = false, { focusSearch = true } = {}) {
         renderItems();
         els.productName.value = "";
         renderSuggestions();
-        focusProductSearch();
+        if (focusSearch) focusProductSearch();
         if (notify) showToast(`${productName} hinzugefügt`);
       }
 
