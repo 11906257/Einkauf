@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.9">
+  <meta name="application-version" content="1.10.10">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -51,7 +51,7 @@
       --touch-size-small: 44px;
       --icon-button-size: 44px;
       --item-row-height: 62px;
-      --suggestion-row-height: 54px;
+      --suggestion-row-height: 48px;
       --category-header-height: 32px;
       --settings-row-height: 72px;
       --list-row-height: 82px;
@@ -111,6 +111,13 @@
 
     body.list-overview-mode .list-title,
     body.list-overview-mode .settings-trigger { color: #41436A; }
+
+    /* Confirmation overlays must also recolor the list overview's fixed header.
+       Its normal cream theme otherwise remains visible behind the backdrop. */
+    body.list-overview-mode.confirmation-open {
+      --bg: #765A6E;
+      background: #765A6E;
+    }
 
     button, input { font: inherit; }
     button { color: inherit; cursor: pointer; }
@@ -227,7 +234,7 @@
     }
 
     .settings-trigger[hidden] { display: none; }
-    .settings-trigger .small-icon { width: 23px; height: 23px; }
+    .settings-trigger .small-icon { width: 24px; height: 24px; }
 
     .section { margin-top: var(--space-content); }
 
@@ -321,7 +328,7 @@
       display: flex;
       align-items: center;
       min-height: var(--item-row-height);
-      padding: var(--space-sm) 16px var(--space-sm) 12px;
+      padding: var(--space-sm) 0 var(--space-sm) 14px;
       background: var(--surface);
       touch-action: pan-y;
       transition: transform .16s ease;
@@ -334,7 +341,7 @@
       width: var(--touch-size);
       height: var(--touch-size);
       flex: 0 0 auto;
-      margin: -8px calc(var(--control-gap) - 8px) -8px -8px;
+      margin: -8px 0 -8px auto;
       padding: 0;
       place-items: center;
       border: 0;
@@ -348,25 +355,32 @@
     .check-button::before {
       content: "";
       position: absolute;
+      top: 50%;
+      left: 0;
       width: 28px;
       height: 28px;
       border: 2px solid #984063;
       border-radius: 50%;
       background: transparent;
+      transform: translateY(-50%);
     }
 
     .check-button:active { transform: scale(.88); }
 
-    .check-button.checked {
-      color: #F3E6DF;
-    }
-
     .check-button.checked::before { border-color: #984063; background: #984063; }
 
     .item-copy {
-      min-width: 0;
-      flex: 1;
-      padding: 0;
+      display: flex;
+      flex: 0 1 auto;
+      flex-direction: column;
+      width: max-content;
+      min-width: 5ch;
+      max-width: calc(100% - var(--touch-size));
+      min-height: 0;
+      margin-block: calc(-1 * var(--space-sm));
+      justify-content: center;
+      align-self: stretch;
+      padding: var(--space-sm) 0;
       border: 0;
       background: transparent;
       color: inherit;
@@ -397,11 +411,6 @@
       white-space: nowrap;
     }
 
-    .quantity-button.item-quantity-button {
-      flex: 0 0 auto;
-      margin: 0 calc(-1 * var(--space-sm)) 0 var(--space-content);
-    }
-
     .item.bought .item-name {
       color: color-mix(in srgb, #41436A 82%, transparent);
       text-decoration: line-through;
@@ -418,9 +427,9 @@
       padding: 0;
       place-items: center;
       border: 0;
-      border-radius: 50%;
-      background: #F3E6DF;
-      color: #5F606B;
+      border-radius: 0;
+      background: transparent;
+      color: #F3E6DF;
       font-size: var(--font-secondary);
       font-weight: 600;
     }
@@ -428,8 +437,8 @@
     .clear-button[hidden] { display: none; }
 
     .trash-icon {
-      width: 15px;
-      height: 15px;
+      width: 16px;
+      height: 16px;
       fill: none;
       stroke: currentColor;
       stroke-width: 2;
@@ -599,7 +608,7 @@
       border-radius: 14px;
       background: #F3E6DF;
       color: #41436A;
-      caret-color: #984063;
+      caret-color: #41436A;
     }
 
     .search-field,
@@ -629,7 +638,7 @@
       place-items: center;
       border: 0;
       background: transparent;
-      color: var(--secondary);
+      color: #41436A;
       font-size: var(--font-heading);
       font-weight: 500;
       line-height: 1;
@@ -825,6 +834,14 @@
       cursor: default;
     }
 
+    .suggestion.already-listed .suggestion-status {
+      position: absolute;
+      left: 50%;
+      z-index: 1;
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+
     .quantity-button {
       display: grid;
       width: var(--icon-button-size);
@@ -832,7 +849,7 @@
       margin-right: var(--space-sm);
       padding: 0;
       place-items: center;
-      border: 1px solid #984063;
+      border: 0;
       border-radius: 11px;
       background: transparent;
       color: #984063;
@@ -846,8 +863,8 @@
     }
 
     .quantity-icon {
-      width: 21px;
-      height: 21px;
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: currentColor;
       stroke-width: 1.8;
@@ -864,7 +881,7 @@
 
     .suggestions-empty {
       display: grid;
-      min-height: var(--item-row-height);
+      min-height: var(--suggestion-row-height);
       padding: var(--space-sm) 16px;
       place-items: center;
       border-radius: 14px;
@@ -967,6 +984,25 @@
       color: #984063;
     }
 
+    .group-add-inline {
+      display: inline-flex;
+      width: auto;
+      height: var(--touch-size-small);
+      min-width: 0;
+      padding: 0 15px;
+      align-items: center;
+      gap: 6px;
+      border: 1.5px dashed #F3E6DF;
+      border-radius: 999px;
+      background: transparent;
+      color: #F3E6DF;
+      font-size: var(--font-secondary);
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .group-add-inline .plus-icon { width: 20px; height: 20px; }
+
     .unit-chip {
       min-height: var(--touch-size-small);
       padding: 0 15px;
@@ -995,7 +1031,7 @@
       text-align: right;
     }
 
-    .quantity-page .sheet-header { grid-template-columns: 64px minmax(0, 1fr) 88px; }
+    .quantity-page .sheet-header { grid-template-columns: 88px minmax(0, 1fr) 88px; }
 
     .back-button {
       display: inline-flex;
@@ -1007,7 +1043,7 @@
       color: var(--accent);
     }
 
-    .back-button .small-icon { width: 21px; height: 21px; }
+    .back-button .small-icon { width: 20px; height: 20px; }
 
     .search-page .back-button,
     .quantity-page .back-button { color: #F3E6DF; }
@@ -1020,11 +1056,13 @@
       opacity: 1;
     }
 
-    .search-page .search-clear { color: #984063; }
+    .search-page .search-clear { color: #41436A; }
 
     .quantity-page .sheet-header h2,
     .quantity-page .back-button,
     .quantity-page .quantity-add { color: #F3E6DF; }
+
+    .settings-sheet .back-button { color: #41436A; }
 
     #addSheet { background: #FE9677; }
 
@@ -1110,7 +1148,7 @@
       color: #41436A;
     }
 
-    .settings-action-icon .small-icon { width: 19px; height: 19px; }
+    .settings-action-icon .small-icon { width: 20px; height: 20px; }
 
     .cleanup-count-icon {
       font-size: var(--font-secondary);
@@ -1155,10 +1193,14 @@
     }
 
     .group-manager-empty {
-      padding: 16px;
+      display: grid;
+      min-height: var(--item-row-height);
+      padding: var(--space-sm) 16px;
+      place-items: center;
       background: transparent;
       color: #41436A;
       font-size: var(--font-secondary);
+      line-height: 1.2;
       text-align: center;
     }
 
@@ -1167,7 +1209,7 @@
       z-index: 1;
       display: grid;
       grid-template-columns: minmax(0, 1fr) repeat(3, var(--touch-size-small));
-      min-height: var(--suggestion-row-height);
+      min-height: var(--item-row-height);
       padding: var(--space-sm) var(--space-content) var(--space-sm) 16px;
       align-items: center;
       gap: var(--space-xs);
@@ -1225,8 +1267,8 @@
     }
 
     .group-edit-button .small-icon {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
     }
 
     .inline-group-input {
@@ -1256,8 +1298,8 @@
     }
 
     .group-save-button .small-icon {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       stroke-width: 2.7;
     }
 
@@ -1443,17 +1485,17 @@
       color: #41436A;
     }
 
-    .rename-list .small-icon { width: 18px; height: 18px; }
+    .rename-list .small-icon { width: 20px; height: 20px; }
 
     .save-list-name .small-icon {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       stroke-width: 2.7;
     }
 
     .small-icon {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: currentColor;
       stroke-width: 2;
@@ -1463,18 +1505,47 @@
 
     .dialog-card {
       position: fixed;
-      inset: auto;
-      top: 33.333%;
-      left: 50%;
-      width: min(calc(100% - 36px), 360px);
+      inset: 0;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      max-width: none;
+      max-height: none;
       margin: 0;
-      padding: 20px;
+      padding: var(--safe-top) var(--page-gutter) var(--safe-bottom);
       border: 0;
+      background: transparent;
+      color: var(--text);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      overflow: hidden;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    /* Native dialogs are hidden until opened; when open they own the full viewport. */
+    .dialog-card:not([open]) { display: none; }
+    .dialog-card[open] { display: flex; }
+
+    .dialog-card::backdrop {
+      background: color-mix(in srgb, #41436A 72%, transparent);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    .dialog-card-content {
+      width: min(100%, 360px);
+      margin-top: 33.333vh;
+      margin-top: 33.333dvh;
+      max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);
+      overflow: auto;
+      padding: 20px;
       border-radius: 18px;
       background: var(--surface);
-      color: var(--text);
       box-shadow: var(--shadow);
-      transform: translate(-50%, -50%);
+      transform: translateY(-50%);
     }
 
     .dialog-card h2 { margin: 0 0 var(--space-sm); font-size: var(--font-heading); text-align: center; }
@@ -1602,7 +1673,7 @@
 
       <div class="sheet-page quantity-page" id="quantityPage" aria-hidden="true" inert>
         <div class="sheet-header">
-          <button class="back-button" id="backFromQuantity" type="button" aria-label="Zurück zur Artikelauswahl"><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <button class="back-button" id="backFromQuantity" type="button">Abbrechen</button>
           <h2 id="quantityTitle"></h2>
           <button class="quantity-add" id="addWithQuantity" type="submit">Hinzufügen</button>
         </div>
@@ -1629,29 +1700,35 @@
   </dialog>
 
   <dialog class="dialog-card" id="deleteListDialog" aria-labelledby="deleteListTitle" tabindex="-1">
-    <h2 id="deleteListTitle">Liste löschen?</h2>
-    <p id="deleteListText"></p>
-    <div class="dialog-actions">
-      <button class="dialog-button cancel" id="cancelDeleteList" type="button">Abbrechen</button>
-      <button class="dialog-button danger" id="confirmDeleteList" type="button">Löschen</button>
+    <div class="dialog-card-content">
+      <h2 id="deleteListTitle">Liste löschen?</h2>
+      <p id="deleteListText"></p>
+      <div class="dialog-actions">
+        <button class="dialog-button cancel" id="cancelDeleteList" type="button">Abbrechen</button>
+        <button class="dialog-button danger" id="confirmDeleteList" type="button">Löschen</button>
+      </div>
     </div>
   </dialog>
 
   <dialog class="dialog-card" id="deleteProductDialog" aria-labelledby="deleteProductTitle" tabindex="-1">
-    <h2 id="deleteProductTitle">Artikel überall löschen?</h2>
-    <p id="deleteProductText"></p>
-    <div class="dialog-actions">
-      <button class="dialog-button cancel" id="cancelDeleteProduct" type="button">Abbrechen</button>
-      <button class="dialog-button danger" id="confirmDeleteProduct" type="button">Löschen</button>
+    <div class="dialog-card-content">
+      <h2 id="deleteProductTitle">Artikel überall löschen?</h2>
+      <p id="deleteProductText"></p>
+      <div class="dialog-actions">
+        <button class="dialog-button cancel" id="cancelDeleteProduct" type="button">Abbrechen</button>
+        <button class="dialog-button danger" id="confirmDeleteProduct" type="button">Löschen</button>
+      </div>
     </div>
   </dialog>
 
   <dialog class="dialog-card" id="deleteGroupDialog" aria-labelledby="deleteGroupTitle" tabindex="-1">
-    <h2 id="deleteGroupTitle">Artikelgruppe löschen?</h2>
-    <p id="deleteGroupText"></p>
-    <div class="dialog-actions">
-      <button class="dialog-button cancel" id="cancelDeleteGroup" type="button">Abbrechen</button>
-      <button class="dialog-button danger" id="confirmDeleteGroup" type="button">Löschen</button>
+    <div class="dialog-card-content">
+      <h2 id="deleteGroupTitle">Artikelgruppe löschen?</h2>
+      <p id="deleteGroupText"></p>
+      <div class="dialog-actions">
+        <button class="dialog-button cancel" id="cancelDeleteGroup" type="button">Abbrechen</button>
+        <button class="dialog-button danger" id="confirmDeleteGroup" type="button">Löschen</button>
+      </div>
     </div>
   </dialog>
 
@@ -1715,20 +1792,24 @@
   </dialog>
 
   <dialog class="dialog-card" id="importBackupDialog" aria-labelledby="importBackupTitle" tabindex="-1">
-    <h2 id="importBackupTitle">Backup importieren?</h2>
-    <p>Alle vorhandenen Listen, Artikel und Artikelgruppen werden durch die Daten aus dem Backup ersetzt.</p>
-    <div class="dialog-actions">
-      <button class="dialog-button cancel" id="cancelImportBackup" type="button">Abbrechen</button>
-      <button class="dialog-button danger" id="confirmImportBackup" type="button">Importieren</button>
+    <div class="dialog-card-content">
+      <h2 id="importBackupTitle">Backup importieren?</h2>
+      <p>Alle vorhandenen Listen, Artikel und Artikelgruppen werden durch die Daten aus dem Backup ersetzt.</p>
+      <div class="dialog-actions">
+        <button class="dialog-button cancel" id="cancelImportBackup" type="button">Abbrechen</button>
+        <button class="dialog-button danger" id="confirmImportBackup" type="button">Importieren</button>
+      </div>
     </div>
   </dialog>
 
   <dialog class="dialog-card" id="cleanupProductsDialog" aria-labelledby="cleanupProductsTitle" tabindex="-1">
-    <h2 id="cleanupProductsTitle">Artikel löschen?</h2>
-    <p id="cleanupProductsText"></p>
-    <div class="dialog-actions">
-      <button class="dialog-button cancel" id="cancelCleanupProducts" type="button">Abbrechen</button>
-      <button class="dialog-button danger" id="confirmCleanupProducts" type="button">Löschen</button>
+    <div class="dialog-card-content">
+      <h2 id="cleanupProductsTitle">Artikel löschen?</h2>
+      <p id="cleanupProductsText"></p>
+      <div class="dialog-actions">
+        <button class="dialog-button cancel" id="cancelCleanupProducts" type="button">Abbrechen</button>
+        <button class="dialog-button danger" id="confirmCleanupProducts" type="button">Löschen</button>
+      </div>
     </div>
   </dialog>
 
@@ -1780,6 +1861,7 @@
         quantityGroupId: null,
         quantityEditingItemId: null,
         quantityEntrySource: "add",
+        settingsReturnToQuantity: false,
         operations: new Set()
       };
       const els = {
@@ -2312,7 +2394,6 @@
           const check = document.createElement("button");
           check.type = "button";
           check.className = `check-button${item.checked ? " checked" : ""}`;
-          check.textContent = "✓";
           check.setAttribute("aria-label", item.checked ? `${item.productName} wieder öffnen` : `${item.productName} als gekauft markieren`);
           check.setAttribute("aria-pressed", String(item.checked));
           check.addEventListener("click", () => toggleItem(item));
@@ -2328,19 +2409,12 @@
             quantity.textContent = `${formatQuantity(item.quantityValue)} ${item.quantityUnit}`;
             copy.append(quantity);
           }
-          row.append(check, copy);
-          if (!item.checked) {
-            const quantityButton = makeQuantityButton(
-              `Menge für ${item.productName} ändern`,
-              () => openQuantityEditor(item),
-              "item-quantity-button"
-            );
-            row.append(quantityButton);
-            row.addEventListener("click", (event) => {
-              if (event.target.closest("button") || row.dataset.suppressClick === "true" || row.style.transform) return;
-              openAddSheet();
-            });
-          }
+          copy.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (!item.checked) openQuantityEditor(item);
+          });
+          row.append(copy);
+          row.append(check);
           shell.append(reveal, row);
           bindSwipeGesture(row, reveal, () => deleteItem(item), "input");
           fragment.append(shell);
@@ -2758,11 +2832,16 @@
         if (restoreFocus) els.openGroups.focus({ preventScroll: true });
       }
 
-      function closeSettingsSheet({ immediate = false, restoreFocus = true } = {}) {
+      function closeSettingsSheet({ immediate = false, restoreFocus = true, preserveGroupsPage = false } = {}) {
         if (!els.settingsSheet.open || els.settingsSheet.classList.contains("closing")) return;
-        closeGroupsPage();
+        state.settingsReturnToQuantity = false;
+        if (!preserveGroupsPage) closeGroupsPage();
+        if (els.addSheet.open && els.addForm.classList.contains("quantity-mode")) {
+          renderQuantityGroupOptions();
+        }
         if (immediate) {
           els.settingsSheet.close();
+          if (preserveGroupsPage) closeGroupsPage();
           if (restoreFocus) els.openSettings.focus({ preventScroll: true });
           return;
         }
@@ -2770,6 +2849,7 @@
         setTimeout(() => {
           els.settingsSheet.close();
           els.settingsSheet.classList.remove("closing");
+          if (preserveGroupsPage) closeGroupsPage();
           if (restoreFocus) els.openSettings.focus({ preventScroll: true });
         }, 220);
       }
@@ -3485,6 +3565,20 @@
           button.addEventListener("click", () => setQuantityGroup(group.id));
           els.quantityGroupOptions.append(button);
         });
+        const addGroup = document.createElement("button");
+        addGroup.type = "button";
+        addGroup.className = "group-add-inline";
+        addGroup.setAttribute("aria-label", "Artikelgruppe hinzufügen");
+        addGroup.innerHTML = '<svg class="plus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Neue Artikelgruppe</span>';
+        addGroup.addEventListener("click", openQuantityGroups);
+        els.quantityGroupOptions.append(addGroup);
+      }
+
+      function openQuantityGroups() {
+        if (!els.addSheet.open || !els.addForm.classList.contains("quantity-mode")) return;
+        if (!openLockedSheet(els.settingsSheet)) return;
+        state.settingsReturnToQuantity = true;
+        openGroupsPage();
       }
 
       function syncQuantityClear() {
@@ -3555,7 +3649,7 @@
       function openQuantityEditor(item) {
         els.addForm.reset();
         resetQuantityPage();
-        if (!openLockedSheet(els.addSheet)) return;
+        if (!els.addSheet.open && !openLockedSheet(els.addSheet)) return;
         setAddSheetBackground("#FE9677");
         openQuantityPage(item.productName, item);
       }
@@ -3648,11 +3742,13 @@
           });
         }
 
-        if (!fragment.childNodes.length && (query || state.products.length)) {
+        if (!fragment.childNodes.length && (query || state.products.length || state.quickMode === "category")) {
           const empty = document.createElement("div");
           empty.className = "suggestions-empty";
           if (query) {
             empty.textContent = "Kein Treffer";
+          } else if (state.quickMode === "category" && !state.products.length) {
+            empty.textContent = "Noch keine Artikelgruppen";
           } else {
             empty.textContent = "Alle bekannten Produkte stehen bereits auf der Liste";
           }
@@ -3720,6 +3816,15 @@
           status.className = "suggestion-status";
           status.textContent = "Auf der Liste";
           main.append(status);
+          const listedItem = state.items.find((item) =>
+            !item.checked && (item.productId === productId || comparable(item.productName) === comparable(productName))
+          );
+          if (listedItem) {
+            row.append(makeQuantityButton(
+              `Menge und Artikelgruppe für ${productName} ändern`,
+              () => openQuantityEditor(listedItem)
+            ));
+          }
         } else {
           main.addEventListener("click", () => {
             if (row.dataset.suppressClick === "true" || row.style.transform) return;
@@ -3747,7 +3852,6 @@
       function updateScrollFade() {
         const element = els.suggestions;
         const hasTop = element.scrollTop > 3;
-        element.classList.remove("fade-bottom", "fade-both");
         element.classList.toggle("fade-top", hasTop);
       }
 
@@ -3904,11 +4008,23 @@
       }
 
       els.openAdd.addEventListener("click", openAddSheet);
+      [els.openSection, els.boughtSection].forEach((section) => {
+        section.addEventListener("click", (event) => {
+          if (event.target.closest("button")) return;
+          openAddSheet();
+        });
+      });
       els.reloadApp.addEventListener("click", () => location.reload());
       els.openSettings.addEventListener("click", openSettingsSheet);
       els.closeSettings.addEventListener("click", () => closeSettingsSheet());
       els.openGroups.addEventListener("click", openGroupsPage);
-      els.closeGroups.addEventListener("click", () => closeGroupsPage({ restoreFocus: true }));
+      els.closeGroups.addEventListener("click", () => {
+        if (state.settingsReturnToQuantity) {
+          closeSettingsSheet({ restoreFocus: false, preserveGroupsPage: true });
+          return;
+        }
+        closeGroupsPage({ restoreFocus: true });
+      });
       els.exportBackup.addEventListener("click", exportBackup);
       els.importBackup.addEventListener("click", () => {
         els.backupFile.value = "";
@@ -4027,7 +4143,11 @@
       els.settingsSheet.addEventListener("cancel", (event) => {
         if (event.target !== els.settingsSheet) return;
         event.preventDefault();
-        closeSettingsSheet();
+        const returnToQuantity = state.settingsReturnToQuantity;
+        closeSettingsSheet({
+          restoreFocus: !returnToQuantity,
+          preserveGroupsPage: returnToQuantity
+        });
       });
       els.addSheet.addEventListener("close", () => {
         unlockPageScroll(els.addSheet);
