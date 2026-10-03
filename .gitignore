@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+*.log
+.codex/
+.agents/
+einkauf-backup-*.json
+einkauf-dummy-backup.json

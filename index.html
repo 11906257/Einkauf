@@ -7,27 +7,29 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.11">
+  <meta name="application-version" content="1.10.13">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
   <title>Einkauf</title>
-  <style>
+<style>
     :root {
       color-scheme: only light;
-      --bg: #41436A;
+      --bg: var(--text);
       --surface: #F3E6DF;
       --text: #41436A;
       --secondary: #984063;
-      --accent: #FE9677;
-      --accent-pressed: #984063;
+      --orange: #FE9677;
+      --accent: var(--orange);
+      --accent-pressed: var(--secondary);
       --text-on-accent: #3F4166;
       --muted: #666776;
       --danger: #F64668;
       --separator-size: 1px;
-      --item-separator: #984063;
-      --manager-separator: #41436A;
-      --shadow: 0 12px 36px color-mix(in srgb, #41436A 28%, transparent);
+      --item-separator: var(--secondary);
+      --manager-separator: var(--text);
+      --confirmation: #765A6E;
+      --shadow: 0 12px 36px color-mix(in srgb, var(--text) 28%, transparent);
       --font-small: 12px;
       --font-secondary: 14px;
       --font-body: 17px;
@@ -72,7 +74,7 @@
     body {
       margin: 0;
       background: var(--bg);
-      color: #F3E6DF;
+      color: var(--surface);
       overscroll-behavior-y: none;
     }
 
@@ -86,7 +88,7 @@
     body.confirmation-open,
     body.list-overview-mode.confirmation-open {
       min-height: 100dvh;
-      background: #765A6E;
+      background: var(--confirmation);
     }
 
     html.page-scroll-locked,
@@ -103,20 +105,20 @@
     }
 
     body.list-overview-mode {
-      --bg: #F3E6DF;
-      --accent: #41436A;
-      --accent-pressed: #984063;
-      background: #F3E6DF;
+      --bg: var(--surface);
+      --accent: var(--text);
+      --accent-pressed: var(--secondary);
+      background: var(--surface);
     }
 
     body.list-overview-mode .list-title,
-    body.list-overview-mode .settings-trigger { color: #41436A; }
+    body.list-overview-mode .settings-trigger { color: var(--text); }
 
     /* Confirmation overlays must also recolor the list overview's fixed header.
        Its normal cream theme otherwise remains visible behind the backdrop. */
     body.list-overview-mode.confirmation-open {
-      --bg: #765A6E;
-      background: #765A6E;
+      --bg: var(--confirmation);
+      background: var(--confirmation);
     }
 
     button, input { font: inherit; }
@@ -125,7 +127,7 @@
 
     :focus { outline: none; }
 
-    :focus-visible { outline: none; box-shadow: none; }
+    :focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 
     .app-error {
       margin-top: var(--space-content);
@@ -143,8 +145,8 @@
       padding: 0 var(--space-category);
       border: 0;
       border-radius: 12px;
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
       font-weight: 650;
     }
 
@@ -197,7 +199,7 @@
       font-weight: 750;
       letter-spacing: -.9px;
       text-align: left;
-      color: #F3E6DF;
+      color: var(--surface);
     }
 
     .list-title-text {
@@ -212,8 +214,8 @@
       width: 9px;
       height: 9px;
       margin: -5px 0 0 2px;
-      border-right: 2.5px solid #F3E6DF;
-      border-bottom: 2.5px solid #F3E6DF;
+      border-right: 2.5px solid var(--surface);
+      border-bottom: 2.5px solid var(--surface);
       transform: rotate(45deg);
     }
 
@@ -230,7 +232,7 @@
       place-items: center;
       border: 0;
       background: transparent;
-      color: #41436A;
+      color: var(--text);
     }
 
     .settings-trigger[hidden] { display: none; }
@@ -250,7 +252,7 @@
 
     .section-heading {
       margin: 0;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-small);
       font-weight: 650;
       letter-spacing: .45px;
@@ -262,12 +264,6 @@
       border-radius: 15px;
       background: var(--surface);
       color: var(--text);
-    }
-
-    .card.grouped-card {
-      overflow: hidden;
-      border-radius: 15px;
-      background: var(--surface);
     }
 
     .swipe-row {
@@ -290,8 +286,8 @@
       min-height: var(--category-header-height);
       padding: var(--space-sm) 16px;
       align-items: center;
-      background: #984063;
-      color: #F3E6DF;
+      background: var(--secondary);
+      color: var(--surface);
       font-size: var(--font-small);
       font-weight: 700;
       letter-spacing: .5px;
@@ -314,7 +310,7 @@
       place-items: center;
       appearance: none;
       -webkit-appearance: none;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-secondary);
       font-weight: 650;
       border: 0;
@@ -359,7 +355,7 @@
       left: 0;
       width: 28px;
       height: 28px;
-      border: 2px solid #984063;
+      border: 2px solid var(--secondary);
       border-radius: 50%;
       background: transparent;
       transform: translateY(-50%);
@@ -367,7 +363,7 @@
 
     .check-button:active { transform: scale(.88); }
 
-    .check-button.checked::before { border-color: #984063; background: #984063; }
+    .check-button.checked::before { border-color: var(--secondary); background: var(--secondary); }
 
     .item-copy {
       display: flex;
@@ -397,7 +393,7 @@
       white-space: nowrap;
       font-size: var(--font-body);
       line-height: 1.3;
-      color: #41436A;
+      color: var(--text);
     }
 
     .item-quantity {
@@ -412,7 +408,7 @@
     }
 
     .item.bought .item-name {
-      color: color-mix(in srgb, #41436A 82%, transparent);
+      color: color-mix(in srgb, var(--text) 82%, transparent);
       text-decoration: line-through;
       text-decoration-thickness: 1.5px;
     }
@@ -429,7 +425,7 @@
       border: 0;
       border-radius: 0;
       background: transparent;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-secondary);
       font-weight: 600;
     }
@@ -489,7 +485,7 @@
       border: 0;
       border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 10px 26px color-mix(in srgb, #984063 36%, transparent);
+      box-shadow: 0 10px 26px color-mix(in srgb, var(--secondary) 36%, transparent);
       color: var(--text-on-accent);
       font-size: var(--font-page-title);
       font-weight: 300;
@@ -508,20 +504,20 @@
     dialog:focus { outline: none; }
 
     dialog::backdrop {
-      background: color-mix(in srgb, #41436A 72%, transparent);
+      background: color-mix(in srgb, var(--text) 72%, transparent);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
     }
 
     .settings-sheet::backdrop {
-      background: #F3E6DF;
+      background: var(--surface);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
 
     .settings-sheet,
     .settings-sheet .sheet-inner {
-      background: #F3E6DF;
+      background: var(--surface);
     }
 
     .sheet {
@@ -565,12 +561,12 @@
 
     .search-page {
       padding-bottom: 0;
-      background: #FE9677;
+      background: var(--orange);
       transform: translateX(0);
     }
 
     .quantity-page {
-      background: #984063;
+      background: var(--secondary);
       opacity: 0;
       pointer-events: none;
       transform: translateX(100%);
@@ -598,7 +594,7 @@
     .sheet-header h2 {
       margin: 0;
       overflow: hidden;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-heading);
       text-align: center;
       text-overflow: ellipsis;
@@ -611,9 +607,9 @@
       padding: 0 50px 0 16px;
       border: 0;
       border-radius: 14px;
-      background: #F3E6DF;
-      color: #41436A;
-      caret-color: #41436A;
+      background: var(--surface);
+      color: var(--text);
+      caret-color: var(--text);
     }
 
     .search-field,
@@ -643,7 +639,7 @@
       place-items: center;
       border: 0;
       background: transparent;
-      color: #41436A;
+      color: var(--text);
       font-size: var(--font-heading);
       font-weight: 500;
       line-height: 1;
@@ -686,8 +682,8 @@
     }
 
     .segment.active {
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
       box-shadow: none;
     }
 
@@ -729,7 +725,7 @@
       align-items: center;
       overflow: hidden;
       border-radius: 0;
-      background: #F3E6DF;
+      background: var(--surface);
       touch-action: pan-y;
       transition: transform .16s ease;
     }
@@ -801,7 +797,7 @@
 
     .suggestion-category {
       flex: 0 0 auto;
-      background: #F3E6DF;
+      background: var(--surface);
     }
 
     .suggestion-category-heading {
@@ -809,8 +805,8 @@
       min-height: var(--category-header-height);
       padding: var(--space-sm) 16px;
       align-items: center;
-      background: #984063;
-      color: #F3E6DF;
+      background: var(--secondary);
+      color: var(--surface);
       font-size: var(--font-small);
       font-weight: 700;
       letter-spacing: .45px;
@@ -820,7 +816,7 @@
 
     .suggestion-category-items {
       overflow: visible;
-      background: #F3E6DF;
+      background: var(--surface);
     }
 
     .suggestion-name {
@@ -829,7 +825,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: var(--font-body);
-      color: #41436A;
+      color: var(--text);
     }
 
     .suggestion.add-new .suggestion-main { color: var(--text); font-weight: 400; }
@@ -857,14 +853,14 @@
       border: 0;
       border-radius: 11px;
       background: transparent;
-      color: #984063;
+      color: var(--secondary);
       font-size: var(--font-small);
       font-weight: 750;
       letter-spacing: -.3px;
     }
 
     .quantity-button:active {
-      background: color-mix(in srgb, #984063 10%, transparent);
+      background: color-mix(in srgb, var(--secondary) 10%, transparent);
     }
 
     .quantity-icon {
@@ -879,7 +875,7 @@
 
     .suggestion-status {
       flex: 0 0 auto;
-      color: #984063;
+      color: var(--secondary);
       font-size: var(--font-small);
       font-weight: 600;
     }
@@ -890,7 +886,7 @@
       padding: var(--space-sm) 16px;
       place-items: center;
       border-radius: 14px;
-      background: #F3E6DF;
+      background: var(--surface);
       color: var(--secondary);
       font-size: var(--font-secondary);
       line-height: 1.4;
@@ -906,7 +902,7 @@
 
     .quantity-label {
       margin: 0 0 0 2px;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-small);
       font-weight: 650;
       letter-spacing: .35px;
@@ -924,9 +920,9 @@
       padding: 0 50px 0 16px;
       border: 0;
       border-radius: 14px;
-      background: #F3E6DF;
-      color: #984063;
-      caret-color: #984063;
+      background: var(--surface);
+      color: var(--secondary);
+      caret-color: var(--secondary);
       font-variant-numeric: tabular-nums;
     }
 
@@ -942,7 +938,7 @@
       place-items: center;
       border: 0;
       background: transparent;
-      color: #984063;
+      color: var(--secondary);
       font-size: var(--font-heading);
       font-weight: 500;
       line-height: 1;
@@ -964,7 +960,7 @@
       gap: var(--space-content);
       margin-top: 6px;
       padding-top: 16px;
-      border-top: 1px solid #F3E6DF;
+      border-top: 1px solid var(--surface);
     }
 
     .group-options {
@@ -973,20 +969,22 @@
       gap: var(--space-sm);
     }
 
-    .group-chip {
+    .group-chip,
+    .unit-chip {
       min-height: var(--touch-size-small);
       padding: 0 15px;
-      border: 1.5px solid #F3E6DF;
+      border: 1.5px solid var(--surface);
       border-radius: 999px;
       background: transparent;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-secondary);
       font-weight: 650;
     }
 
-    .group-chip.active {
-      background: #F3E6DF;
-      color: #984063;
+    .group-chip.active,
+    .unit-chip.active {
+      background: var(--surface);
+      color: var(--secondary);
     }
 
     .group-add-inline {
@@ -997,32 +995,16 @@
       padding: 0 15px;
       align-items: center;
       gap: 6px;
-      border: 1.5px dashed #F3E6DF;
+      border: 1.5px dashed var(--surface);
       border-radius: 999px;
       background: transparent;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-secondary);
       font-weight: 650;
       white-space: nowrap;
     }
 
     .group-add-inline .plus-icon { width: 20px; height: 20px; }
-
-    .unit-chip {
-      min-height: var(--touch-size-small);
-      padding: 0 15px;
-      border: 1.5px solid #F3E6DF;
-      border-radius: 999px;
-      background: transparent;
-      color: #F3E6DF;
-      font-size: var(--font-secondary);
-      font-weight: 650;
-    }
-
-    .unit-chip.active {
-      background: #F3E6DF;
-      color: #984063;
-    }
 
     .quantity-add {
       min-height: var(--touch-size);
@@ -1051,7 +1033,7 @@
     .back-button .small-icon { width: 20px; height: 20px; }
 
     .search-page .back-button,
-    .quantity-page .back-button { color: #F3E6DF; }
+    .quantity-page .back-button { color: var(--surface); }
 
     .search-page .sheet-header h2,
     .search-page .back-button { color: var(--text-on-accent); }
@@ -1061,31 +1043,29 @@
       opacity: 1;
     }
 
-    .search-page .search-clear { color: #41436A; }
-
     .quantity-page .sheet-header h2,
     .quantity-page .back-button,
-    .quantity-page .quantity-add { color: #F3E6DF; }
+    .quantity-page .quantity-add { color: var(--surface); }
 
-    .settings-sheet .back-button { color: #41436A; }
+    .settings-sheet .back-button { color: var(--text); }
 
-    #addSheet { background: #FE9677; }
+    #addSheet { background: var(--orange); }
 
     #addSheet::backdrop {
-      background: #FE9677;
+      background: var(--orange);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
 
-    #addSheet.quantity-mode { background: #984063; }
+    #addSheet.quantity-mode { background: var(--secondary); }
 
-    #addSheet.quantity-mode::backdrop { background: #984063; }
+    #addSheet.quantity-mode::backdrop { background: var(--secondary); }
 
 
-    .settings-sheet .sheet-header h2 { color: #41436A; }
+    .settings-sheet .sheet-header h2 { color: var(--text); }
 
     .settings-main-page,
-    .settings-groups-page { background: #F3E6DF; }
+    .settings-groups-page { background: var(--surface); }
 
     .settings-groups-page {
       overflow-x: hidden;
@@ -1110,7 +1090,7 @@
 
     .settings-content {
       margin-top: var(--space-content);
-      color: #41436A;
+      color: var(--text);
     }
 
     .settings-content + .settings-content { margin-top: var(--space-category); }
@@ -1137,8 +1117,8 @@
       align-items: center;
       border: 0;
       border-radius: 14px;
-      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
-      color: #41436A;
+      background: color-mix(in srgb, var(--text) 7%, var(--surface));
+      color: var(--text);
       text-align: left;
     }
 
@@ -1150,7 +1130,7 @@
       height: 34px;
       place-items: center;
       background: transparent;
-      color: #41436A;
+      color: var(--text);
     }
 
     .settings-action-icon .small-icon { width: 20px; height: 20px; }
@@ -1163,16 +1143,12 @@
     }
 
     .settings-action.danger {
-      background: color-mix(in srgb, #41436A 7%, #F3E6DF);
       color: var(--danger);
     }
 
     .settings-action.danger .settings-action-icon {
-      background: transparent;
       color: var(--danger);
     }
-
-    .settings-action.danger .settings-action-description { color: #41436A; }
 
     .settings-action-title {
       display: block;
@@ -1183,7 +1159,7 @@
     .settings-action-description {
       display: block;
       margin-top: 2px;
-      color: #41436A;
+      color: var(--text);
       font-size: var(--font-small);
       line-height: 1.3;
     }
@@ -1192,9 +1168,9 @@
       display: grid;
       gap: 0;
       overflow: hidden;
-      border: 2px solid #41436A;
+      border: 2px solid var(--text);
       border-radius: 14px;
-      background: #F3E6DF;
+      background: var(--surface);
     }
 
     .group-manager-empty {
@@ -1203,7 +1179,7 @@
       padding: var(--space-sm) 16px;
       place-items: center;
       background: transparent;
-      color: #41436A;
+      color: var(--text);
       font-size: var(--font-secondary);
       line-height: 1.2;
       text-align: center;
@@ -1219,8 +1195,8 @@
       align-items: center;
       gap: var(--space-xs);
       border-radius: 0;
-      background: #F3E6DF;
-      color: #41436A;
+      background: var(--surface);
+      color: var(--text);
       touch-action: pan-y;
       transition: transform .16s ease;
     }
@@ -1256,8 +1232,8 @@
       place-items: center;
       border: 0;
       border-radius: 10px;
-      background: #F3E6DF;
-      color: #41436A;
+      background: var(--surface);
+      color: var(--text);
       font-size: var(--font-heading);
       font-weight: 650;
     }
@@ -1284,22 +1260,22 @@
       border: 0;
       border-radius: 0;
       background: transparent;
-      color: #41436A;
-      caret-color: #984063;
+      color: var(--text);
+      caret-color: var(--secondary);
       font: inherit;
       font-size: var(--font-body);
       font-weight: 650;
     }
 
     .inline-group-input::selection {
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
     }
 
     .group-save-button {
       border-radius: 10px;
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
     }
 
     .group-save-button .small-icon {
@@ -1320,8 +1296,8 @@
       -webkit-appearance: none;
       border: 0;
       border-radius: 14px;
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
       font-size: var(--font-page-title);
       font-weight: 300;
       line-height: 1;
@@ -1354,8 +1330,8 @@
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       min-height: var(--list-row-height);
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
       touch-action: pan-y;
       transition: transform .16s ease, opacity .15s;
     }
@@ -1368,16 +1344,16 @@
       margin-bottom: var(--space-content);
       border-radius: 20px;
       background: var(--danger);
-      box-shadow: 0 5px 20px color-mix(in srgb, #41436A 18%, transparent);
+      box-shadow: 0 5px 20px color-mix(in srgb, var(--text) 18%, transparent);
     }
 
     .list-overview {
       padding-top: var(--space-category);
-      color: #41436A;
+      color: var(--text);
       animation: overviewIn .2s ease-out;
     }
 
-    .list-overview .section-heading { color: #41436A; }
+    .list-overview .section-heading { color: var(--text); }
 
     .list-overview[hidden] { display: none; }
 
@@ -1390,18 +1366,18 @@
       justify-content: center;
       appearance: none;
       -webkit-appearance: none;
-      border: 2px solid #41436A;
+      border: 2px solid var(--text);
       border-radius: 20px;
       background: transparent;
-      color: #41436A;
+      color: var(--text);
       font-size: var(--font-page-title);
       font-weight: 300;
       line-height: 1;
     }
 
     .list-add-tile:active {
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
     }
 
     .list-action,
@@ -1415,7 +1391,7 @@
       height: var(--list-row-height);
       overflow: hidden;
       padding: 0 8px 0 18px;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-list);
       font-weight: 750;
       text-align: left;
@@ -1431,7 +1407,7 @@
       border: 0;
       border-radius: 0;
       background: transparent;
-      color: #F3E6DF;
+      color: var(--surface);
       font-size: var(--font-list);
       font-weight: 750;
     }
@@ -1451,9 +1427,9 @@
       align-items: center;
       justify-content: center;
       border-radius: 11px;
-      background: #F3E6DF;
-      box-shadow: 0 7px 22px color-mix(in srgb, #41436A 38%, transparent);
-      color: #41436A;
+      background: var(--surface);
+      box-shadow: 0 7px 22px color-mix(in srgb, var(--text) 38%, transparent);
+      color: var(--text);
     }
 
     .list-action {
@@ -1482,12 +1458,12 @@
 
     .rename-list {
       background: transparent;
-      color: #F3E6DF;
+      color: var(--surface);
     }
 
     .inline-list-input::selection {
-      background: #F3E6DF;
-      color: #41436A;
+      background: var(--surface);
+      color: var(--text);
     }
 
     .rename-list .small-icon { width: 20px; height: 20px; }
@@ -1520,7 +1496,7 @@
       margin: 0;
       padding: var(--safe-top) var(--page-gutter) var(--safe-bottom);
       border: 0;
-      background: color-mix(in srgb, #41436A 72%, transparent);
+      background: color-mix(in srgb, var(--text) 72%, transparent);
       color: var(--text);
       display: flex;
       align-items: flex-start;
@@ -1556,7 +1532,7 @@
     }
 
     .dialog-card h2 { margin: 0 0 var(--space-sm); font-size: var(--font-heading); text-align: center; }
-    .dialog-card p { margin: 0; color: #41436A; line-height: 1.4; text-align: center; }
+    .dialog-card p { margin: 0; color: var(--text); line-height: 1.4; text-align: center; }
 
     .dialog-actions {
       display: grid;
@@ -1574,13 +1550,13 @@
     }
 
     .dialog-button.cancel {
-      border: 1.5px solid #41436A;
-      color: #41436A;
+      border: 1.5px solid var(--text);
+      color: var(--text);
     }
 
     .dialog-button.danger {
       background: var(--danger);
-      color: #F3E6DF;
+      color: var(--surface);
     }
     .toast {
       position: fixed;
@@ -1604,13 +1580,13 @@
     .toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
     #toast {
-      background: #F3E6DF;
-      color: #41436A;
+      background: var(--surface);
+      color: var(--text);
     }
 
     body.list-overview-mode #toast {
-      background: #41436A;
-      color: #F3E6DF;
+      background: var(--text);
+      color: var(--surface);
     }
 
     @keyframes rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -1840,6 +1816,9 @@
       const QUANTITY_UNITS = new Set(["Stück", "g", "kg", "ml", "l"]);
       const QUANTITY_ICON_MARKUP = '<svg class="quantity-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h6M14 7h6M4 17h10M18 17h2"/><circle cx="12" cy="7" r="2"/><circle cx="16" cy="17" r="2"/></svg>';
       const collator = new Intl.Collator("de", { sensitivity: "base" });
+      const rootStyle = getComputedStyle(document.documentElement);
+      const colors = Object.fromEntries(["text", "surface", "secondary", "orange", "confirmation"]
+        .map((name) => [name, rootStyle.getPropertyValue(`--${name}`).trim()]));
       const quantityFormatter = new Intl.NumberFormat("de-DE", {
         maximumFractionDigits: 3,
         useGrouping: false
@@ -1946,9 +1925,18 @@
       let suggestionFrame;
       let settingsWriteQueue = Promise.resolve();
       let externalRefreshTimer;
-      const dataChannel = typeof BroadcastChannel === "function"
-        ? new BroadcastChannel(`${DB_NAME}-changes`)
-        : null;
+      let appReady = false;
+      let updatePending = false;
+      let applyingUpdate = false;
+      let updateTimer;
+      let dataChannel = null;
+      try {
+        if (typeof BroadcastChannel === "function") {
+          dataChannel = new BroadcastChannel(`${DB_NAME}-changes`);
+        }
+      } catch (error) {
+        console.warn("Tab-Synchronisierung nicht verfügbar", error);
+      }
       const pageScrollLocks = new Set();
       let lockedPageScrollY = 0;
 
@@ -1956,6 +1944,8 @@
       const clean = (value) => String(value ?? "").normalize("NFC").replace(/\s+/gu, " ").trim();
       const comparable = (value) => clean(value).toLocaleLowerCase("de-DE");
       const byName = (a, b) => collator.compare(a.productName, b.productName);
+      const bySortOrder = (a, b) =>
+        (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name);
       const byCreated = (a, b) =>
         (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0)
         || collator.compare(a.productName || "", b.productName || "")
@@ -1997,7 +1987,7 @@
         try {
           if (dialog.classList.contains("dialog-card")) {
             dialog.dataset.previousThemeColor = els.themeColor.content;
-            els.themeColor.content = "#765A6E";
+            els.themeColor.content = colors.confirmation;
             document.documentElement.classList.add("confirmation-open");
             document.body.classList.add("confirmation-open");
           }
@@ -2037,14 +2027,8 @@
           return await operation();
         } finally {
           state.operations.delete(key);
+          scheduleAppUpdate();
         }
-      }
-
-      function request(requestObject) {
-        return new Promise((resolve, reject) => {
-          requestObject.onsuccess = () => resolve(requestObject.result);
-          requestObject.onerror = () => reject(requestObject.error);
-        });
       }
 
       function showFatalError(message) {
@@ -2117,10 +2101,6 @@
         });
       }
 
-      function store(name, mode = "readonly") {
-        return requireDatabase().transaction(name, mode).objectStore(name);
-      }
-
       function transact(storeNames, mode, operation) {
         return new Promise((resolve, reject) => {
           const changedStoreNames = Array.isArray(storeNames) ? storeNames : [storeNames];
@@ -2142,7 +2122,11 @@
             if (settled) return;
             settled = true;
             if (mode === "readwrite" && changedStoreNames.some((name) => name !== "settings")) {
-              dataChannel?.postMessage({ stores: changedStoreNames });
+              try {
+                dataChannel?.postMessage({ stores: changedStoreNames });
+              } catch (error) {
+                console.warn("Tab-Synchronisierung fehlgeschlagen", error);
+              }
             }
             resolve(result);
           };
@@ -2163,18 +2147,19 @@
         });
       }
 
+      function readStores(names) {
+        return transact(names, "readonly", (transaction) => {
+          const data = {};
+          names.forEach((name) => {
+            const reading = transaction.objectStore(name).getAll();
+            reading.onsuccess = () => { data[name] = reading.result; };
+          });
+          return data;
+        });
+      }
+
       async function getAll(name) {
-        return request(store(name).getAll());
-      }
-
-      async function getItemsForList(listId) {
-        const objectStore = store("items");
-        return request(objectStore.index("listId").getAll(listId));
-      }
-
-      async function getHistoryForList(listId) {
-        const objectStore = store("history");
-        return request(objectStore.index("listId").getAll(listId));
+        return (await readStores([name]))[name];
       }
 
       function deleteRecords(storeName, ids) {
@@ -2200,10 +2185,10 @@
         });
       }
 
-      function makeQuantityButton(label, onClick, className = "") {
+      function makeQuantityButton(label, onClick) {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = `quantity-button ${className}`.trim();
+        button.className = "quantity-button";
         button.innerHTML = QUANTITY_ICON_MARKUP;
         button.setAttribute("aria-label", label);
         button.addEventListener("click", onClick);
@@ -2224,60 +2209,61 @@
       }
 
       async function initialiseData() {
-        [state.products, state.groups] = await Promise.all([
-          getAll("products"),
-          getAll("groups")
-        ]);
-        state.groups.sort((a, b) =>
-          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
-        );
-        state.lists = (await getAll("lists")).sort((a, b) =>
-          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
-        );
+        const data = await readStores(["products", "groups", "lists", "settings"]);
+        state.products = data.products;
+        state.groups = data.groups;
+        state.groups.sort(bySortOrder);
+        state.lists = data.lists.sort(bySortOrder);
         let activeList = state.lists[0];
         if (!activeList) {
-          activeList = { id: id(), name: DEFAULT_LIST_NAME, sortOrder: 0 };
-          await put("lists", activeList);
-          state.lists = [activeList];
+          const initial = await transact(["lists"], "readwrite", (transaction) => {
+            const result = {};
+            const listStore = transaction.objectStore("lists");
+            const reading = listStore.getAll();
+            reading.onsuccess = () => {
+              result.lists = reading.result;
+              if (result.lists.length) return;
+              const list = { id: id(), name: DEFAULT_LIST_NAME, sortOrder: 0 };
+              listStore.put(list);
+              result.lists.push(list);
+            };
+            return result;
+          });
+          state.lists = initial.lists.sort(bySortOrder);
+          activeList = state.lists[0];
         }
-        const [lastOpened, savedQuickMode] = await Promise.all([
-          request(store("settings").get("lastOpenedListId")),
-          request(store("settings").get("quickMode"))
-        ]);
+        const lastOpened = data.settings.find((entry) => entry.key === "lastOpenedListId");
+        const savedQuickMode = data.settings.find((entry) => entry.key === "quickMode");
         if (["frequent", "category", "alphabetical"].includes(savedQuickMode?.value)) {
           state.quickMode = savedQuickMode.value;
         }
         activeList = state.lists.find((list) => list.id === lastOpened?.value) || activeList;
         state.list = activeList;
         await persistSetting("lastOpenedListId", activeList.id);
-        const data = await loadListData(activeList.id);
-        state.items = data.items;
-        state.history = data.history;
+        const listData = await loadListData(activeList.id);
+        state.items = listData.items;
+        state.history = listData.history;
       }
 
       async function refreshFromDatabase() {
         if (!state.db || state.fatalError) return;
-        const [products, groups, lists, lastOpened] = await Promise.all([
-          getAll("products"),
-          getAll("groups"),
-          getAll("lists"),
-          request(store("settings").get("lastOpenedListId"))
-        ]);
+        const loadToken = ++state.listLoadToken;
+        const { products, groups, lists, settings } = await readStores(["products", "groups", "lists", "settings"]);
+        const lastOpened = settings.find((entry) => entry.key === "lastOpenedListId");
         if (!lists.length) return;
-        groups.sort((a, b) =>
-          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
-        );
-        lists.sort((a, b) =>
-          (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || collator.compare(a.name, b.name)
-        );
+        if (loadToken !== state.listLoadToken) return;
+        groups.sort(bySortOrder);
+        lists.sort(bySortOrder);
         const activeList = lists.find((list) => list.id === state.list?.id)
           || lists.find((list) => list.id === lastOpened?.value)
           || lists[0];
+        const data = await loadListData(activeList.id, products);
+        if (loadToken !== state.listLoadToken) return;
         state.products = products;
         state.groups = groups;
+        if (!groups.some((group) => group.id === state.quantityGroupId)) state.quantityGroupId = null;
         state.lists = lists;
         state.list = activeList;
-        const data = await loadListData(activeList.id);
         state.items = data.items;
         state.history = data.history;
         renderItems();
@@ -2290,7 +2276,7 @@
       function scheduleExternalRefresh() {
         clearTimeout(externalRefreshTimer);
         externalRefreshTimer = setTimeout(() => {
-          if (state.operations.size) {
+          if (state.operations.size || state.inlineEditingListId || state.inlineEditingGroupId) {
             scheduleExternalRefresh();
             return;
           }
@@ -2300,22 +2286,27 @@
 
       if (dataChannel) dataChannel.onmessage = scheduleExternalRefresh;
 
-      async function loadListData(listId) {
-        const [items, history] = await Promise.all([getItemsForList(listId), getHistoryForList(listId)]);
-        const productNames = new Map(state.products.map((product) => [product.id, product.name]));
+      async function loadListData(listId, products = state.products) {
+        const data = await transact(["items", "history"], "readonly", (transaction) => {
+          const snapshot = {};
+          ["items", "history"].forEach((name) => {
+            const reading = transaction.objectStore(name).index("listId").getAll(listId);
+            reading.onsuccess = () => { snapshot[name] = reading.result; };
+          });
+          return snapshot;
+        });
+        const productNames = new Map(products.map((product) => [product.id, product.name]));
         return {
-          items: items
+          items: data.items
             .map((item) => ({ ...item, productName: productNames.get(item.productId) || "Unbekannter Artikel" }))
             .sort(byCreated),
-          history
+          history: data.history
         };
       }
 
       function renderItems() {
         els.listTitleText.textContent = state.showingLists ? "Listen" : state.list.name;
         els.listTitle.setAttribute("aria-expanded", String(state.showingLists));
-        els.openItems.classList.remove("grouped-card");
-        els.boughtItems.classList.remove("grouped-card");
         els.openItems.replaceChildren();
         els.boughtItems.replaceChildren();
         const openItems = state.items.filter((item) => !item.checked);
@@ -2357,7 +2348,6 @@
       }
 
       function renderGroupedRows(container, items) {
-        container.classList.add("grouped-card");
         const knownGroupIds = new Set(state.groups.map((group) => group.id));
         const groupByProductId = new Map(state.products.map((product) => [
           product.id,
@@ -2532,6 +2522,7 @@
 
           try {
             await putProductItemAndHistory(null, updatedItem, updatedHistory);
+            if (state.list.id !== currentItem.listId) return;
             state.items = state.items.map((entry) => entry.id === updatedItem.id ? updatedItem : entry);
             state.history = existingHistory
               ? state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry)
@@ -2720,7 +2711,7 @@
           try {
             const updatedGroup = { ...group, name, key: comparable(name) };
             await put("groups", updatedGroup);
-            Object.assign(group, updatedGroup);
+            state.groups = state.groups.map((entry) => entry.id === group.id ? updatedGroup : entry);
             state.inlineEditingGroupId = null;
             renderGroupManager();
             renderQuantityGroupOptions();
@@ -2764,7 +2755,6 @@
 
       function deleteGroup(groupId) {
         return runExclusive(`delete-group:${groupId}`, async () => {
-          const affectedProducts = state.products.filter((product) => product.groupId === groupId);
           const remainingGroups = state.groups
             .filter((group) => group.id !== groupId)
             .map((group, sortOrder) => ({ ...group, sortOrder }));
@@ -2773,7 +2763,13 @@
             groupStore.delete(groupId);
             remainingGroups.forEach((group) => groupStore.put(group));
             const productStore = transaction.objectStore("products");
-            affectedProducts.forEach((product) => productStore.put({ ...product, groupId: null }));
+            const reading = productStore.openCursor();
+            reading.onsuccess = () => {
+              const cursor = reading.result;
+              if (!cursor) return;
+              if (cursor.value.groupId === groupId) cursor.update({ ...cursor.value, groupId: null });
+              cursor.continue();
+            };
           });
           state.groups = remainingGroups;
           if (state.inlineEditingGroupId === groupId) state.inlineEditingGroupId = null;
@@ -2820,6 +2816,7 @@
       }
 
       function openGroupsPage() {
+        els.settingsSheet.setAttribute("aria-labelledby", "groupsPageTitle");
         renderGroupManager();
         els.settingsInner.classList.add("groups-mode");
         els.settingsMainPage.inert = true;
@@ -2830,6 +2827,7 @@
       }
 
       function closeGroupsPage({ restoreFocus = false } = {}) {
+        els.settingsSheet.setAttribute("aria-labelledby", "settingsTitle");
         state.inlineEditingGroupId = null;
         els.settingsInner.classList.remove("groups-mode");
         els.settingsMainPage.inert = false;
@@ -2865,8 +2863,9 @@
         return runExclusive("export-backup", async () => {
           els.exportBackup.disabled = true;
           try {
-            const values = await Promise.all(BACKUP_STORE_NAMES.map((name) => getAll(name)));
-            const data = Object.fromEntries(BACKUP_STORE_NAMES.map((name, index) => [name, values[index]]));
+            const data = await readStores(BACKUP_STORE_NAMES);
+            data.lists.sort(bySortOrder);
+            data.groups.sort(bySortOrder);
             data.products = data.products.map((product) => ({
               ...product,
               groupId: product.groupId ?? null
@@ -2939,8 +2938,8 @@
           if (!isObject(entry) || !validId(entry.id)) invalid();
           const name = clean(entry.name);
           if (!name || name.length > MAX_LIST_NAME_LENGTH) invalid();
-          return { id: entry.id, name, sortOrder: index };
-        });
+          return { id: entry.id, name, sortOrder: Number.isSafeInteger(entry.sortOrder) ? entry.sortOrder : index };
+        }).sort(bySortOrder).map((entry, sortOrder) => ({ ...entry, sortOrder }));
         if (!unique(lists.map((entry) => entry.id)) || !unique(lists.map((entry) => comparable(entry.name)))) invalid();
         const listIds = new Set(lists.map((entry) => entry.id));
 
@@ -2948,8 +2947,8 @@
           if (!isObject(entry) || !validId(entry.id)) invalid();
           const name = clean(entry.name);
           if (!name || name.length > MAX_PRODUCT_NAME_LENGTH) invalid();
-          return { id: entry.id, name, key: comparable(name), sortOrder: index };
-        });
+          return { id: entry.id, name, key: comparable(name), sortOrder: Number.isSafeInteger(entry.sortOrder) ? entry.sortOrder : index };
+        }).sort(bySortOrder).map((entry, sortOrder) => ({ ...entry, sortOrder }));
         if (!unique(groups.map((entry) => entry.id)) || !unique(groups.map((entry) => entry.key))) invalid();
         const groupIds = new Set(groups.map((entry) => entry.id));
 
@@ -3043,8 +3042,10 @@
         const backup = state.pendingBackupImport;
         if (!backup) return;
         return runExclusive("import-backup", async () => {
+          ++state.listLoadToken;
           els.confirmImportBackup.disabled = true;
           try {
+            await settingsWriteQueue.catch(console.error);
             await transact(BACKUP_STORE_NAMES, "readwrite", (transaction) => {
               BACKUP_STORE_NAMES.forEach((name) => transaction.objectStore(name).clear());
               backup.lists.forEach((entry) => transaction.objectStore("lists").put(entry));
@@ -3157,7 +3158,7 @@
 
       function showListOverview() {
         state.showingLists = true;
-        els.themeColor.content = "#F3E6DF";
+        els.themeColor.content = colors.surface;
         document.body.classList.add("list-overview-mode");
         els.openSection.hidden = true;
         els.boughtSection.hidden = true;
@@ -3172,7 +3173,7 @@
 
       function showShoppingList() {
         state.showingLists = false;
-        els.themeColor.content = "#41436A";
+        els.themeColor.content = colors.text;
         document.body.classList.remove("list-overview-mode");
         els.openSection.hidden = false;
         els.boughtSection.hidden = false;
@@ -3190,10 +3191,10 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      function makeListAction(label, iconPath, className = "") {
+      function makeListAction(label, iconPath) {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = `list-action ${className}`.trim();
+        button.className = "list-action";
         button.setAttribute("aria-label", label);
         button.innerHTML = `<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true">${iconPath}</svg>`;
         return button;
@@ -3330,7 +3331,8 @@
             try {
               const updatedList = { ...list, name };
               await put("lists", updatedList);
-              Object.assign(list, updatedList);
+              state.lists = state.lists.map((entry) => entry.id === list.id ? updatedList : entry);
+              if (state.list.id === list.id) state.list = updatedList;
               state.inlineEditingListId = null;
               renderItems();
               renderListOptions();
@@ -3406,6 +3408,7 @@
         const list = state.pendingListDelete;
         if (!list) return;
         return runExclusive(`delete-list:${list.id}`, async () => {
+          ++state.listLoadToken;
           els.confirmDeleteList.disabled = true;
           try {
             let nextLists = state.lists.filter((entry) => entry.id !== list.id);
@@ -3515,8 +3518,8 @@
         resetQuantityPage();
         setQuickMode(state.quickMode, { persist: false });
         if (!openLockedSheet(els.addSheet)) return;
-        els.themeColor.content = "#FE9677";
-        setAddSheetBackground("#FE9677");
+        els.themeColor.content = colors.orange;
+        setAddSheetBackground(colors.orange);
         focusProductSearch();
       }
 
@@ -3541,7 +3544,7 @@
           els.addSheet.classList.remove("closing");
           resetQuantityPage();
           clearAddSheetBackground();
-          els.themeColor.content = state.showingLists ? "#F3E6DF" : "#41436A";
+          els.themeColor.content = state.showingLists ? colors.surface : colors.text;
           els.openAdd.focus({ preventScroll: true });
         }, 220);
       }
@@ -3593,6 +3596,7 @@
       }
 
       function resetQuantityPage() {
+        els.addSheet.setAttribute("aria-labelledby", "addTitle");
         state.quantityProductName = null;
         state.quantityUnit = "Stück";
         state.quantityGroupId = null;
@@ -3624,9 +3628,10 @@
         state.quantityEntrySource = item ? "list" : "add";
         const product = state.products.find((entry) => entry.key === comparable(normalizedName));
         state.quantityGroupId = product?.groupId || null;
-        els.themeColor.content = "#984063";
-        setAddSheetBackground("#984063");
+        els.themeColor.content = colors.secondary;
+        setAddSheetBackground(colors.secondary);
         els.quantityTitle.textContent = normalizedName;
+        els.addSheet.setAttribute("aria-labelledby", "quantityTitle");
         els.quantityValue.value = item?.quantityValue ? formatQuantity(item.quantityValue) : "";
         syncQuantityClear();
         els.addWithQuantity.textContent = item ? "Speichern" : "Hinzufügen";
@@ -3648,8 +3653,8 @@
 
       function closeQuantityPage({ focus = true } = {}) {
         resetQuantityPage();
-        els.themeColor.content = "#FE9677";
-        setAddSheetBackground("#FE9677");
+        els.themeColor.content = colors.orange;
+        setAddSheetBackground(colors.orange);
         if (focus) focusProductSearch();
       }
 
@@ -3657,7 +3662,7 @@
         els.addForm.reset();
         resetQuantityPage();
         if (!els.addSheet.open && !openLockedSheet(els.addSheet)) return;
-        setAddSheetBackground("#FE9677");
+        setAddSheetBackground(colors.orange);
         openQuantityPage(item.productName, item);
       }
 
@@ -3684,6 +3689,7 @@
             if (updatedProduct) {
               state.products = state.products.map((entry) => entry.id === updatedProduct.id ? updatedProduct : entry);
             }
+            if (state.list.id !== item.listId) return;
             renderItems();
             closeAddSheet();
             if (quantityValue) showToast(`${item.productName} gespeichert`);
@@ -3873,6 +3879,7 @@
 
       async function addProduct(value, quantity = null, { focusSearch = true } = {}) {
         return runExclusive("add-product", async () => {
+          const listId = state.list.id;
           const productName = clean(value);
           if (!productName) {
             showToast("Bitte gib einen Artikelnamen ein");
@@ -3889,7 +3896,7 @@
           const openDuplicate = state.items.find((item) => !item.checked && comparable(item.productName) === productKey);
           if (openDuplicate) {
             renderSuggestions();
-            focusProductSearch();
+            if (focusSearch) focusProductSearch();
             return;
           }
 
@@ -3935,18 +3942,19 @@
               await putProductItemAndHistory(productToSave, reopenedItem, updatedHistory);
               if (newProduct) state.products.push(product);
               else if (productToSave) state.products = state.products.map((entry) => entry.id === product.id ? product : entry);
+              if (state.list.id !== listId) return;
               state.items = [...state.items.filter((item) => item.id !== reopenedItem.id), reopenedItem];
               if (updatedHistory) {
                 state.history = state.history.map((entry) => entry.id === updatedHistory.id ? updatedHistory : entry);
               }
               if (quantity) closeQuantityPage({ focus: false });
-              finishAddingProduct(reopenedItem.productName, Boolean(quantity));
+              finishAddingProduct(reopenedItem.productName, Boolean(quantity), { focusSearch });
               return;
             }
 
             const item = {
               id: id(),
-              listId: state.list.id,
+              listId,
               productId: product.id,
               productName,
               checked: false,
@@ -3956,7 +3964,7 @@
             };
             const historyItem = existingHistory ? null : {
               id: id(),
-              listId: state.list.id,
+              listId,
               productId: product.id,
               purchaseCount: 0,
               lastPurchasedAt: null
@@ -3964,6 +3972,7 @@
             await putProductItemAndHistory(productToSave, item, historyItem);
             if (newProduct) state.products.push(product);
             else if (productToSave) state.products = state.products.map((entry) => entry.id === product.id ? product : entry);
+            if (state.list.id !== listId) return;
             state.items.push(item);
             if (historyItem) state.history.push(historyItem);
             if (quantity) closeQuantityPage({ focus: false });
@@ -4204,6 +4213,17 @@
           state.db = await openDatabase();
           await initialiseData();
           renderItems();
+          appReady = true;
+          try {
+            const savedView = sessionStorage.getItem(`${DB_NAME}-update-view`);
+            sessionStorage.removeItem(`${DB_NAME}-update-view`);
+            if (savedView) {
+              const view = JSON.parse(savedView);
+              if (view.overview === true) showListOverview();
+              if (Number.isFinite(view.scrollY)) requestAnimationFrame(() => window.scrollTo(0, view.scrollY));
+            }
+          } catch {}
+          scheduleAppUpdate();
         } catch (error) {
           console.error(error);
           showFatalError(
@@ -4216,9 +4236,80 @@
 
       start();
 
+      function canApplyUpdate() {
+        return appReady && !document.hidden && !state.fatalError && !state.operations.size
+          && !state.inlineEditingListId && !state.inlineEditingGroupId
+          && !document.querySelector("dialog[open]")
+          && !document.activeElement?.matches("input, textarea, [contenteditable]");
+      }
+
+      function scheduleAppUpdate() {
+        if (!updatePending) return;
+        clearTimeout(updateTimer);
+        updateTimer = setTimeout(applyAppUpdate, 300);
+      }
+
+      async function applyAppUpdate() {
+        if (applyingUpdate || !updatePending || !canApplyUpdate()) return;
+        applyingUpdate = true;
+        try {
+          const pendingSettings = settingsWriteQueue;
+          await pendingSettings.catch(console.error);
+          if (!canApplyUpdate() || pendingSettings !== settingsWriteQueue) {
+            scheduleAppUpdate();
+            return;
+          }
+          try {
+            sessionStorage.setItem(`${DB_NAME}-update-view`, JSON.stringify({
+              overview: state.showingLists,
+              scrollY: window.scrollY
+            }));
+          } catch {}
+          updatePending = false;
+          location.reload();
+        } finally {
+          applyingUpdate = false;
+        }
+      }
+
+      document.addEventListener("focusout", scheduleAppUpdate);
+      document.querySelectorAll("dialog").forEach((dialog) => dialog.addEventListener("close", scheduleAppUpdate));
+
       if ("serviceWorker" in navigator && location.protocol !== "file:") {
+        let controller = navigator.serviceWorker.controller;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (controller) {
+            updatePending = true;
+            scheduleAppUpdate();
+          }
+          controller = navigator.serviceWorker.controller;
+        });
         addEventListener("load", () => {
-          navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" }).catch((error) => {
+          navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" }).then((registration) => {
+            let checking = false;
+            const checkUpdate = async () => {
+              scheduleAppUpdate();
+              if (checking || document.hidden || !navigator.onLine) return;
+              checking = true;
+              try { await registration.update(); }
+              catch (error) { console.warn("Update-Prüfung fehlgeschlagen", error); }
+              finally { checking = false; }
+            };
+            document.addEventListener("visibilitychange", () => {
+              if (document.hidden) return;
+              scheduleExternalRefresh();
+              scheduleAppUpdate();
+              checkUpdate();
+            });
+            window.addEventListener("pageshow", (event) => {
+              if (!event.persisted) return;
+              scheduleExternalRefresh();
+              scheduleAppUpdate();
+              checkUpdate();
+            });
+            window.addEventListener("online", checkUpdate);
+            setInterval(checkUpdate, 60000);
+          }).catch((error) => {
             console.error("Service Worker konnte nicht registriert werden", error);
           });
         });

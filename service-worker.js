@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = "einkauf-app-";
-const CACHE_NAME = `${CACHE_PREFIX}v1.10.11`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.10.13`;
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
@@ -17,7 +17,10 @@ const SCOPE_URL = new URL(self.registration.scope).href;
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) => cache.addAll(APP_SHELL.map((path) =>
+        new Request(new URL(path, self.registration.scope), { cache: "reload" })
+      )))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -28,7 +31,8 @@ self.addEventListener("activate", (event) => {
       .filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
       .map((name) => caches.delete(name)));
     if (self.registration.navigationPreload) {
-      await self.registration.navigationPreload.enable();
+      try { await self.registration.navigationPreload.enable(); }
+      catch (error) { console.warn("Navigation Preload nicht verfügbar", error); }
     }
     await self.clients.claim();
   })());
@@ -42,12 +46,14 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
+    const isAppDocument = url.pathname === new URL(SCOPE_URL).pathname || url.pathname === new URL(OFFLINE_URL).pathname;
+    if (!isAppDocument) return;
     event.respondWith((async () => {
       try {
         const response = await event.preloadResponse || await fetch(request);
+        if (!response.ok) return await caches.match(OFFLINE_URL, { cacheName: CACHE_NAME }) || response;
         const contentType = response?.headers.get("content-type") || "";
-        const isAppDocument = url.href === SCOPE_URL || url.href === OFFLINE_URL;
-        if (response?.ok && isAppDocument && contentType.includes("text/html")) {
+        if (contentType.includes("text/html")) {
           try {
             const cache = await caches.open(CACHE_NAME);
             await cache.put(OFFLINE_URL, response.clone());
@@ -57,13 +63,13 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       } catch {
-        return await caches.match(OFFLINE_URL) || Response.error();
+        return await caches.match(OFFLINE_URL, { cacheName: CACHE_NAME }) || Response.error();
       }
     })());
     return;
   }
 
   if (APP_SHELL_URLS.has(url.href)) {
-    event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+    event.respondWith(caches.match(request, { cacheName: CACHE_NAME }).then((cached) => cached || fetch(request)));
   }
 });
