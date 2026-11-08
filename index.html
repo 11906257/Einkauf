@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.15">
+  <meta name="application-version" content="1.10.16">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -104,12 +104,10 @@
     body.list-overview-mode {
       --bg: var(--surface);
       --accent: var(--text);
-      --accent-pressed: var(--secondary);
       background: var(--surface);
     }
 
-    body.list-overview-mode .list-title,
-    body.list-overview-mode .settings-trigger { color: var(--text); }
+    body.list-overview-mode .list-title { color: var(--text); }
 
     /* Confirmation overlays must also recolor the list overview's fixed header.
        Its normal cream theme otherwise remains visible behind the backdrop. */
@@ -493,8 +491,6 @@
       font: inherit;
     }
 
-    dialog:focus { outline: none; }
-
     dialog::backdrop {
       background: color-mix(in srgb, var(--text) 72%, transparent);
       backdrop-filter: blur(2px);
@@ -507,7 +503,6 @@
       -webkit-backdrop-filter: none;
     }
 
-    .settings-sheet,
     .settings-sheet .sheet-inner {
       background: var(--surface);
     }
@@ -527,7 +522,6 @@
       border: 0;
       border-radius: 0;
       background: var(--bg);
-      box-shadow: none;
     }
 
     .sheet[open] { animation: rise .22s cubic-bezier(.2, .75, .25, 1); }
@@ -681,7 +675,6 @@
     .segment.active {
       background: var(--text);
       color: var(--surface);
-      box-shadow: none;
     }
 
     .suggestions {
@@ -694,10 +687,6 @@
       overflow-y: auto;
       margin-top: var(--space-content);
       -webkit-overflow-scrolling: touch;
-    }
-
-    .suggestions:has(> .suggestion-category) {
-      background: transparent;
     }
 
     .suggestions:has(.suggestion, .suggestion-category)::after {
@@ -738,22 +727,14 @@
       background: var(--danger);
     }
 
-    .suggestion-swipe-row > .suggestion { min-height: inherit; }
-
     .suggestion-swipe-row > .swipe-reveal { z-index: 0; }
     .suggestion-swipe-row:first-child { border-radius: 14px 14px 0 0; }
     .suggestion-swipe-row:last-of-type { border-radius: 0 0 14px 14px; }
-    .suggestion-swipe-row.standalone,
-    .suggestions > .suggestion-swipe-row:only-child,
-    .suggestions > .suggestion-swipe-row:first-child:last-of-type { border-radius: 14px; }
-    .suggestion-swipe-row.standalone > .suggestion,
-    .suggestions > .suggestion-swipe-row:only-child > .suggestion,
-    .suggestions > .suggestion-swipe-row:first-child:last-of-type > .suggestion { border-radius: inherit; }
-    .suggestions:has(> .suggestion-category) > .suggestion-swipe-row,
+    .suggestions > .suggestion-swipe-row:only-child { border-radius: 14px; }
+    .suggestions > .suggestion-swipe-row:only-child > .suggestion { border-radius: inherit; }
     .suggestion-category .suggestion-swipe-row { border-radius: 0; }
 
-    .suggestions > .suggestion-category:first-child .suggestion-category-heading,
-    .suggestions > .suggestion-swipe-row:first-child {
+    .suggestions > .suggestion-category:first-child .suggestion-category-heading {
       border-radius: 14px 14px 0 0;
     }
 
@@ -932,13 +913,6 @@
 
     .quantity-clear[hidden] { display: none; }
 
-    .unit-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-sm);
-      margin-top: 0;
-    }
-
     .quantity-group-control {
       display: flex;
       flex-direction: column;
@@ -948,6 +922,7 @@
       border-top: 1px solid var(--surface);
     }
 
+    .unit-options,
     .group-options {
       display: flex;
       flex-wrap: wrap;
@@ -1022,9 +997,6 @@
 
     .back-button .small-icon { width: 20px; height: 20px; }
 
-    .search-page .back-button,
-    .quantity-page .back-button { color: var(--surface); }
-
     .search-page .sheet-header h2,
     .search-page .back-button { color: var(--text-on-accent); }
 
@@ -1033,7 +1005,6 @@
       opacity: 1;
     }
 
-    .quantity-page .sheet-header h2,
     .quantity-page .back-button,
     .quantity-page .quantity-add { color: var(--surface); }
 
@@ -1232,11 +1203,6 @@
       background: transparent;
     }
 
-    .group-edit-button .small-icon {
-      width: 20px;
-      height: 20px;
-    }
-
     .inline-group-input {
       min-width: 0;
       width: 100%;
@@ -1247,7 +1213,6 @@
       background: transparent;
       color: var(--text);
       caret-color: var(--secondary);
-      font: inherit;
       font-size: var(--font-body);
       font-weight: 650;
     }
@@ -1258,16 +1223,11 @@
     }
 
     .group-save-button {
-      border-radius: 10px;
       background: var(--text);
       color: var(--surface);
     }
 
-    .group-save-button .small-icon {
-      width: 20px;
-      height: 20px;
-      stroke-width: 2.7;
-    }
+    .group-save-button .small-icon { stroke-width: 2.7; }
 
     .group-add-tile {
       display: flex;
@@ -1318,7 +1278,7 @@
       background: var(--text);
       color: var(--surface);
       touch-action: pan-y;
-      transition: transform .16s ease, opacity .15s;
+      transition: transform .16s ease;
     }
 
     .list-option.dragging { transition: none; }
@@ -1429,18 +1389,10 @@
       margin-right: var(--control-gap);
     }
 
-    .list-icon-action {
-      display: grid;
-      width: var(--icon-button-size);
+    .rename-list {
       height: var(--icon-button-size);
       padding: 0;
-      place-items: center;
-      border: 0;
       border-radius: 11px;
-    }
-
-    .rename-list {
-      background: transparent;
       color: var(--surface);
     }
 
@@ -1449,13 +1401,7 @@
       color: var(--text);
     }
 
-    .rename-list .small-icon { width: 20px; height: 20px; }
-
-    .save-list-name .small-icon {
-      width: 20px;
-      height: 20px;
-      stroke-width: 2.7;
-    }
+    .save-list-name .small-icon { stroke-width: 2.7; }
 
     .small-icon {
       width: 20px;
@@ -1493,7 +1439,6 @@
 
     /* Native dialogs are hidden until opened; when open they own the full viewport. */
     .dialog-card:not([open]) { display: none; }
-    .dialog-card[open] { display: flex; }
 
     .dialog-card::backdrop {
       background: transparent;
@@ -1828,7 +1773,6 @@
         quantityUnit: "Stück",
         quantityGroupId: null,
         quantityEditingItemId: null,
-        quantityEntrySource: "add",
         settingsReturnToQuantity: false,
         operations: new Set()
       };
@@ -2085,14 +2029,7 @@
 
       function transact(storeNames, mode, operation) {
         return new Promise((resolve, reject) => {
-          const changedStoreNames = Array.isArray(storeNames) ? storeNames : [storeNames];
-          let transaction;
-          try {
-            transaction = requireDatabase().transaction(storeNames, mode);
-          } catch (error) {
-            reject(error);
-            return;
-          }
+          const transaction = requireDatabase().transaction(storeNames, mode);
           let result;
           let settled = false;
           const rejectOnce = (error) => {
@@ -2103,9 +2040,9 @@
           transaction.oncomplete = () => {
             if (settled) return;
             settled = true;
-            if (mode === "readwrite" && changedStoreNames.some((name) => name !== "settings")) {
+            if (mode === "readwrite" && storeNames.some((name) => name !== "settings")) {
               try {
-                dataChannel?.postMessage({ stores: changedStoreNames });
+                dataChannel?.postMessage("changed");
               } catch (error) {
                 console.warn("Tab-Synchronisierung fehlgeschlagen", error);
               }
@@ -2145,7 +2082,6 @@
       }
 
       function deleteRecords(storeName, ids) {
-        if (!ids.length) return Promise.resolve();
         return transact([storeName], "readwrite", (transaction) => {
           const objectStore = transaction.objectStore(storeName);
           ids.forEach((recordId) => objectStore.delete(recordId));
@@ -3203,7 +3139,7 @@
           reveal.setAttribute("aria-label", `${list.name} löschen`);
           const select = document.createElement("button");
           select.type = "button";
-          select.className = `list-select${list.id === state.list.id ? " active" : ""}`;
+          select.className = "list-select";
           select.textContent = list.name;
           if (list.id === state.list.id) select.setAttribute("aria-current", "true");
           select.addEventListener("click", () => {
@@ -3211,7 +3147,7 @@
             switchList(list);
           });
           const rename = makeListAction(`${list.name} umbenennen`, '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>');
-          rename.classList.add("list-icon-action", "rename-list");
+          rename.classList.add("rename-list");
           rename.addEventListener("click", () => startInlineRename(list));
           const actions = document.createElement("div");
           actions.className = "list-row-actions";
@@ -3535,7 +3471,6 @@
           els.addSheet.close();
           els.addSheet.classList.remove("closing");
           resetQuantityPage();
-          clearAddSheetBackground();
           els.themeColor.content = state.showingLists ? colors.surface : colors.text;
           els.openAdd.focus({ preventScroll: true });
         }, 220);
@@ -3590,10 +3525,8 @@
       function resetQuantityPage() {
         els.addSheet.setAttribute("aria-labelledby", "addTitle");
         state.quantityProductName = null;
-        state.quantityUnit = "Stück";
         state.quantityGroupId = null;
         state.quantityEditingItemId = null;
-        state.quantityEntrySource = "add";
         els.addSheet.classList.remove("quantity-mode");
         els.addForm.classList.remove("quantity-mode");
         els.quantityPage.setAttribute("aria-hidden", "true");
@@ -3617,7 +3550,6 @@
         }
         state.quantityProductName = normalizedName;
         state.quantityEditingItemId = item?.id || null;
-        state.quantityEntrySource = item ? "list" : "add";
         const product = state.products.find((entry) => entry.key === comparable(normalizedName));
         state.quantityGroupId = product?.groupId || null;
         els.themeColor.content = colors.secondary;
@@ -3749,23 +3681,11 @@
           matches.forEach((entry) => fragment.append(suggestionFor(entry)));
         }
 
-        if (!fragment.childNodes.length && (query || state.products.length || state.quickMode === "category")) {
+        if (!fragment.childElementCount && (query || state.quickMode === "category")) {
           const empty = document.createElement("div");
           empty.className = "suggestions-empty";
-          if (query) {
-            empty.textContent = "Kein Treffer";
-          } else if (state.quickMode === "category" && !state.products.length) {
-            empty.textContent = "Noch keine Artikelgruppen";
-          } else {
-            empty.textContent = "Alle bekannten Produkte stehen bereits auf der Liste";
-          }
+          empty.textContent = query ? "Kein Treffer" : "Noch keine Artikelgruppen";
           fragment.append(empty);
-        }
-        if (
-          fragment.childElementCount === 1
-          && fragment.firstElementChild.classList.contains("suggestion-swipe-row")
-        ) {
-          fragment.firstElementChild.classList.add("standalone");
         }
         els.suggestions.append(fragment);
         els.suggestions.setAttribute("aria-busy", "false");
@@ -4035,10 +3955,7 @@
         closeGroupsPage({ restoreFocus: true });
       });
       els.exportBackup.addEventListener("click", exportBackup);
-      els.importBackup.addEventListener("click", () => {
-        els.backupFile.value = "";
-        els.backupFile.click();
-      });
+      els.importBackup.addEventListener("click", () => els.backupFile.click());
       els.groupAddTile.addEventListener("click", createGroupAndEdit);
       els.backupFile.addEventListener("change", selectBackupFile);
       els.cleanupRareProducts.addEventListener("click", () => askCleanupProducts("rare"));
@@ -4103,7 +4020,7 @@
       });
       els.addForm.addEventListener("submit", submitAddForm);
       els.backFromQuantity.addEventListener("click", () => {
-        if (state.quantityEntrySource === "list") closeAddSheet();
+        if (state.quantityEditingItemId) closeAddSheet();
         else closeQuantityPage();
       });
       els.unitOptions.addEventListener("click", (event) => {
@@ -4290,13 +4207,11 @@
             document.addEventListener("visibilitychange", () => {
               if (document.hidden) return;
               scheduleExternalRefresh();
-              scheduleAppUpdate();
               checkUpdate();
             });
             window.addEventListener("pageshow", (event) => {
               if (!event.persisted) return;
               scheduleExternalRefresh();
-              scheduleAppUpdate();
               checkUpdate();
             });
             window.addEventListener("online", checkUpdate);

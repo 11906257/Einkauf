@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = "einkauf-app-";
-const CACHE_NAME = `${CACHE_PREFIX}v1.10.15`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.10.16`;
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
@@ -10,15 +10,15 @@ const APP_SHELL = [
   "./icons/icon-192.png",
   "./icons/icon-512.png"
 ];
-const APP_SHELL_URLS = new Set(APP_SHELL.map((path) => new URL(path, self.registration.scope).href));
-const OFFLINE_URL = new URL("./index.html", self.registration.scope).href;
-const SCOPE_URL = new URL(self.registration.scope).href;
+const SCOPE_URL = new URL(self.registration.scope);
+const OFFLINE_URL = new URL("./index.html", SCOPE_URL);
+const APP_SHELL_URLS = new Set(APP_SHELL.map((path) => new URL(path, SCOPE_URL).href));
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL.map((path) =>
-        new Request(new URL(path, self.registration.scope), { cache: "reload" })
+      .then((cache) => cache.addAll([...APP_SHELL_URLS].map((url) =>
+        new Request(url, { cache: "reload" })
       )))
       .then(() => self.skipWaiting())
   );
@@ -46,13 +46,13 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    const isAppDocument = url.pathname === new URL(SCOPE_URL).pathname || url.pathname === new URL(OFFLINE_URL).pathname;
+    const isAppDocument = url.pathname === SCOPE_URL.pathname || url.pathname === OFFLINE_URL.pathname;
     if (!isAppDocument) return;
     event.respondWith((async () => {
       try {
         const response = await event.preloadResponse || await fetch(request);
         if (!response.ok) return await caches.match(OFFLINE_URL, { cacheName: CACHE_NAME }) || response;
-        const contentType = response?.headers.get("content-type") || "";
+        const contentType = response.headers.get("content-type") || "";
         if (contentType.includes("text/html")) {
           try {
             const cache = await caches.open(CACHE_NAME);

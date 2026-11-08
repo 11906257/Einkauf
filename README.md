@@ -22,7 +22,7 @@ Updates auf derselben Website verwenden die vorhandene Datenbank weiter. Die Dat
 
 Ab Version 1.10.13 prüft die geöffnete App im Vordergrund jede Minute sowie beim Wiederöffnen und bei wiederhergestellter Internetverbindung auf Updates. Eine vollständig heruntergeladene Version wird automatisch übernommen, sobald keine Dialoge, Texteingaben oder Speichervorgänge offen sind. Listenansicht und Scrollposition bleiben nach Möglichkeit erhalten. Schlägt die Installation fehl, bleibt die bisherige Offline-Version verfügbar.
 
-Bereits laufende ältere Versionen enthalten diese automatische Neuladefunktion noch nicht. Beim ersten Wechsel auf Version 1.10.13 ist daher gegebenenfalls ein Neuladen oder erneutes Öffnen nötig; danach funktioniert die automatische Übernahme auch bei künftig geöffnet bleibenden Apps.
+Bei einem Wechsel von Versionen vor 1.10.13 kann einmaliges Neuladen oder erneutes Öffnen nötig sein.
 
 `index.html` und `service-worker.js` immer gemeinsam veröffentlichen. Beide müssen dieselbe Versionsnummer verwenden; die App benötigt keine zusätzlichen Pakete oder Server-Komponenten.
 
