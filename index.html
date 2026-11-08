@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.14">
+  <meta name="application-version" content="1.10.15">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -123,8 +123,6 @@
     button:disabled { cursor: default; opacity: .45; }
 
     :focus { outline: none; }
-
-    :focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 
     .app-error {
       margin-top: var(--space-content);
@@ -2621,9 +2619,10 @@
       function createGroupAndEdit() {
         if (state.operations.has("create-group")) return;
         const name = nextDefaultGroupName();
-        const group = { id: id(), name, key: comparable(name), sortOrder: state.groups.length };
+        const sortOrder = Number(state.groups.at(-1)?.sortOrder ?? -1) + 1;
+        const group = { id: id(), name, key: comparable(name), sortOrder };
         state.groups.push(group);
-        startInlineGroupRename(group);
+        startInlineGroupRename(group, { isNew: true });
         return runExclusive("create-group", async () => {
           try {
             await put("groups", group);
@@ -2642,7 +2641,7 @@
         renderGroupManager();
       }
 
-      function startInlineGroupRename(group) {
+      function startInlineGroupRename(group, { isNew = false } = {}) {
         state.inlineEditingGroupId = null;
         renderGroupManager();
         const shell = [...els.groupManager.querySelectorAll(".group-swipe-row")]
@@ -2668,6 +2667,10 @@
         save.innerHTML = '<svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
         save.setAttribute("aria-label", "Artikelgruppenname sichern");
         row.replaceChildren(input, save);
+        if (isNew) {
+          els.groupManager.prepend(shell);
+          els.settingsGroupsPage.scrollTop = 0;
+        }
 
         const persist = async () => runExclusive(`rename-group:${group.id}`, async () => {
           const name = clean(input.value);
@@ -3238,9 +3241,10 @@
 
       function createListAndEdit() {
         if (state.operations.has("create-list")) return;
-        const list = { id: id(), name: nextDefaultListName(), sortOrder: state.lists.length };
+        const sortOrder = Number(state.lists.at(-1)?.sortOrder ?? -1) + 1;
+        const list = { id: id(), name: nextDefaultListName(), sortOrder };
         state.lists.push(list);
-        startInlineRename(list);
+        startInlineRename(list, { isNew: true });
         return runExclusive("create-list", async () => {
           try {
             await put("lists", list);
@@ -3259,7 +3263,7 @@
         renderListOptions();
       }
 
-      function startInlineRename(list) {
+      function startInlineRename(list, { isNew = false } = {}) {
         state.inlineEditingListId = null;
         renderListOptions();
         const shell = [...els.listOptions.querySelectorAll(".list-option-shell")]
@@ -3285,6 +3289,10 @@
         saveAction.setAttribute("aria-label", "Listenname sichern");
         select.replaceWith(input);
         actions.replaceWith(saveAction);
+        if (isNew) {
+          els.listOptions.prepend(shell);
+          window.scrollTo(0, 0);
+        }
 
         const save = async () => {
           return runExclusive(`rename-list:${list.id}`, async () => {
