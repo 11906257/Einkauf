@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Einkauf">
-  <meta name="application-version" content="1.10.13">
+  <meta name="application-version" content="1.10.14">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" sizes="180x180">
@@ -46,7 +46,6 @@
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --topbar-height: 82px;
-      --app-bottom-space: 112px;
       --sheet-header-height: 52px;
       --field-height: 58px;
       --touch-size: 44px;
@@ -57,8 +56,6 @@
       --category-header-height: 32px;
       --settings-row-height: 72px;
       --list-row-height: 82px;
-      --floating-button-size: 62px;
-      --floating-button-offset: 22px;
       --dialog-button-height: 46px;
       --control-gap: 12px;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
@@ -154,7 +151,7 @@
       width: min(100%, 520px);
       min-height: 100vh;
       margin: 0 auto;
-      padding: calc(var(--topbar-height) + var(--safe-top)) var(--page-gutter) calc(var(--app-bottom-space) + var(--safe-bottom));
+      padding: calc(var(--topbar-height) + var(--safe-top)) var(--page-gutter) calc(var(--page-gutter) + var(--safe-bottom));
     }
 
     .topbar {
@@ -167,6 +164,7 @@
       min-height: calc(var(--topbar-height) + var(--safe-top));
       align-items: center;
       justify-content: space-between;
+      gap: var(--space-sm);
       padding: calc(var(--space-sm) + var(--safe-top)) var(--page-gutter) 0;
       background: var(--bg);
       transform: translateX(-50%);
@@ -191,7 +189,7 @@
       display: inline-flex;
       align-items: center;
       gap: var(--space-sm);
-      max-width: 100%;
+      min-width: 0;
       padding: var(--space-sm) 2px;
       border: 0;
       background: transparent;
@@ -213,6 +211,7 @@
       content: "";
       width: 9px;
       height: 9px;
+      flex-shrink: 0;
       margin: -5px 0 0 2px;
       border-right: 2.5px solid var(--surface);
       border-bottom: 2.5px solid var(--surface);
@@ -388,9 +387,7 @@
 
     .item-name {
       display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
       font-size: var(--font-body);
       line-height: 1.3;
       color: var(--text);
@@ -470,13 +467,10 @@
     }
 
     .add-button {
-      position: fixed;
-      z-index: 8;
-      right: max(var(--floating-button-offset), calc((100vw - 520px) / 2 + var(--floating-button-offset)));
-      bottom: calc(var(--floating-button-offset) + var(--safe-bottom));
       display: flex;
-      width: var(--floating-button-size);
-      height: var(--floating-button-size);
+      width: var(--touch-size);
+      height: var(--touch-size);
+      flex: 0 0 auto;
       padding: 0;
       align-items: center;
       justify-content: center;
@@ -559,6 +553,13 @@
       transition: opacity .22s ease, transform .24s cubic-bezier(.2, .75, .25, 1);
     }
 
+    .quantity-page,
+    .settings-main-page,
+    .settings-groups-page {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
     .search-page {
       padding-bottom: 0;
       background: var(--orange);
@@ -593,12 +594,10 @@
 
     .sheet-header h2 {
       margin: 0;
-      overflow: hidden;
+      overflow-wrap: anywhere;
       color: var(--surface);
       font-size: var(--font-heading);
       text-align: center;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .search-field {
@@ -666,7 +665,7 @@
       height: auto;
       min-height: 0;
       min-width: 0;
-      flex: 1 1 0;
+      flex: 1 1 auto;
       padding: 0;
       align-items: center;
       justify-content: center;
@@ -821,27 +820,15 @@
 
     .suggestion-name {
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
       font-size: var(--font-body);
       color: var(--text);
     }
 
     .suggestion.add-new .suggestion-main { color: var(--text); font-weight: 400; }
 
-    .suggestion.already-listed .suggestion-main {
-      opacity: .46;
-      cursor: default;
-    }
-
-    .suggestion.already-listed .suggestion-status {
-      position: absolute;
-      left: 50%;
-      z-index: 1;
-      pointer-events: none;
-      transform: translateX(-50%);
-    }
+    .suggestion.already-listed .suggestion-main { cursor: default; }
+    .suggestion.already-listed .suggestion-name { color: var(--muted); }
 
     .quantity-button {
       display: grid;
@@ -969,6 +956,11 @@
       gap: var(--space-sm);
     }
 
+    .group-chip {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
     .group-chip,
     .unit-chip {
       min-height: var(--touch-size-small);
@@ -1068,12 +1060,9 @@
     .settings-groups-page { background: var(--surface); }
 
     .settings-groups-page {
-      overflow-x: hidden;
-      overflow-y: auto;
       opacity: 0;
       pointer-events: none;
       transform: translateX(100%);
-      -webkit-overflow-scrolling: touch;
     }
 
     .settings-inner.groups-mode .settings-main-page {
@@ -1217,11 +1206,9 @@
 
 
     .group-manager-name {
-      overflow: hidden;
       font-size: var(--font-body);
       font-weight: 650;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
     }
 
     .group-manager-button {
@@ -1388,15 +1375,13 @@
 
     .list-select {
       min-width: 0;
-      height: var(--list-row-height);
-      overflow: hidden;
-      padding: 0 8px 0 18px;
+      min-height: var(--list-row-height);
+      padding: var(--space-sm) 8px var(--space-sm) 18px;
       color: var(--surface);
       font-size: var(--font-list);
       font-weight: 750;
       text-align: left;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
     }
 
     .inline-list-input {
@@ -1604,6 +1589,7 @@
   <main class="app">
     <header class="topbar">
       <button class="list-title" id="listTitle" type="button" aria-expanded="false"><span class="list-title-text" id="listTitleText">Einkauf</span></button>
+      <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen"><svg class="plus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
       <button class="settings-trigger" id="openSettings" type="button" aria-label="Einstellungen öffnen" hidden><svg class="small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </header>
 
@@ -1631,8 +1617,6 @@
       <div class="list-options" id="listOptions"></div>
     </section>
   </main>
-
-  <button class="add-button" id="openAdd" type="button" aria-label="Artikel hinzufügen"><svg class="plus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
 
   <dialog class="sheet" id="addSheet" aria-labelledby="addTitle">
     <form class="sheet-inner" id="addForm" autocomplete="off" novalidate>
@@ -3695,6 +3679,7 @@
             if (quantityValue) showToast(`${item.productName} gespeichert`);
           } catch (error) {
             console.error(error);
+            showToast("Änderungen konnten nicht gespeichert werden");
           }
         });
       }
@@ -3721,8 +3706,8 @@
         const query = comparable(els.productName.value);
         els.clearSearch.hidden = els.productName.value.length === 0;
         const openItems = state.items.filter((item) => !item.checked);
-        const openProductIds = new Set(openItems.map((item) => item.productId));
-        const openNames = new Set(openItems.map((item) => comparable(item.productName)));
+        const openByProduct = new Map(openItems.map((item) => [item.productId, item]));
+        const openByName = new Map(openItems.map((item) => [comparable(item.productName), item]));
         const frequencyByProduct = new Map(state.history.map((entry) => [entry.productId, Number(entry.purchaseCount || 0)]));
         const knownProducts = state.products.map((product) => ({
           productId: product.id,
@@ -3731,7 +3716,11 @@
           groupId: product.groupId || null,
           purchaseCount: frequencyByProduct.get(product.id) || 0
         }));
-        let matches = knownProducts.filter((entry) => !query || entry.productKey.includes(query));
+        const matches = knownProducts.filter((entry) => !query || entry.productKey.includes(query));
+        const suggestionFor = (entry) => createSuggestion(entry.productName, {
+          productId: entry.productId,
+          listedItem: openByProduct.get(entry.productId) || openByName.get(entry.productKey)
+        });
 
         if (state.quickMode !== "category") {
           matches.sort(state.quickMode === "frequent"
@@ -3742,17 +3731,14 @@
         els.suggestions.replaceChildren();
         const fragment = document.createDocumentFragment();
         const exactProductMatch = knownProducts.some((entry) => entry.productKey === query);
-        if (query && !openNames.has(query) && !exactProductMatch) {
+        if (query && !openByName.has(query) && !exactProductMatch) {
           fragment.append(createSuggestion(clean(els.productName.value), { isNew: true }));
         }
 
         if (state.quickMode === "category") {
-          appendCategorySuggestions(fragment, matches, openProductIds, openNames);
+          appendCategorySuggestions(fragment, matches, suggestionFor);
         } else {
-          matches.forEach((entry) => {
-            const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
-            fragment.append(createSuggestion(entry.productName, { isOnList, productId: entry.productId }));
-          });
+          matches.forEach((entry) => fragment.append(suggestionFor(entry)));
         }
 
         if (!fragment.childNodes.length && (query || state.products.length || state.quickMode === "category")) {
@@ -3778,13 +3764,18 @@
         scheduleScrollFade();
       }
 
-      function appendCategorySuggestions(fragment, matches, openProductIds, openNames) {
+      function appendCategorySuggestions(fragment, matches, suggestionFor) {
         const knownGroupIds = new Set(state.groups.map((group) => group.id));
+        const matchesByGroup = new Map();
+        for (const entry of matches) {
+          const groupId = knownGroupIds.has(entry.groupId) ? entry.groupId : null;
+          if (!matchesByGroup.has(groupId)) matchesByGroup.set(groupId, []);
+          matchesByGroup.get(groupId).push(entry);
+        }
         [...state.groups, { id: null, name: "Sonstiges" }].forEach((group) => {
-          const groupMatches = matches
-            .filter((entry) => (knownGroupIds.has(entry.groupId) ? entry.groupId : null) === group.id)
-            .sort((a, b) => Number(b.purchaseCount || 0) - Number(a.purchaseCount || 0) || byName(a, b));
-          if (!groupMatches.length) return;
+          const groupMatches = matchesByGroup.get(group.id);
+          if (!groupMatches) return;
+          groupMatches.sort((a, b) => b.purchaseCount - a.purchaseCount || byName(a, b));
           const section = document.createElement("div");
           section.className = "suggestion-category";
           const heading = document.createElement("div");
@@ -3792,10 +3783,7 @@
           heading.textContent = group.name;
           const rows = document.createElement("div");
           rows.className = "suggestion-category-items";
-          groupMatches.forEach((entry) => {
-            const isOnList = openProductIds.has(entry.productId) || openNames.has(entry.productKey);
-            rows.append(createSuggestion(entry.productName, { isOnList, productId: entry.productId }));
-          });
+          groupMatches.forEach((entry) => rows.append(suggestionFor(entry)));
           section.append(heading, rows);
           fragment.append(section);
         });
@@ -3809,11 +3797,11 @@
         });
       }
 
-      function createSuggestion(productName, { isOnList = false, isNew = false, productId = null } = {}) {
+      function createSuggestion(productName, { listedItem, isNew = false, productId = null } = {}) {
         const shell = document.createElement("div");
         shell.className = "suggestion-swipe-row";
         const row = document.createElement("div");
-        row.className = `suggestion${isOnList ? " already-listed" : ""}${isNew ? " add-new" : ""}`;
+        row.className = `suggestion${listedItem ? " already-listed" : ""}${isNew ? " add-new" : ""}`;
         const main = document.createElement("button");
         main.type = "button";
         main.className = "suggestion-main";
@@ -3823,21 +3811,16 @@
         main.append(name);
         row.append(main);
 
-        if (isOnList) {
+        if (listedItem) {
           main.setAttribute("aria-disabled", "true");
           const status = document.createElement("span");
           status.className = "suggestion-status";
           status.textContent = "Auf der Liste";
           main.append(status);
-          const listedItem = state.items.find((item) =>
-            !item.checked && (item.productId === productId || comparable(item.productName) === comparable(productName))
-          );
-          if (listedItem) {
-            row.append(makeQuantityButton(
-              `Menge und Artikelgruppe für ${productName} ändern`,
-              () => openQuantityEditor(listedItem)
-            ));
-          }
+          row.append(makeQuantityButton(
+            `Menge und Artikelgruppe für ${productName} ändern`,
+            () => openQuantityEditor(listedItem)
+          ));
         } else {
           main.addEventListener("click", () => {
             if (row.dataset.suppressClick === "true" || row.style.transform) return;
@@ -3979,6 +3962,7 @@
             finishAddingProduct(productName, Boolean(quantity), { focusSearch });
           } catch (error) {
             console.error(error);
+            showToast("Artikel konnte nicht hinzugefügt werden");
           }
         });
       }
